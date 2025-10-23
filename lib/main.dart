@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:keepassux/ui/pages/favorites_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
+import 'package:keepassux/ui/pages/start_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +17,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: FavoritesPage(),
+      home: BlocProvider(
+        create: (context) => KeePassBloc(),
+        child: StartPage(),
+      ),
     );
   }
 }
