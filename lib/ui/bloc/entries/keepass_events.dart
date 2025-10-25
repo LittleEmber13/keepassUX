@@ -8,3 +8,7 @@ class LoadDatabase extends KeePassEvent {
 
   LoadDatabase({required this.bytes, required this.password});
 }
+
+class GetRootGroup extends KeePassEvent {
+  GetRootGroup();
+}

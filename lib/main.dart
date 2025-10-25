@@ -12,14 +12,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'KeepassUX',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: BlocProvider(
-        create: (context) => KeePassBloc(),
-        child: StartPage(),
+    return BlocProvider(
+      create: (context) => KeePassBloc(),
+      child: MaterialApp(
+        title: 'KeepassUX',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: StartPage(),
       ),
     );
   }

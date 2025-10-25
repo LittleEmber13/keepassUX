@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
+import 'package:keepassux/ui/pages/entries_page.dart';
 
 import '../bloc/entries/keepass_events.dart';
 
@@ -15,6 +17,26 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<KeePassBloc, KeePassState>(
+      listener: (context, state) {
+        if (state is KeePassLoaded) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const EntriesPage()),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is KeePassLoading) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        } else {
+          return _page();
+        }
+      },
+    );
+  }
+
+  Widget _page() {
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
