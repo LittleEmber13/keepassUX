@@ -6,6 +6,9 @@ import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
+import 'package:keepassux/ui/pages/add_entry.dart';
+import 'package:keepassux/ui/widgets/custom_app_bar.dart';
+import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({super.key});
@@ -62,110 +65,11 @@ class _EntriesPageState extends State<EntriesPage> {
               left: 24,
               right: 24,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 5,
-                            spreadRadius: 1,
-                            offset: Offset(1, 2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
-                        ),
-                        child: Icon(FeatherIcons.logOut, color: Colors.black),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Hola,',
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                        ),
-                        Text(
-                          'Bonifacio',
-                          style: TextStyle(color: Colors.black54, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            child: CustomAppBar(),
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(
-          bottom: 24,
-          left: 24,
-          right: 24,
-          top: 24,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 5,
-                spreadRadius: 1,
-                offset: Offset(1, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(FontAwesomeIcons.star),
-                Icon(FontAwesomeIcons.folder, color: Colors.grey),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Icon(Icons.add, color: Colors.white, size: 39),
-                  ),
-                ),
-                Icon(FontAwesomeIcons.user, color: Colors.grey),
-                Icon(FeatherIcons.settings, color: Colors.grey, size: 26),
-              ],
-            ),
-          ),
-        ),
-      ),
+      bottomNavigationBar: CustomBottomNavigationBar(),
       body: Column(
         children: [
           Padding(
