@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/utils.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 
@@ -17,18 +21,41 @@ class _AddEntryPageState extends State<AddEntryPage> {
   bool includeNumbers = true;
   bool includeSpecial = false;
 
+  TextEditingController titleController = TextEditingController();
+  TextEditingController userController = TextEditingController();
+  TextEditingController urlController = TextEditingController();
+  TextEditingController notesController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   bool obscurePassword = false;
 
   @override
   void dispose() {
+    titleController.dispose();
+    urlController.dispose();
+    urlController.dispose();
+    notesController.dispose();
     passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<KeePassBloc, KeePassState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        print("klk");
+        print(state.runtimeType);
+        if (state is KeePassLoading) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        } else {
+          return _page();
+        }
+      },
+    );
+  }
+
+  Widget _page() {
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -45,16 +72,23 @@ class _AddEntryPageState extends State<AddEntryPage> {
                     children: [
                       const Text("Información"),
                       const SizedBox(height: 16),
-                      _buildTextField(label: "Título"),
+                      _buildTextField(
+                        label: "Título",
+                        controller: titleController,
+                      ),
                       const SizedBox(height: 16),
                       _buildTextField(
                         label: "Usuario",
-                        initialValue: "Test@gmail.com",
+                        controller: userController,
                       ),
                       const SizedBox(height: 16),
-                      _buildTextField(label: "URL"),
+                      _buildTextField(label: "URL", controller: urlController),
                       const SizedBox(height: 16),
-                      _buildTextField(label: "Notas", maxLines: 3),
+                      _buildTextField(
+                        label: "Notas",
+                        controller: notesController,
+                        maxLines: 3,
+                      ),
                     ],
                   ),
                 ),
@@ -135,7 +169,17 @@ class _AddEntryPageState extends State<AddEntryPage> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      context.read<KeePassBloc>().add(
+                        AddEntry(
+                          title: titleController.text,
+                          userName: userController.text,
+                          url: urlController.text,
+                          notes: notesController.text,
+                          password: passwordController.text,
+                        ),
+                      );
+                    },
                     child: const Text(
                       "Guardar",
                       style: TextStyle(fontSize: 16),
@@ -171,15 +215,12 @@ class _AddEntryPageState extends State<AddEntryPage> {
   }
 
   Widget _buildTextField({
+    required TextEditingController controller,
     required String label,
-    String? initialValue,
     int maxLines = 1,
   }) {
     return TextField(
-      controller:
-          initialValue != null
-              ? TextEditingController(text: initialValue)
-              : null,
+      controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
         filled: true,
@@ -226,7 +267,11 @@ class _AddEntryPageState extends State<AddEntryPage> {
               fillColor: Color(0xFFF3F5F9),
               labelText: "Contraseña",
               suffixIcon: IconButton(
-                icon:  Icon(obscurePassword == true ? Icons.visibility_outlined : Icons.visibility_off_outlined,),
+                icon: Icon(
+                  obscurePassword == true
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
                 onPressed: () {
                   setState(() {
                     obscurePassword = !obscurePassword;
