@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:keepassux/ui/utils.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 
 class AddEntryPage extends StatefulWidget {
@@ -10,11 +11,21 @@ class AddEntryPage extends StatefulWidget {
 }
 
 class _AddEntryPageState extends State<AddEntryPage> {
-  double passwordLength = 14;
+  int passwordLength = 14;
   bool includeUppercase = true;
   bool includeLowercase = true;
   bool includeNumbers = true;
   bool includeSpecial = false;
+
+  TextEditingController passwordController = TextEditingController();
+
+  bool obscurePassword = false;
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,12 +91,12 @@ class _AddEntryPageState extends State<AddEntryPage> {
                           ),
                           Expanded(
                             child: Slider(
-                              value: passwordLength,
+                              value: passwordLength.toDouble(),
                               min: 4,
                               max: 32,
                               activeColor: Colors.teal,
                               onChanged: (v) {
-                                setState(() => passwordLength = v);
+                                setState(() => passwordLength = v.toInt());
                               },
                             ),
                           ),
@@ -193,18 +204,34 @@ class _AddEntryPageState extends State<AddEntryPage> {
   Widget _buildPasswordField() {
     return Row(
       children: [
-        InkWell(onTap: () {}, child: Icon(FeatherIcons.refreshCcw)),
+        InkWell(
+          onTap: () {
+            passwordController.text = generatePassword(
+              upperCase: includeUppercase,
+              lowerCase: includeLowercase,
+              numeric: includeNumbers,
+              special: includeSpecial,
+              length: passwordLength,
+            );
+          },
+          child: Icon(FeatherIcons.refreshCcw),
+        ),
         SizedBox(width: 16),
         Expanded(
           child: TextField(
-            obscureText: true,
+            controller: passwordController,
+            obscureText: obscurePassword,
             decoration: InputDecoration(
               filled: true,
               fillColor: Color(0xFFF3F5F9),
               labelText: "Contraseña",
               suffixIcon: IconButton(
-                icon: const Icon(Icons.visibility_outlined),
-                onPressed: () {},
+                icon:  Icon(obscurePassword == true ? Icons.visibility_outlined : Icons.visibility_off_outlined,),
+                onPressed: () {
+                  setState(() {
+                    obscurePassword = !obscurePassword;
+                  });
+                },
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
