@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/pages/add_entry.dart';
+import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:keepassux/ui/pages/settings_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({super.key});
@@ -9,12 +11,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 24,
-        left: 24,
-        right: 24,
-        top: 24,
-      ),
+      padding: const EdgeInsets.only(bottom: 24, left: 24, right: 24, top: 24),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -34,7 +31,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(FontAwesomeIcons.star),
-              Icon(FontAwesomeIcons.folder, color: Colors.grey),
+              InkWell(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EntriesPage(),
+                    ),
+                  );
+                },
+                child: Icon(FontAwesomeIcons.folder, color: Colors.grey),
+              ),
               InkWell(
                 onTap: () {
                   Navigator.push(
@@ -56,7 +63,21 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 ),
               ),
               Icon(FontAwesomeIcons.user, color: Colors.grey),
-              Icon(FeatherIcons.settings, color: Colors.grey, size: 26),
+              InkWell(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsPage(),
+                    ),
+                  );
+                },
+                child: Icon(
+                  FeatherIcons.settings,
+                  color: Colors.grey,
+                  size: 26,
+                ),
+              ),
             ],
           ),
         ),

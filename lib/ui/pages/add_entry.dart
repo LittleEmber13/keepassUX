@@ -44,8 +44,6 @@ class _AddEntryPageState extends State<AddEntryPage> {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {},
       builder: (context, state) {
-        print("klk");
-        print(state.runtimeType);
         if (state is KeePassLoading) {
           return Scaffold(body: Center(child: CircularProgressIndicator()));
         } else {
@@ -64,7 +62,11 @@ class _AddEntryPageState extends State<AddEntryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomAppBar(),
+                CustomAppBar(
+                  onTapExit: () {
+                    Navigator.pop(context);
+                  },
+                ),
                 const SizedBox(height: 24),
                 _buildCard(
                   child: Column(

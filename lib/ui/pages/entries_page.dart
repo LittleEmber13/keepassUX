@@ -65,7 +65,11 @@ class _EntriesPageState extends State<EntriesPage> {
               left: 24,
               right: 24,
             ),
-            child: CustomAppBar(),
+            child: CustomAppBar(
+              onTapExit: () {
+                /// TODO
+              },
+            ),
           ),
         ),
       ),

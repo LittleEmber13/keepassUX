@@ -20,7 +20,7 @@ class _StartPageState extends State<StartPage> {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
         if (state is KeePassLoaded) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const EntriesPage()),
           );

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({super.key});
+  const CustomAppBar({super.key, required this.onTapExit});
+
+  final Function() onTapExit;
 
   @override
   Widget build(BuildContext context) {
@@ -12,25 +14,33 @@ class CustomAppBar extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                    offset: Offset(1, 2),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 16,
+            InkWell(
+              onTap: onTapExit,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                      offset: Offset(1, 2),
+                    ),
+                  ],
                 ),
-                child: Icon(FeatherIcons.logOut, color: Colors.black),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                  child: Icon(
+                    Navigator.canPop(context)
+                        ? Icons.arrow_back
+                        : FeatherIcons.logOut,
+                    color: Colors.black,
+                  ),
+                ),
               ),
             ),
             SizedBox(width: 16),
