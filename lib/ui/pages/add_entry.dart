@@ -6,6 +6,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/utils.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
+import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 
 class AddEntryPage extends StatefulWidget {
   const AddEntryPage({super.key});
@@ -55,143 +56,148 @@ class _AddEntryPageState extends State<AddEntryPage> {
 
   Widget _page() {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomAppBar(
-                  onTapExit: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                const SizedBox(height: 24),
-                _buildCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Información"),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        label: "Título",
-                        controller: titleController,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        label: "Usuario",
-                        controller: userController,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(label: "URL", controller: urlController),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        label: "Notas",
-                        controller: notesController,
-                        maxLines: 3,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Contraseña"),
-                      const SizedBox(height: 16),
-                      _buildPasswordField(),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          const Text("Security"),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: LinearProgressIndicator(
-                              value: 0.8,
-                              color: Colors.greenAccent,
-                              backgroundColor: Colors.grey[300],
-                              minHeight: 6,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Text(
-                            passwordLength.toInt().toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                            child: Slider(
-                              value: passwordLength.toDouble(),
-                              min: 4,
-                              max: 32,
-                              activeColor: Colors.teal,
-                              onChanged: (v) {
-                                setState(() => passwordLength = v.toInt());
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Toggles
-                      _buildToggle("A-Z", includeUppercase, (v) {
-                        setState(() => includeUppercase = v);
-                      }),
-                      _buildToggle("a-z", includeLowercase, (v) {
-                        setState(() => includeLowercase = v);
-                      }),
-                      _buildToggle("0-9", includeNumbers, (v) {
-                        setState(() => includeNumbers = v);
-                      }),
-                      _buildToggle("Special characters", includeSpecial, (v) {
-                        setState(() => includeSpecial = v);
-                      }),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Save button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onPressed: () {
-                      context.read<KeePassBloc>().add(
-                        AddEntry(
-                          title: titleController.text,
-                          userName: userController.text,
-                          url: urlController.text,
-                          notes: notesController.text,
-                          password: passwordController.text,
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      "Guardar",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(116),
+        child: Container(
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 52,
+              bottom: 6,
+              left: 24,
+              right: 24,
+            ),
+            child: CustomAppBar(
+              onTapExit: () {
+                Navigator.pop(context);
+              },
             ),
           ),
         ),
+      ),
+      body: Column(
+        children: [
+          CustomAppScroll(
+            children: [
+              _buildCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Información"),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      label: "Título",
+                      controller: titleController,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      label: "Usuario",
+                      controller: userController,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextField(label: "URL", controller: urlController),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      label: "Notas",
+                      controller: notesController,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Contraseña"),
+                    const SizedBox(height: 16),
+                    _buildPasswordField(),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const Text("Security"),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: 0.8,
+                            color: Colors.greenAccent,
+                            backgroundColor: Colors.grey[300],
+                            minHeight: 6,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text(
+                          passwordLength.toInt().toString(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            value: passwordLength.toDouble(),
+                            min: 4,
+                            max: 32,
+                            activeColor: Colors.teal,
+                            onChanged: (v) {
+                              setState(() => passwordLength = v.toInt());
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _buildToggle("A-Z", includeUppercase, (v) {
+                      setState(() => includeUppercase = v);
+                    }),
+                    _buildToggle("a-z", includeLowercase, (v) {
+                      setState(() => includeLowercase = v);
+                    }),
+                    _buildToggle("0-9", includeNumbers, (v) {
+                      setState(() => includeNumbers = v);
+                    }),
+                    _buildToggle("Special characters", includeSpecial, (v) {
+                      setState(() => includeSpecial = v);
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: () {
+                    context.read<KeePassBloc>().add(
+                      AddEntry(
+                        title: titleController.text,
+                        userName: userController.text,
+                        url: urlController.text,
+                        notes: notesController.text,
+                        password: passwordController.text,
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Guardar",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -199,7 +205,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
   Widget _buildCard({required Widget child}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
