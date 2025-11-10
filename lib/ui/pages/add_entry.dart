@@ -43,7 +43,11 @@ class _AddEntryPageState extends State<AddEntryPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is KeePassAddEntrySuccess){
+          Navigator.pop(context);
+        }
+      },
       builder: (context, state) {
         if (state is KeePassLoading) {
           return Scaffold(body: Center(child: CircularProgressIndicator()));

@@ -17,9 +17,10 @@ class EntriesPage extends StatefulWidget {
 }
 
 class _EntriesPageState extends State<EntriesPage> {
-
   final TextEditingController searchBarController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
+  KdbxGroup? group;
 
   @override
   void dispose() {
@@ -39,12 +40,16 @@ class _EntriesPageState extends State<EntriesPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is KeePassRootGroup) {
+          setState(() {
+            group = state.group;
+          });
+        }
+      },
       builder: (context, state) {
         if (state is KeePassLoading) {
           return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else if (state is KeePassRootGroup) {
-          return _page(group: state.group);
         } else {
           return _page();
         }
@@ -52,7 +57,7 @@ class _EntriesPageState extends State<EntriesPage> {
     );
   }
 
-  Widget _page({KdbxGroup? group}) {
+  Widget _page() {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(116),
@@ -177,13 +182,11 @@ class _EntriesPageState extends State<EntriesPage> {
               ),
               ...List.generate(
                 group?.groups.length ?? 0,
-                    (index) => Padding(
+                (index) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     children: [
-                      Icon(
-                        FontAwesomeIcons.folder,
-                      ),
+                      Icon(FontAwesomeIcons.folder),
                       SizedBox(width: 16),
                       Expanded(
                         child: Container(
@@ -248,5 +251,4 @@ class _EntriesPageState extends State<EntriesPage> {
       ),
     );
   }
-
 }

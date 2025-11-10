@@ -79,6 +79,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       await Future(() => kdbx!.save());
 
       emit(KeePassRootGroup(kdbx!.body.rootGroup));
+      emit(KeePassAddEntrySuccess());
     } catch (e) {
       logger.e(e);
       emit(KeePassError('Error al cargar la base: $e'));
@@ -99,6 +100,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       await Future(() => kdbx!.save());
 
       emit(KeePassRootGroup(kdbx!.body.rootGroup));
+      emit(KeePassAddGroupSuccess());
     } catch (e) {
       logger.e(e);
       emit(KeePassError('Error al cargar la base: $e'));

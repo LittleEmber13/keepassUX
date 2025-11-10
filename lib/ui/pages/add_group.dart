@@ -25,7 +25,11 @@ class _AddGroupPageState extends State<AddGroupPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is KeePassAddGroupSuccess){
+          Navigator.pop(context);
+        }
+      },
       builder: (context, state) {
         if (state is KeePassLoading) {
           return Scaffold(body: Center(child: CircularProgressIndicator()));

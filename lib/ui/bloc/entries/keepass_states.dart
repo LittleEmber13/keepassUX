@@ -19,3 +19,11 @@ class KeePassError extends KeePassState {
   final String message;
   KeePassError(this.message);
 }
+
+class KeePassAddEntrySuccess extends KeePassState {
+  KeePassAddEntrySuccess();
+}
+
+class KeePassAddGroupSuccess extends KeePassState {
+  KeePassAddGroupSuccess();
+}
