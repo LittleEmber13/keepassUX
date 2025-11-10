@@ -17,6 +17,7 @@ class EntriesPage extends StatefulWidget {
 }
 
 class _EntriesPageState extends State<EntriesPage> {
+
   final TextEditingController searchBarController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -175,6 +176,40 @@ class _EntriesPageState extends State<EntriesPage> {
                 ],
               ),
               ...List.generate(
+                group?.groups.length ?? 0,
+                    (index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.folder,
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 5,
+                                spreadRadius: 1,
+                                offset: Offset(1, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(group!.groups[index].name.get() ?? "-"),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ...List.generate(
                 group?.entries.length ?? 0,
                 (index) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -214,216 +249,4 @@ class _EntriesPageState extends State<EntriesPage> {
     );
   }
 
-  Widget _pageOld({KdbxGroup? group}) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(116),
-        child: Container(
-          color: Colors.transparent,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 52,
-              bottom: 6,
-              left: 24,
-              right: 24,
-            ),
-            child: CustomAppBar(
-              onTapExit: () {
-                /// TODO
-              },
-            ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                    offset: Offset(1, 2),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchBarController,
-                        decoration: InputDecoration(
-                          hintText: "Search for an entry",
-                          contentPadding: EdgeInsets.all(0),
-                          isDense: true,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Icon(Icons.search),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 24),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          width: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  RawScrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    thickness: 8.0,
-                    trackVisibility: false,
-                    trackColor: Colors.black,
-                    thumbColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(99)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 24),
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          children: [
-                            Stack(
-                              alignment: Alignment.topCenter,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
-                                  ),
-                                  child: Container(
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFEEFDFF),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 5,
-                                          spreadRadius: 1,
-                                          offset: Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 8,
-                                    top: 8,
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFEEFDFF),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 5,
-                                          spreadRadius: 1,
-                                          offset: Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text("Title"),
-                                              Icon(Icons.close),
-                                            ],
-                                          ),
-                                          SizedBox(height: 8),
-                                          Text(
-                                            "dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            ...List.generate(
-                              group?.entries.length ?? 0,
-                              (index) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 5,
-                                        spreadRadius: 1,
-                                        offset: Offset(1, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          FontAwesomeIcons.twitter,
-                                          color: Colors.lightBlueAccent,
-                                        ),
-                                        SizedBox(width: 16),
-                                        Text(group!.entries[index].label ?? ""),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

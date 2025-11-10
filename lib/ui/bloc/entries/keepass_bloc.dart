@@ -8,6 +8,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   KeePassBloc() : super(KeePassInitial()) {
     on<LoadDatabase>(_onLoadDatabase);
     on<AddEntry>(_onAddEntry);
+    on<AddGroup>(_onAddGroup);
     on<GetRootGroup>(_onGetRootGroup);
   }
 
@@ -74,6 +75,26 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
         KdbxKeyCommon.PASSWORD,
         ProtectedValue.fromString(event.password),
       );
+
+      await Future(() => kdbx!.save());
+
+      emit(KeePassRootGroup(kdbx!.body.rootGroup));
+    } catch (e) {
+      logger.e(e);
+      emit(KeePassError('Error al cargar la base: $e'));
+    }
+  }
+
+  Future<void> _onAddGroup(AddGroup event, Emitter<KeePassState> emit) async {
+    try {
+      emit(KeePassLoading());
+      KdbxGroup group = event.group ?? kdbx!.body.rootGroup;
+      KdbxGroup newGroup = KdbxGroup.create(
+        ctx: kdbx!.ctx,
+        parent: group,
+        name: event.title,
+      );
+      group.addGroup(newGroup);
 
       await Future(() => kdbx!.save());
 

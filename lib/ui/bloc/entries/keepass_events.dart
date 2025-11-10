@@ -32,3 +32,13 @@ class AddEntry extends KeePassEvent {
     required this.password,
   });
 }
+
+class AddGroup extends KeePassEvent {
+  final KdbxGroup? group;
+  final String title;
+
+  AddGroup({
+    this.group,
+    required this.title,
+  });
+}

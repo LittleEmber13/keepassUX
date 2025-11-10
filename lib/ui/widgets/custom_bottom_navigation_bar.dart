@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/pages/add_entry.dart';
+import 'package:keepassux/ui/pages/add_group.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/settings_page.dart';
 
@@ -96,6 +97,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
                             InkWell(
                               onTap: () {
                                 Navigator.pop(ctx);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AddGroupPage(),
+                                  ),
+                                );
                               },
                               child: Container(
                                 decoration: BoxDecoration(
