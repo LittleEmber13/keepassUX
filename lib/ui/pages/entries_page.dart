@@ -83,8 +83,11 @@ class _EntriesPageState extends State<EntriesPage> {
               right: 24,
             ),
             child: CustomAppBar(
+              isExit: widget.uuidGroup == null,
               onTapExit: () {
-                /// TODO
+                if (widget.uuidGroup != null) {
+                  Navigator.pop(context);
+                }
               },
             ),
           ),

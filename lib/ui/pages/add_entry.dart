@@ -74,6 +74,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
               right: 24,
             ),
             child: CustomAppBar(
+              isExit: false,
               onTapExit: () {
                 Navigator.pop(context);
               },

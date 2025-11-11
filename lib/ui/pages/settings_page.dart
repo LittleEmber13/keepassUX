@@ -28,6 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomAppBar(
+                isExit: true,
                 onTapExit: () {
                   /// TODO
                 },

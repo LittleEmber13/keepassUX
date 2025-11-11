@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
 class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({super.key, required this.onTapExit});
+  const CustomAppBar({
+    super.key,
+    required this.onTapExit,
+    required this.isExit,
+  });
 
   final Function() onTapExit;
+  final bool isExit;
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +40,7 @@ class CustomAppBar extends StatelessWidget {
                     vertical: 16,
                   ),
                   child: Icon(
-                    Navigator.canPop(context)
-                        ? Icons.arrow_back
-                        : FeatherIcons.logOut,
+                    isExit ? FeatherIcons.logOut : Icons.arrow_back,
                     color: Colors.black,
                   ),
                 ),

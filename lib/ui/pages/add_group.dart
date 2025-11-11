@@ -56,6 +56,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
               right: 24,
             ),
             child: CustomAppBar(
+              isExit: false,
               onTapExit: () {
                 Navigator.pop(context);
               },
