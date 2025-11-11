@@ -16,7 +16,7 @@ class GetRootGroup extends KeePassEvent {
 }
 
 class AddEntry extends KeePassEvent {
-  final KdbxGroup? group;
+  final String? uuidGroup;
   final String title;
   final String? userName;
   final String? url;
@@ -24,7 +24,7 @@ class AddEntry extends KeePassEvent {
   final String password;
 
   AddEntry({
-    this.group,
+    this.uuidGroup,
     required this.title,
     this.userName,
     this.url,
@@ -34,11 +34,11 @@ class AddEntry extends KeePassEvent {
 }
 
 class AddGroup extends KeePassEvent {
-  final KdbxGroup? group;
+  final String? uuidGroup;
   final String title;
 
   AddGroup({
-    this.group,
+    this.uuidGroup,
     required this.title,
   });
 }

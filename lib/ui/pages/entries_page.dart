@@ -8,9 +8,12 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
+import 'package:collection/collection.dart';
 
 class EntriesPage extends StatefulWidget {
-  const EntriesPage({super.key});
+  const EntriesPage({this.uuidGroup, super.key});
+
+  final String? uuidGroup;
 
   @override
   State<EntriesPage> createState() => _EntriesPageState();
@@ -42,9 +45,18 @@ class _EntriesPageState extends State<EntriesPage> {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
         if (state is KeePassRootGroup) {
-          setState(() {
-            group = state.group;
-          });
+          if (widget.uuidGroup == null) {
+            setState(() {
+              group = state.group;
+            });
+          } else {
+            List<KdbxGroup> allGroups = state.group?.getAllGroups() ?? [];
+            setState(() {
+              group = allGroups.firstWhereOrNull(
+                (g) => g.uuid.uuid == widget.uuidGroup,
+              );
+            });
+          }
         }
       },
       builder: (context, state) {
@@ -78,7 +90,9 @@ class _EntriesPageState extends State<EntriesPage> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        uuidGroup: widget.uuidGroup,
+      ),
       body: Column(
         children: [
           Padding(
@@ -189,22 +203,37 @@ class _EntriesPageState extends State<EntriesPage> {
                       Icon(FontAwesomeIcons.folder),
                       SizedBox(width: 16),
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 5,
-                                spreadRadius: 1,
-                                offset: Offset(1, 2),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => EntriesPage(
+                                      uuidGroup: group!.groups[index].uuid.uuid,
+                                    ),
                               ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(group!.groups[index].name.get() ?? "-"),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                  offset: Offset(1, 2),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text(
+                                group!.groups[index].name.get() ?? "-",
+                              ),
+                            ),
                           ),
                         ),
                       ),

@@ -7,7 +7,9 @@ import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 
 class AddGroupPage extends StatefulWidget {
-  const AddGroupPage({super.key});
+  const AddGroupPage({this.uuidGroup, super.key});
+
+  final String? uuidGroup;
 
   @override
   State<AddGroupPage> createState() => _AddGroupPageState();
@@ -26,7 +28,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassAddGroupSuccess){
+        if (state is KeePassAddGroupSuccess) {
           Navigator.pop(context);
         }
       },
@@ -92,7 +94,10 @@ class _AddGroupPageState extends State<AddGroupPage> {
                   ),
                   onPressed: () {
                     context.read<KeePassBloc>().add(
-                      AddGroup(title: titleController.text),
+                      AddGroup(
+                        uuidGroup: widget.uuidGroup,
+                        title: titleController.text,
+                      ),
                     );
                   },
                   child: const Text("Guardar", style: TextStyle(fontSize: 16)),

@@ -7,7 +7,9 @@ import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/settings_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  const CustomBottomNavigationBar({super.key});
+  const CustomBottomNavigationBar({this.uuidGroup, super.key});
+
+  final String? uuidGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +72,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AddEntryPage(),
+                                    builder:
+                                        (context) =>
+                                            AddEntryPage(uuidGroup: uuidGroup),
                                   ),
                                 );
                               },
@@ -100,7 +104,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AddGroupPage(),
+                                    builder:
+                                        (context) =>
+                                            AddGroupPage(uuidGroup: uuidGroup),
                                   ),
                                 );
                               },

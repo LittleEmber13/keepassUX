@@ -9,7 +9,9 @@ import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 
 class AddEntryPage extends StatefulWidget {
-  const AddEntryPage({super.key});
+  const AddEntryPage({this.uuidGroup, super.key});
+
+  final String? uuidGroup;
 
   @override
   State<AddEntryPage> createState() => _AddEntryPageState();
@@ -44,7 +46,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassAddEntrySuccess){
+        if (state is KeePassAddEntrySuccess) {
           Navigator.pop(context);
         }
       },
@@ -184,6 +186,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
                   onPressed: () {
                     context.read<KeePassBloc>().add(
                       AddEntry(
+                        uuidGroup: widget.uuidGroup,
                         title: titleController.text,
                         userName: userController.text,
                         url: urlController.text,
@@ -192,10 +195,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
                       ),
                     );
                   },
-                  child: const Text(
-                    "Guardar",
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  child: const Text("Guardar", style: TextStyle(fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 16),

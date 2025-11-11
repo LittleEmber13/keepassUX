@@ -3,6 +3,7 @@ import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:logger/logger.dart';
+import 'package:collection/collection.dart';
 
 class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   KeePassBloc() : super(KeePassInitial()) {
@@ -62,7 +63,11 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   Future<void> _onAddEntry(AddEntry event, Emitter<KeePassState> emit) async {
     try {
       emit(KeePassLoading());
-      KdbxGroup group = event.group ?? kdbx!.body.rootGroup;
+      List<KdbxGroup> allGroups = kdbx!.body.rootGroup.getAllGroups();
+      KdbxGroup? foundGroup = allGroups.firstWhereOrNull(
+              (g) => g.uuid.uuid == event.uuidGroup,
+        );
+      KdbxGroup group = foundGroup ?? kdbx!.body.rootGroup;
       KdbxEntry entry = KdbxEntry.create(kdbx!, group);
       group.addEntry(entry);
       entry.setString(KdbxKeyCommon.TITLE, PlainValue(event.title));
@@ -89,7 +94,11 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   Future<void> _onAddGroup(AddGroup event, Emitter<KeePassState> emit) async {
     try {
       emit(KeePassLoading());
-      KdbxGroup group = event.group ?? kdbx!.body.rootGroup;
+      List<KdbxGroup> allGroups = kdbx!.body.rootGroup.getAllGroups();
+      KdbxGroup? foundGroup = allGroups.firstWhereOrNull(
+            (g) => g.uuid.uuid == event.uuidGroup,
+      );
+      KdbxGroup group = foundGroup ?? kdbx!.body.rootGroup;
       KdbxGroup newGroup = KdbxGroup.create(
         ctx: kdbx!.ctx,
         parent: group,
