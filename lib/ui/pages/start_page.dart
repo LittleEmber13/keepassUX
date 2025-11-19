@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bloc/entries/keepass_events.dart';
 
@@ -19,6 +23,17 @@ class _StartPageState extends State<StartPage> {
   TextEditingController folderController = TextEditingController();
 
   bool obscurePassword = false;
+
+  SharedPreferences? preferences;
+
+  @override
+  void initState() {
+    SharedPreferences.getInstance().then((preferences) {
+      this.preferences = preferences;
+      folderController.text = preferences.getString('kdbx_path') ?? '';
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -80,39 +95,50 @@ class _StartPageState extends State<StartPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.folder_open),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: TextField(
-                            controller: folderController,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Color(0xFFF3F5F9),
-                              labelText: "Base de datos",
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFD2D2D2),
-                                  width: 1,
+                    InkWell(
+                      onTap: () async {
+                        if (preferences == null) {
+                          return;
+                        }
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['kdbx'],
+                        );
+                        if (result != null &&
+                            result.files.single.path != null) {
+                          String path = result.files.single.path!;
+                          folderController.text = path;
+                          await preferences!.setString('kdbx_path', path);
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.folder_open),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: TextField(
+                              controller: folderController,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Color(0xFFF3F5F9),
+                                labelText: "Base de datos",
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFFD2D2D2),
+                                    width: 1,
+                                  ),
                                 ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                  color: Color(0xFFD2D2D2),
-                                  width: 1,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
                                 ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     SizedBox(height: 16),
                     TextField(
@@ -168,8 +194,8 @@ class _StartPageState extends State<StartPage> {
               child: InkWell(
                 onTap: () async {
                   String password = 'test123';
-                  ByteData data = await rootBundle.load('assets/test.kdbx');
-                  Uint8List bytes = data.buffer.asUint8List();
+                  File file = File(folderController.text);
+                  Uint8List bytes = await file.readAsBytes();
                   context.read<KeePassBloc>().add(
                     LoadDatabase(bytes: bytes, password: password),
                   );
