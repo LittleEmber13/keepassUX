@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 
 import '../widgets/custom_app_bar.dart';
@@ -17,6 +19,21 @@ class _SettingsPageState extends State<SettingsPage> {
   bool biometricLogin = true;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentLocale = context.locale;
+      setState(() {
+        if (currentLocale.languageCode == 'es') {
+          selectedLanguage = 'Español';
+        } else if (currentLocale.languageCode == 'en') {
+          selectedLanguage = 'Inglés';
+        }
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -30,30 +47,35 @@ class _SettingsPageState extends State<SettingsPage> {
               CustomAppBar(
                 isExit: true,
                 onTapExit: () {
-                  /// TODO
+                  // TODO unload database
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => StartPage()),
+                    (Route<dynamic> route) => false,
+                  );
                 },
               ),
               const SizedBox(height: 24),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                      offset: Offset(1, 2),
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.star_border),
-                  title: const Text('FAQ'),
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(height: 16),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(8),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: Colors.black.withOpacity(0.05),
+              //         blurRadius: 5,
+              //         spreadRadius: 1,
+              //         offset: Offset(1, 2),
+              //       ),
+              //     ],
+              //   ),
+              //   child: ListTile(
+              //     leading: const Icon(Icons.star_border),
+              //     title: const Text('FAQ'),
+              //     onTap: () {},
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -74,8 +96,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Idioma',
+                      Text(
+                        tr("settings_page.language"),
                         style: TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 6),
@@ -102,25 +124,30 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                         onChanged: (value) {
                           setState(() => selectedLanguage = value!);
+                          if (value == 'Español') {
+                            context.setLocale(const Locale('es'));
+                          } else if (value == 'Inglés') {
+                            context.setLocale(const Locale('en'));
+                          }
                         },
                       ),
-                      const SizedBox(height: 16),
-                      SwitchListTile(
-                        title: const Text('Automatic app theme'),
-                        value: autoTheme,
-                        onChanged: (val) => setState(() => autoTheme = val),
-                      ),
-                      SwitchListTile(
-                        title: const Text('Dark theme'),
-                        value: darkTheme,
-                        onChanged: (val) => setState(() => darkTheme = val),
-                      ),
-                      SwitchListTile(
-                        title: const Text('Login biometrico'),
-                        value: biometricLogin,
-                        onChanged:
-                            (val) => setState(() => biometricLogin = val),
-                      ),
+                      // const SizedBox(height: 16),
+                      // SwitchListTile(
+                      //   title: const Text('Automatic app theme'),
+                      //   value: autoTheme,
+                      //   onChanged: (val) => setState(() => autoTheme = val),
+                      // ),
+                      // SwitchListTile(
+                      //   title: const Text('Dark theme'),
+                      //   value: darkTheme,
+                      //   onChanged: (val) => setState(() => darkTheme = val),
+                      // ),
+                      // SwitchListTile(
+                      //   title: const Text('Login biometrico'),
+                      //   value: biometricLogin,
+                      //   onChanged:
+                      //       (val) => setState(() => biometricLogin = val),
+                      // ),
                     ],
                   ),
                 ),

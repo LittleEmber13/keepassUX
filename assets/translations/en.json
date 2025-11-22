@@ -1,1 +1,60 @@
-{}
+{
+  "form_error": {
+    "required": "This field is required"
+  },
+  "exception": {
+    "invalid_password": "Invalid password",
+    "unknown": "Unknown error"
+  },
+  "start_page": {
+    "title": "KeePass",
+    "folder_hint": "Database",
+    "password_hint": "Password",
+    "open_database": "Open database",
+    "create_database": "Create database"
+  },
+  "create_database_page": {
+    "title": "Create database",
+    "name_hint": "File name",
+    "password_hint": "Password",
+    "open_database": "Open database",
+    "create_database": "Create database"
+  },
+  "entries_page": {
+    "search": "Search an entry"
+  },
+  "app_bar": {
+    "hello": "Hello,",
+    "welcome": "Welcome"
+  },
+  "nav_bar": {
+    "add_group": "Add group",
+    "add_entry": "Add entry"
+  },
+  "add_entry": {
+    "information": "Information",
+    "title": "Title",
+    "user": "User",
+    "url": "URL",
+    "notes": "Notes",
+    "password": "Password",
+    "password_hint": "Password",
+    "security": "Security",
+    "special_characters": "Special characters",
+    "save": "Save"
+  },
+  "add_group": {
+    "information": "Information",
+    "title": "Title",
+    "save": "Save"
+  },
+  "entry_data": {
+    "title": "Title",
+    "user": "User",
+    "password": "Password",
+    "url": "URL"
+  },
+  "settings_page": {
+    "language": "Language"
+  }
+}

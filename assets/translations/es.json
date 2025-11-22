@@ -53,5 +53,8 @@
     "user": "Usuario",
     "password": "Contraseña",
     "url": "URL"
+  },
+  "settings_page": {
+    "language": "Idioma"
   }
 }
