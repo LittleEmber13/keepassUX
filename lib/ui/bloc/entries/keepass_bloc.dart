@@ -17,6 +17,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     on<AddEntry>(_onAddEntry);
     on<AddGroup>(_onAddGroup);
     on<GetRootGroup>(_onGetRootGroup);
+    on<CreateDatabase>(_onCreateDatabase);
   }
 
   KdbxFile? kdbx;
@@ -25,9 +26,9 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   Logger logger = Logger();
 
   Future<void> _onLoadDatabase(
-    LoadDatabase event,
-    Emitter<KeePassState> emit,
-  ) async {
+      LoadDatabase event,
+      Emitter<KeePassState> emit,
+      ) async {
     try {
       emit(KeePassLoading());
       print("Loading database...");
@@ -44,16 +45,36 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
 
       kdbx = result['kdbx'];
 
-      // kdbx = KdbxFormat().create(
-      //   Credentials(ProtectedValue.fromString(event.password)),
-      //   'KeepassUX',
-      // );
-
       print("Loaded database");
       emit(KeePassLoaded());
     } catch (e, s) {
       logger.e(e);
       emit(KeePassError('Error al cargar la base: $e'));
+    }
+  }
+
+  Future<void> _onCreateDatabase(
+      CreateDatabase event,
+      Emitter<KeePassState> emit,
+      ) async {
+    try {
+      emit(KeePassLoading());
+      print("Creating database...");
+
+      preferences = await SharedPreferences.getInstance();
+
+      kdbx = KdbxFormat().create(
+        Credentials(ProtectedValue.fromString(event.password)),
+        'KeepassUX',
+      );
+      Uint8List bytes = await kdbx!.save();
+      await ContentResolver.writeContent(event.uri, bytes);
+
+      print("Created database");
+      emit(KeePassCreated());
+    } catch (e, s) {
+      logger.e(e);
+      emit(KeePassError('Error al crear la base: $e'));
     }
   }
 

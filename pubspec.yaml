@@ -43,7 +43,6 @@ dependencies:
   shared_preferences: ^2.5.3
   uri_content: ^3.1.1
   content_resolver: ^0.3.6
-  file_selector: ^1.0.4
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:kdbx/kdbx.dart';
 
 abstract class KeePassState {}
@@ -6,9 +8,9 @@ class KeePassInitial extends KeePassState {}
 
 class KeePassLoading extends KeePassState {}
 
-class KeePassLoaded extends KeePassState {
-  KeePassLoaded();
-}
+class KeePassLoaded extends KeePassState {}
+
+class KeePassCreated extends KeePassState {}
 
 class KeePassRootGroup extends KeePassState {
   final KdbxGroup? group;

@@ -4,23 +4,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
-import 'package:keepassux/ui/pages/create_database_page.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uri_content/uri_content.dart';
 
 import '../bloc/entries/keepass_events.dart';
 
-class StartPage extends StatefulWidget {
-  const StartPage({super.key});
+class CreateDatabasePage extends StatefulWidget {
+  const CreateDatabasePage({super.key});
 
   @override
-  State<StartPage> createState() => _StartPageState();
+  State<CreateDatabasePage> createState() => _CreateDatabasePageState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _CreateDatabasePageState extends State<CreateDatabasePage> {
+  TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController folderController = TextEditingController();
 
   bool obscurePassword = false;
 
@@ -30,14 +29,13 @@ class _StartPageState extends State<StartPage> {
   void initState() {
     SharedPreferences.getInstance().then((preferences) {
       this.preferences = preferences;
-      folderController.text = preferences.getString('kdbx_uri') ?? '';
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    folderController.dispose();
+    nameController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -46,7 +44,7 @@ class _StartPageState extends State<StartPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassLoaded) {
+        if (state is KeePassCreated) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const EntriesPage()),
@@ -70,11 +68,10 @@ class _StartPageState extends State<StartPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(),
-          Center(child: Text("KeePass", style: TextStyle(fontSize: 32))),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Container(color: Colors.black, height: 200),
+          Center(
+            child: Text("Crear base de datos", style: TextStyle(fontSize: 32)),
           ),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
@@ -95,56 +92,30 @@ class _StartPageState extends State<StartPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
-                      onTap: () async {
-                        if (preferences == null) {
-                          return;
-                        }
-
-                        final result = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['kdbx'],
-                          withData: false,
-                        );
-
-                        if (result != null && result.files.isNotEmpty) {
-                          PlatformFile file = result.files.single;
-
-                          String? safUri = file.identifier;
-
-                          if (safUri != null) {
-                            folderController.text = safUri;
-                            await preferences!.setString('kdbx_uri', safUri);
-                          }
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.folder_open),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: TextField(
-                              controller: folderController,
-                              enabled: false,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Color(0xFFF3F5F9),
-                                labelText: "Base de datos",
-                                disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFFD2D2D2),
-                                    width: 1,
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                              ),
-                            ),
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFFF3F5F9),
+                        labelText: "Nombre del archivo",
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Color(0xFFD2D2D2),
+                            width: 1,
                           ),
-                        ],
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Color(0xFFD2D2D2),
+                            width: 1,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -198,11 +169,27 @@ class _StartPageState extends State<StartPage> {
               children: [
                 InkWell(
                   onTap: () async {
-                    final uri = Uri.parse(folderController.text);
-                    final bytes = await UriContent().from(uri);
+                    if (preferences == null) {
+                      return;
+                    }
+                    final rawPath = await FilePicker.platform.saveFile(
+                      dialogTitle: 'Guardar como',
+                      fileName: "${nameController.text}.kdbx",
+                      type: FileType.custom,
+                      allowedExtensions: ['kdbx'],
+                      bytes: Uint8List.fromList([0]),
+                    );
+                    if (rawPath == null) {
+                      return;
+                    }
+                    String documentId = rawPath.replaceFirst('/document/', '');
+                    String encoded = Uri.encodeComponent(documentId);
+                    String safUri =
+                        "content://com.android.externalstorage.documents/document/$encoded";
+                    await preferences!.setString('kdbx_uri', safUri);
                     context.read<KeePassBloc>().add(
-                      LoadDatabase(
-                        bytes: bytes,
+                      CreateDatabase(
+                        uri: safUri,
                         password: passwordController.text,
                       ),
                     );
@@ -224,13 +211,13 @@ class _StartPageState extends State<StartPage> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.arrow_forward),
+                              child: Icon(Icons.call_received),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Open database",
+                              "Create database",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -248,11 +235,11 @@ class _StartPageState extends State<StartPage> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CreateDatabasePage(),
+                        builder: (context) => const StartPage(),
                       ),
                     );
                   },
-                  child: InkWell(child: Text("Crear base de datos")),
+                  child: InkWell(child: Text("Abrir base de datos")),
                 ),
               ],
             ),

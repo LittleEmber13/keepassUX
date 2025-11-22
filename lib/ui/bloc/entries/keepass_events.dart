@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:kdbx/kdbx.dart';
-
 abstract class KeePassEvent {}
 
 class LoadDatabase extends KeePassEvent {
@@ -9,6 +7,13 @@ class LoadDatabase extends KeePassEvent {
   final String password;
 
   LoadDatabase({required this.bytes, required this.password});
+}
+
+class CreateDatabase extends KeePassEvent {
+  final String uri;
+  final String password;
+
+  CreateDatabase({required this.uri, required this.password});
 }
 
 class GetRootGroup extends KeePassEvent {
