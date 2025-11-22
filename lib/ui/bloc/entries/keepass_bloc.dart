@@ -1,9 +1,15 @@
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:typed_data';
+
+import 'package:content_resolver/content_resolver.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:logger/logger.dart';
 import 'package:collection/collection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   KeePassBloc() : super(KeePassInitial()) {
@@ -14,6 +20,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   }
 
   KdbxFile? kdbx;
+  SharedPreferences? preferences;
 
   Logger logger = Logger();
 
@@ -25,20 +32,22 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassLoading());
       print("Loading database...");
 
-      //final result = await Isolate.run(() async {
-      //  final credentials = Credentials(
-      //    ProtectedValue.fromString(event.password),
-      //  );
-      //  KdbxFile kdbx = await KdbxFormat().read(event.bytes, credentials);
-      //  return {'kdbx': kdbx};
-      //});
-      //
-      //KdbxFile? originalKdbx = result['kdbx'];
+      preferences = await SharedPreferences.getInstance();
 
-      kdbx = KdbxFormat().create(
-        Credentials(ProtectedValue.fromString(event.password)),
-        'KeepassUX',
-      );
+      final result = await Isolate.run(() async {
+        final credentials = Credentials(
+          ProtectedValue.fromString(event.password),
+        );
+        KdbxFile kdbx = await KdbxFormat().read(event.bytes, credentials);
+        return {'kdbx': kdbx};
+      });
+
+      kdbx = result['kdbx'];
+
+      // kdbx = KdbxFormat().create(
+      //   Credentials(ProtectedValue.fromString(event.password)),
+      //   'KeepassUX',
+      // );
 
       print("Loaded database");
       emit(KeePassLoaded());
@@ -81,7 +90,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
         ProtectedValue.fromString(event.password),
       );
 
-      await Future(() => kdbx!.save());
+      await _saveFile();
 
       emit(KeePassRootGroup(kdbx!.body.rootGroup));
       emit(KeePassAddEntrySuccess());
@@ -106,7 +115,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       );
       group.addGroup(newGroup);
 
-      await Future(() => kdbx!.save());
+      await _saveFile();
 
       emit(KeePassRootGroup(kdbx!.body.rootGroup));
       emit(KeePassAddGroupSuccess());
@@ -115,4 +124,17 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassError('Error al cargar la base: $e'));
     }
   }
+
+  _saveFile() async {
+    String? uri = preferences?.getString('kdbx_uri');
+    if (uri != null) {
+      Uint8List bytes = await kdbx!.save();
+      await ContentResolver.writeContent(uri, bytes);
+      print("Archivo actualizado correctamente en su ubicación original");
+    } else {
+      print("file unsaved");
+      throw Exception();
+    }
+  }
+
 }

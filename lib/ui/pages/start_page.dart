@@ -8,6 +8,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uri_content/uri_content.dart';
 
 import '../bloc/entries/keepass_events.dart';
 
@@ -30,7 +31,7 @@ class _StartPageState extends State<StartPage> {
   void initState() {
     SharedPreferences.getInstance().then((preferences) {
       this.preferences = preferences;
-      folderController.text = preferences.getString('kdbx_path') ?? '';
+      folderController.text = preferences.getString('kdbx_uri') ?? '';
     });
     super.initState();
   }
@@ -100,17 +101,25 @@ class _StartPageState extends State<StartPage> {
                         if (preferences == null) {
                           return;
                         }
+
                         final result = await FilePicker.platform.pickFiles(
                           type: FileType.custom,
                           allowedExtensions: ['kdbx'],
+                          withData: false,
                         );
-                        if (result != null &&
-                            result.files.single.path != null) {
-                          String path = result.files.single.path!;
-                          folderController.text = path;
-                          await preferences!.setString('kdbx_path', path);
+
+                        if (result != null && result.files.isNotEmpty) {
+                          PlatformFile file = result.files.single;
+
+                          String? safUri = file.identifier;
+
+                          if (safUri != null) {
+                            folderController.text = safUri;
+                            await preferences!.setString('kdbx_uri', safUri);
+                          }
                         }
                       },
+
                       child: Row(
                         children: [
                           Icon(Icons.folder_open),
@@ -193,11 +202,10 @@ class _StartPageState extends State<StartPage> {
               ),
               child: InkWell(
                 onTap: () async {
-                  String password = 'test123';
-                  File file = File(folderController.text);
-                  Uint8List bytes = await file.readAsBytes();
+                  final uri = Uri.parse(folderController.text);
+                  final bytes = await UriContent().from(uri);
                   context.read<KeePassBloc>().add(
-                    LoadDatabase(bytes: bytes, password: password),
+                    LoadDatabase(bytes: bytes, password: 'test123'),
                   );
                 },
                 child: Padding(
