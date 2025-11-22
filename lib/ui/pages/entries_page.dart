@@ -103,6 +103,7 @@ class _EntriesPageState extends State<EntriesPage> {
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         uuidGroup: widget.uuidGroup,
+        selectedIndex: 0,
       ),
       body: Column(
         children: [

@@ -7,9 +7,14 @@ import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/settings_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  const CustomBottomNavigationBar({this.uuidGroup, super.key});
+  const CustomBottomNavigationBar({
+    this.selectedIndex,
+    this.uuidGroup,
+    super.key,
+  });
 
   final String? uuidGroup;
+  final int? selectedIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +38,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(FontAwesomeIcons.star),
               InkWell(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -43,8 +47,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     ),
                   );
                 },
-                child: Icon(FontAwesomeIcons.folder, color: Colors.grey),
+                child: Icon(
+                  FontAwesomeIcons.folder,
+                  color: selectedIndex == 0 ? Colors.black : Colors.grey,
+                ),
               ),
+              Icon(FontAwesomeIcons.star, color: Colors.white),
               InkWell(
                 onTap: () {
                   showModalBottomSheet(
@@ -146,7 +154,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(FontAwesomeIcons.user, color: Colors.grey),
+              Icon(FontAwesomeIcons.user, color: Colors.white),
               InkWell(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -158,7 +166,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 },
                 child: Icon(
                   FeatherIcons.settings,
-                  color: Colors.grey,
+                  color: selectedIndex == 3 ? Colors.black : Colors.grey,
                   size: 26,
                 ),
               ),
