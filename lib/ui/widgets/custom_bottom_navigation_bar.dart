@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -101,7 +102,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
-                                  child: Text("Añadir entrada"),
+                                  child: Text(tr("nav_bar.add_entry")),
                                 ),
                               ),
                             ),
@@ -133,7 +134,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
-                                  child: Text("Añadir grupo"),
+                                  child: Text(tr("nav_bar.add_group")),
                                 ),
                               ),
                             ),

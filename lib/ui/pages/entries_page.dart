@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -130,7 +131,7 @@ class _EntriesPageState extends State<EntriesPage> {
                       child: TextField(
                         controller: searchBarController,
                         decoration: InputDecoration(
-                          hintText: "Search for an entry",
+                          hintText: tr("entries_page.search"),
                           contentPadding: EdgeInsets.all(0),
                           isDense: true,
                           filled: false,

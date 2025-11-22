@@ -19,5 +19,33 @@
     "password_hint": "Contraseña",
     "open_database": "Abrir base de datos",
     "create_database": "Crear base de datos"
+  },
+  "entries_page": {
+    "search": "Buscar una entrada"
+  },
+  "app_bar": {
+    "hello": "Hola,",
+    "welcome": "Bienvenido"
+  },
+  "nav_bar": {
+    "add_group": "Añadir grupo",
+    "add_entry": "Añadir entrada"
+  },
+  "add_entry": {
+    "information": "Información",
+    "title": "Título",
+    "user": "Usuario",
+    "url": "URL",
+    "notes": "Notas",
+    "password": "Contraseña",
+    "password_hint": "Contraseña",
+    "security": "Seguridad",
+    "special_characters": "Carácteres especiales",
+    "save": "Guardar"
+  },
+  "add_group": {
+    "information": "Información",
+    "title": "Título",
+    "save": "Guardar"
   }
 }

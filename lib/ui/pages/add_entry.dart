@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -90,24 +91,38 @@ class _AddEntryPageState extends State<AddEntryPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Información"),
+                    Text(tr("add_entry.information")),
                     const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Título",
+                    TextField(
                       controller: titleController,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        labelText: tr("add_entry.title"),
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Usuario",
+                    TextField(
                       controller: userController,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        labelText: tr("add_entry.user"),
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    _buildTextField(label: "URL", controller: urlController),
+                    TextField(
+                      controller: urlController,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        labelText: tr("add_entry.url"),
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Notas",
+                    TextField(
                       controller: notesController,
                       maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: tr("add_entry.notes"),
+                      ),
                     ),
                   ],
                 ),
@@ -117,13 +132,13 @@ class _AddEntryPageState extends State<AddEntryPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Contraseña"),
+                    Text(tr("add_entry.password")),
                     const SizedBox(height: 16),
                     _buildPasswordField(),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text("Security"),
+                        Text(tr("add_entry.security")),
                         const SizedBox(width: 8),
                         Expanded(
                           child: LinearProgressIndicator(
@@ -166,9 +181,13 @@ class _AddEntryPageState extends State<AddEntryPage> {
                     _buildToggle("0-9", includeNumbers, (v) {
                       setState(() => includeNumbers = v);
                     }),
-                    _buildToggle("Special characters", includeSpecial, (v) {
-                      setState(() => includeSpecial = v);
-                    }),
+                    _buildToggle(
+                      tr("add_entry.special_characters"),
+                      includeSpecial,
+                      (v) {
+                        setState(() => includeSpecial = v);
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -196,7 +215,10 @@ class _AddEntryPageState extends State<AddEntryPage> {
                       ),
                     );
                   },
-                  child: const Text("Guardar", style: TextStyle(fontSize: 16)),
+                  child: Text(
+                    tr("add_entry.save"),
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -227,18 +249,6 @@ class _AddEntryPageState extends State<AddEntryPage> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    int maxLines = 1,
-  }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(labelText: label),
-    );
-  }
-
   Widget _buildPasswordField() {
     return Row(
       children: [
@@ -260,7 +270,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
             controller: passwordController,
             obscureText: obscurePassword,
             decoration: InputDecoration(
-              labelText: "Contraseña",
+              labelText: tr("add_entry.password_hint"),
               suffixIcon: IconButton(
                 icon: Icon(
                   obscurePassword == true

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
@@ -52,11 +53,11 @@ class CustomAppBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Hola,',
+                  tr("app_bar.hello"),
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 Text(
-                  'Bienvenido',
+                  tr("app_bar.welcome"),
                   style: TextStyle(color: Colors.black54, fontSize: 14),
                 ),
               ],

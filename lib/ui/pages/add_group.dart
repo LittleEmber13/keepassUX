@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
@@ -72,11 +73,14 @@ class _AddGroupPageState extends State<AddGroupPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Información"),
+                    Text(tr("add_group.information")),
                     const SizedBox(height: 16),
-                    _buildTextField(
-                      label: "Título",
+                    TextField(
                       controller: titleController,
+                      maxLines: 1,
+                      decoration: InputDecoration(
+                        labelText: tr("add_group.title"),
+                      ),
                     ),
                   ],
                 ),
@@ -101,7 +105,10 @@ class _AddGroupPageState extends State<AddGroupPage> {
                       ),
                     );
                   },
-                  child: const Text("Guardar", style: TextStyle(fontSize: 16)),
+                  child: Text(
+                    tr("add_group.save"),
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -129,18 +136,6 @@ class _AddGroupPageState extends State<AddGroupPage> {
         ],
       ),
       child: child,
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    int maxLines = 1,
-  }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(labelText: label),
     );
   }
 }
