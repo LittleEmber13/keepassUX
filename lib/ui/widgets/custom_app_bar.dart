@@ -56,7 +56,7 @@ class CustomAppBar extends StatelessWidget {
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 Text(
-                  'Bonifacio',
+                  'Bienvenido',
                   style: TextStyle(color: Colors.black54, fontSize: 14),
                 ),
               ],

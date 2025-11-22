@@ -5,6 +5,7 @@ import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
+import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
@@ -87,6 +88,13 @@ class _EntriesPageState extends State<EntriesPage> {
               onTapExit: () {
                 if (widget.uuidGroup != null) {
                   Navigator.pop(context);
+                }else{
+                  // TODO unload database
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => StartPage()),
+                        (Route<dynamic> route) => false,
+                  );
                 }
               },
             ),
