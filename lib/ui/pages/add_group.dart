@@ -17,6 +17,8 @@ class AddGroupPage extends StatefulWidget {
 }
 
 class _AddGroupPageState extends State<AddGroupPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   TextEditingController titleController = TextEditingController();
 
   @override
@@ -31,6 +33,14 @@ class _AddGroupPageState extends State<AddGroupPage> {
       listener: (context, state) {
         if (state is KeePassAddGroupSuccess) {
           Navigator.pop(context);
+        }
+        if (state is KeePassError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -71,56 +81,67 @@ class _AddGroupPageState extends State<AddGroupPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          CustomAppScroll(
-            children: [
-              _buildCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(tr("add_group.information")),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: titleController,
-                      maxLines: 1,
-                      decoration: InputDecoration(
-                        labelText: tr("add_group.title"),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            CustomAppScroll(
+              children: [
+                _buildCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr("add_group.information")),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: titleController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return tr("form_error.required");
+                          }
+                          return null;
+                        },
+                        maxLines: 1,
+                        decoration: InputDecoration(
+                          labelText: tr("add_group.title"),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () {
-                    context.read<KeePassBloc>().add(
-                      AddGroup(
-                        uuidGroup: widget.uuidGroup,
-                        title: titleController.text,
-                      ),
-                    );
-                  },
-                  child: Text(
-                    tr("add_group.save"),
-                    style: TextStyle(fontSize: 16),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ],
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        context.read<KeePassBloc>().add(
+                          AddGroup(
+                            uuidGroup: widget.uuidGroup,
+                            title: titleController.text,
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      tr("add_group.save"),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

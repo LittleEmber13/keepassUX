@@ -19,6 +19,8 @@ class AddEntryPage extends StatefulWidget {
 }
 
 class _AddEntryPageState extends State<AddEntryPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   int passwordLength = 14;
   bool includeUppercase = true;
   bool includeLowercase = true;
@@ -49,6 +51,14 @@ class _AddEntryPageState extends State<AddEntryPage> {
       listener: (context, state) {
         if (state is KeePassAddEntrySuccess) {
           Navigator.pop(context);
+        }
+        if (state is KeePassError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -89,148 +99,159 @@ class _AddEntryPageState extends State<AddEntryPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          CustomAppScroll(
-            children: [
-              _buildCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(tr("add_entry.information")),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: titleController,
-                      maxLines: 1,
-                      decoration: InputDecoration(
-                        labelText: tr("add_entry.title"),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: userController,
-                      maxLines: 1,
-                      decoration: InputDecoration(
-                        labelText: tr("add_entry.user"),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: urlController,
-                      maxLines: 1,
-                      decoration: InputDecoration(
-                        labelText: tr("add_entry.url"),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: notesController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        labelText: tr("add_entry.notes"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(tr("add_entry.password")),
-                    const SizedBox(height: 16),
-                    _buildPasswordField(),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Text(tr("add_entry.security")),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: LinearProgressIndicator(
-                            value: 0.8,
-                            color: Colors.greenAccent,
-                            backgroundColor: Colors.grey[300],
-                            minHeight: 6,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            CustomAppScroll(
+              children: [
+                _buildCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr("add_entry.information")),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: titleController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return tr("form_error.required");
+                          }
+                          return null;
+                        },
+                        maxLines: 1,
+                        decoration: InputDecoration(
+                          labelText: tr("add_entry.title"),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Text(
-                          passwordLength.toInt().toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Expanded(
-                          child: Slider(
-                            value: passwordLength.toDouble(),
-                            min: 4,
-                            max: 32,
-                            activeColor: Colors.teal,
-                            onChanged: (v) {
-                              setState(() => passwordLength = v.toInt());
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    _buildToggle("A-Z", includeUppercase, (v) {
-                      setState(() => includeUppercase = v);
-                    }),
-                    _buildToggle("a-z", includeLowercase, (v) {
-                      setState(() => includeLowercase = v);
-                    }),
-                    _buildToggle("0-9", includeNumbers, (v) {
-                      setState(() => includeNumbers = v);
-                    }),
-                    _buildToggle(
-                      tr("add_entry.special_characters"),
-                      includeSpecial,
-                      (v) {
-                        setState(() => includeSpecial = v);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () {
-                    context.read<KeePassBloc>().add(
-                      AddEntry(
-                        uuidGroup: widget.uuidGroup,
-                        title: titleController.text,
-                        userName: userController.text,
-                        url: urlController.text,
-                        notes: notesController.text,
-                        password: passwordController.text,
                       ),
-                    );
-                  },
-                  child: Text(
-                    tr("add_entry.save"),
-                    style: TextStyle(fontSize: 16),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: userController,
+                        maxLines: 1,
+                        decoration: InputDecoration(
+                          labelText: tr("add_entry.user"),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: urlController,
+                        maxLines: 1,
+                        decoration: InputDecoration(
+                          labelText: tr("add_entry.url"),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: notesController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          labelText: tr("add_entry.notes"),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ],
+                const SizedBox(height: 16),
+                _buildCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr("add_entry.password")),
+                      const SizedBox(height: 16),
+                      _buildPasswordField(),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Text(tr("add_entry.security")),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: LinearProgressIndicator(
+                              value: 0.8,
+                              color: Colors.greenAccent,
+                              backgroundColor: Colors.grey[300],
+                              minHeight: 6,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Text(
+                            passwordLength.toInt().toString(),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Expanded(
+                            child: Slider(
+                              value: passwordLength.toDouble(),
+                              min: 4,
+                              max: 32,
+                              activeColor: Colors.teal,
+                              onChanged: (v) {
+                                setState(() => passwordLength = v.toInt());
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      _buildToggle("A-Z", includeUppercase, (v) {
+                        setState(() => includeUppercase = v);
+                      }),
+                      _buildToggle("a-z", includeLowercase, (v) {
+                        setState(() => includeLowercase = v);
+                      }),
+                      _buildToggle("0-9", includeNumbers, (v) {
+                        setState(() => includeNumbers = v);
+                      }),
+                      _buildToggle(
+                        tr("add_entry.special_characters"),
+                        includeSpecial,
+                        (v) {
+                          setState(() => includeSpecial = v);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        context.read<KeePassBloc>().add(
+                          AddEntry(
+                            uuidGroup: widget.uuidGroup,
+                            title: titleController.text,
+                            userName: userController.text,
+                            url: urlController.text,
+                            notes: notesController.text,
+                            password: passwordController.text,
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      tr("add_entry.save"),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -272,7 +293,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
         ),
         SizedBox(width: 16),
         Expanded(
-          child: TextField(
+          child: TextFormField(
             controller: passwordController,
             obscureText: obscurePassword,
             decoration: InputDecoration(

@@ -60,6 +60,14 @@ class _EntriesPageState extends State<EntriesPage> {
             });
           }
         }
+        if (state is KeePassError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
       builder: (context, state) {
         return Stack(
