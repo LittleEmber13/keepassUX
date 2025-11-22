@@ -19,6 +19,8 @@ class CreateDatabasePage extends StatefulWidget {
 }
 
 class _CreateDatabasePageState extends State<CreateDatabasePage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -51,13 +53,27 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
             MaterialPageRoute(builder: (context) => const EntriesPage()),
           );
         }
+        if (state is KeePassError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
       builder: (context, state) {
-        if (state is KeePassLoading) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else {
-          return _page();
-        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            _page(),
+            if (state is KeePassLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        );
       },
     );
   }
@@ -75,7 +91,6 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
               style: TextStyle(fontSize: 32),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
@@ -91,78 +106,109 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                   ),
                 ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFF3F5F9),
-                        labelText: tr("create_database_page.name_hint"),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD2D2D2),
-                            width: 1,
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: nameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return tr("form_error.required");
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Color(0xFFF3F5F9),
+                          labelText: tr("create_database_page.name_hint"),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD2D2D2),
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD2D2D2),
-                            width: 1,
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.red, width: 1),
                           ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.red, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD2D2D2),
+                              width: 1,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 16),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: obscurePassword,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFF3F5F9),
-                        labelText: tr("create_database_page.password_hint"),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            obscurePassword == true
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
+                      SizedBox(height: 16),
+                      TextFormField(
+                        controller: passwordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return tr("form_error.required");
+                          }
+                          return null;
+                        },
+                        obscureText: obscurePassword,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Color(0xFFF3F5F9),
+                          labelText: tr("create_database_page.password_hint"),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              obscurePassword == true
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                obscurePassword = !obscurePassword;
+                              });
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              obscurePassword = !obscurePassword;
-                            });
-                          },
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD2D2D2),
-                            width: 1,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD2D2D2),
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD2D2D2),
-                            width: 1,
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.red, width: 1),
                           ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.red, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD2D2D2),
+                              width: 1,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -173,30 +219,35 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
               children: [
                 InkWell(
                   onTap: () async {
-                    if (preferences == null) {
-                      return;
+                    if (_formKey.currentState!.validate()) {
+                      if (preferences == null) {
+                        return;
+                      }
+                      final rawPath = await FilePicker.platform.saveFile(
+                        dialogTitle: 'Guardar como',
+                        fileName: "${nameController.text}.kdbx",
+                        type: FileType.custom,
+                        allowedExtensions: ['kdbx'],
+                        bytes: Uint8List.fromList([0]),
+                      );
+                      if (rawPath == null) {
+                        return;
+                      }
+                      String documentId = rawPath.replaceFirst(
+                        '/document/',
+                        '',
+                      );
+                      String encoded = Uri.encodeComponent(documentId);
+                      String safUri =
+                          "content://com.android.externalstorage.documents/document/$encoded";
+                      await preferences!.setString('kdbx_uri', safUri);
+                      context.read<KeePassBloc>().add(
+                        CreateDatabase(
+                          uri: safUri,
+                          password: passwordController.text,
+                        ),
+                      );
                     }
-                    final rawPath = await FilePicker.platform.saveFile(
-                      dialogTitle: 'Guardar como',
-                      fileName: "${nameController.text}.kdbx",
-                      type: FileType.custom,
-                      allowedExtensions: ['kdbx'],
-                      bytes: Uint8List.fromList([0]),
-                    );
-                    if (rawPath == null) {
-                      return;
-                    }
-                    String documentId = rawPath.replaceFirst('/document/', '');
-                    String encoded = Uri.encodeComponent(documentId);
-                    String safUri =
-                        "content://com.android.externalstorage.documents/document/$encoded";
-                    await preferences!.setString('kdbx_uri', safUri);
-                    context.read<KeePassBloc>().add(
-                      CreateDatabase(
-                        uri: safUri,
-                        password: passwordController.text,
-                      ),
-                    );
                   },
                   child: Container(
                     decoration: BoxDecoration(
