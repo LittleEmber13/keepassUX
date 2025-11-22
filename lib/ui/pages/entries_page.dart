@@ -62,11 +62,17 @@ class _EntriesPageState extends State<EntriesPage> {
         }
       },
       builder: (context, state) {
-        if (state is KeePassLoading) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else {
-          return _page();
-        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            _page(),
+            if (state is KeePassLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        );
       },
     );
   }
@@ -89,12 +95,12 @@ class _EntriesPageState extends State<EntriesPage> {
               onTapExit: () {
                 if (widget.uuidGroup != null) {
                   Navigator.pop(context);
-                }else{
+                } else {
                   // TODO unload database
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => StartPage()),
-                        (Route<dynamic> route) => false,
+                    (Route<dynamic> route) => false,
                   );
                 }
               },

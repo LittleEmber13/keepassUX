@@ -52,11 +52,17 @@ class _AddEntryPageState extends State<AddEntryPage> {
         }
       },
       builder: (context, state) {
-        if (state is KeePassLoading) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else {
-          return _page();
-        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            _page(),
+            if (state is KeePassLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        );
       },
     );
   }
