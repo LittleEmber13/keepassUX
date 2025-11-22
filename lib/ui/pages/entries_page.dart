@@ -11,6 +11,7 @@ import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:collection/collection.dart';
+import 'package:keepassux/ui/widgets/entry_data.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({this.uuidGroup, super.key});
@@ -273,30 +274,49 @@ class _EntriesPageState extends State<EntriesPage> {
                 group?.entries.length ?? 0,
                 (index) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 5,
-                          spreadRadius: 1,
-                          offset: Offset(1, 2),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.twitter,
-                            color: Colors.lightBlueAccent,
+                  child: InkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
                           ),
-                          SizedBox(width: 16),
-                          Text(group!.entries[index].label ?? ""),
+                        ),
+                        builder: (BuildContext ctx) {
+                          return Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: EntryData(entry: group!.entries[index]),
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                            offset: Offset(1, 2),
+                          ),
                         ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.twitter,
+                              color: Colors.lightBlueAccent,
+                            ),
+                            SizedBox(width: 16),
+                            Text(group!.entries[index].label ?? ""),
+                          ],
+                        ),
                       ),
                     ),
                   ),

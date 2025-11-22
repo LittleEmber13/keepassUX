@@ -47,5 +47,11 @@
     "information": "Información",
     "title": "Título",
     "save": "Guardar"
+  },
+  "entry_data": {
+    "title": "Título",
+    "user": "Usuario",
+    "password": "Contraseña",
+    "url": "URL"
   }
 }
