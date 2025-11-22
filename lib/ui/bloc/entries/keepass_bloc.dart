@@ -1,8 +1,8 @@
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:content_resolver/content_resolver.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
@@ -26,9 +26,9 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   Logger logger = Logger();
 
   Future<void> _onLoadDatabase(
-      LoadDatabase event,
-      Emitter<KeePassState> emit,
-      ) async {
+    LoadDatabase event,
+    Emitter<KeePassState> emit,
+  ) async {
     try {
       emit(KeePassLoading());
       print("Loading database...");
@@ -47,16 +47,18 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
 
       print("Loaded database");
       emit(KeePassLoaded());
+    } on KdbxInvalidKeyException catch (e) {
+      emit(KeePassError(tr("exception.invalid_password")));
     } catch (e, s) {
       logger.e(e);
-      emit(KeePassError('Error al cargar la base: $e'));
+      emit(KeePassError(tr("exception.unknown")));
     }
   }
 
   Future<void> _onCreateDatabase(
-      CreateDatabase event,
-      Emitter<KeePassState> emit,
-      ) async {
+    CreateDatabase event,
+    Emitter<KeePassState> emit,
+  ) async {
     try {
       emit(KeePassLoading());
       print("Creating database...");
@@ -74,7 +76,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassCreated());
     } catch (e, s) {
       logger.e(e);
-      emit(KeePassError('Error al crear la base: $e'));
+      emit(KeePassError(tr("exception.unknown")));
     }
   }
 
@@ -86,7 +88,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassRootGroup(kdbx!.body.rootGroup));
     } catch (e) {
       logger.e(e);
-      emit(KeePassError('Error al cargar la base: $e'));
+      emit(KeePassError(tr("exception.unknown")));
     }
   }
 
@@ -95,8 +97,8 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassLoading());
       List<KdbxGroup> allGroups = kdbx!.body.rootGroup.getAllGroups();
       KdbxGroup? foundGroup = allGroups.firstWhereOrNull(
-              (g) => g.uuid.uuid == event.uuidGroup,
-        );
+        (g) => g.uuid.uuid == event.uuidGroup,
+      );
       KdbxGroup group = foundGroup ?? kdbx!.body.rootGroup;
       KdbxEntry entry = KdbxEntry.create(kdbx!, group);
       group.addEntry(entry);
@@ -117,7 +119,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassAddEntrySuccess());
     } catch (e) {
       logger.e(e);
-      emit(KeePassError('Error al cargar la base: $e'));
+      emit(KeePassError(tr("exception.unknown")));
     }
   }
 
@@ -126,7 +128,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassLoading());
       List<KdbxGroup> allGroups = kdbx!.body.rootGroup.getAllGroups();
       KdbxGroup? foundGroup = allGroups.firstWhereOrNull(
-            (g) => g.uuid.uuid == event.uuidGroup,
+        (g) => g.uuid.uuid == event.uuidGroup,
       );
       KdbxGroup group = foundGroup ?? kdbx!.body.rootGroup;
       KdbxGroup newGroup = KdbxGroup.create(
@@ -142,7 +144,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       emit(KeePassAddGroupSuccess());
     } catch (e) {
       logger.e(e);
-      emit(KeePassError('Error al cargar la base: $e'));
+      emit(KeePassError(tr("exception.unknown")));
     }
   }
 
@@ -157,5 +159,4 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       throw Exception();
     }
   }
-
 }

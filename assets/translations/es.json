@@ -1,4 +1,11 @@
 {
+  "form_error": {
+    "required": "Este campo es requerido"
+  },
+  "exception": {
+    "invalid_password": "Contraseña inválida",
+    "unknown": "Error desconocido"
+  },
   "start_page":{
     "title": "KeePass",
     "folder_hint": "Base de datos",

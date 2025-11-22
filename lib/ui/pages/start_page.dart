@@ -20,6 +20,8 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   TextEditingController passwordController = TextEditingController();
   TextEditingController folderController = TextEditingController();
 
@@ -53,13 +55,27 @@ class _StartPageState extends State<StartPage> {
             MaterialPageRoute(builder: (context) => const EntriesPage()),
           );
         }
+        if (state is KeePassError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
       builder: (context, state) {
-        if (state is KeePassLoading) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else {
-          return _page();
-        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            _page(),
+            if (state is KeePassLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        );
       },
     );
   }
@@ -93,104 +109,134 @@ class _StartPageState extends State<StartPage> {
                   ),
                 ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        if (preferences == null) {
-                          return;
-                        }
-
-                        final result = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['kdbx'],
-                          withData: false,
-                        );
-
-                        if (result != null && result.files.isNotEmpty) {
-                          PlatformFile file = result.files.single;
-
-                          String? safUri = file.identifier;
-
-                          if (safUri != null) {
-                            folderController.text = safUri;
-                            await preferences!.setString('kdbx_uri', safUri);
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          if (preferences == null) {
+                            return;
                           }
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.folder_open),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: TextField(
-                              controller: folderController,
-                              enabled: false,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Color(0xFFF3F5F9),
-                                labelText: tr("start_page.folder_hint"),
-                                disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFFD2D2D2),
-                                    width: 1,
+
+                          final result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['kdbx'],
+                            withData: false,
+                          );
+
+                          if (result != null && result.files.isNotEmpty) {
+                            PlatformFile file = result.files.single;
+
+                            String? safUri = file.identifier;
+
+                            if (safUri != null) {
+                              folderController.text = safUri;
+                              await preferences!.setString('kdbx_uri', safUri);
+                            }
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.folder_open),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: TextFormField(
+                                controller: folderController,
+                                enabled: false,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return tr("form_error.required");
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Color(0xFFF3F5F9),
+                                  labelText: tr("start_page.folder_hint"),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFD2D2D2),
+                                      width: 1,
+                                    ),
                                   ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Colors.red,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: obscurePassword,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFF3F5F9),
-                        labelText: tr("start_page.password_hint"),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            obscurePassword == true
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              obscurePassword = !obscurePassword;
-                            });
-                          },
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD2D2D2),
-                            width: 1,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Color(0xFFD2D2D2),
-                            width: 1,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 16),
+                      TextFormField(
+                        controller: passwordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return tr("form_error.required");
+                          }
+                          return null;
+                        },
+                        obscureText: obscurePassword,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Color(0xFFF3F5F9),
+                          labelText: tr("start_page.password_hint"),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              obscurePassword == true
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                obscurePassword = !obscurePassword;
+                              });
+                            },
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD2D2D2),
+                              width: 1,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.red, width: 1),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.red, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Color(0xFFD2D2D2),
+                              width: 1,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -201,14 +247,16 @@ class _StartPageState extends State<StartPage> {
               children: [
                 InkWell(
                   onTap: () async {
-                    final uri = Uri.parse(folderController.text);
-                    final bytes = await UriContent().from(uri);
-                    context.read<KeePassBloc>().add(
-                      LoadDatabase(
-                        bytes: bytes,
-                        password: passwordController.text,
-                      ),
-                    );
+                    if (_formKey.currentState!.validate()) {
+                      final uri = Uri.parse(folderController.text);
+                      final bytes = await UriContent().from(uri);
+                      context.read<KeePassBloc>().add(
+                        LoadDatabase(
+                          bytes: bytes,
+                          password: passwordController.text,
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     decoration: BoxDecoration(
