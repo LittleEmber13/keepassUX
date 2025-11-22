@@ -122,35 +122,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                           return null;
                         },
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Color(0xFFF3F5F9),
                           labelText: tr("create_database_page.name_hint"),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Color(0xFFD2D2D2),
-                              width: 1,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Color(0xFFD2D2D2),
-                              width: 1,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
                         ),
                       ),
                       SizedBox(height: 16),
@@ -164,8 +136,6 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                         },
                         obscureText: obscurePassword,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Color(0xFFF3F5F9),
                           labelText: tr("create_database_page.password_hint"),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -178,32 +148,6 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                                 obscurePassword = !obscurePassword;
                               });
                             },
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Color(0xFFD2D2D2),
-                              width: 1,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Color(0xFFD2D2D2),
-                              width: 1,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
                           ),
                         ),
                       ),

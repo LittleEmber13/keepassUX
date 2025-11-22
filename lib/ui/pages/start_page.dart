@@ -154,28 +154,8 @@ class _StartPageState extends State<StartPage> {
                                   return null;
                                 },
                                 decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Color(0xFFF3F5F9),
                                   labelText: tr("start_page.folder_hint"),
-                                  disabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFD2D2D2),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color: Colors.red,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
-                                  ),
-                                ),
+                                 ),
                               ),
                             ),
                           ],
@@ -192,8 +172,6 @@ class _StartPageState extends State<StartPage> {
                         },
                         obscureText: obscurePassword,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Color(0xFFF3F5F9),
                           labelText: tr("start_page.password_hint"),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -207,33 +185,7 @@ class _StartPageState extends State<StartPage> {
                               });
                             },
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Color(0xFFD2D2D2),
-                              width: 1,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.red, width: 1),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Color(0xFFD2D2D2),
-                              width: 1,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                        ),
+                       ),
                       ),
                     ],
                   ),

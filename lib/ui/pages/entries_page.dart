@@ -133,6 +133,7 @@ class _EntriesPageState extends State<EntriesPage> {
                           hintText: "Search for an entry",
                           contentPadding: EdgeInsets.all(0),
                           isDense: true,
+                          filled: false,
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,

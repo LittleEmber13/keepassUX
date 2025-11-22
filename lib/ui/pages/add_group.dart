@@ -140,23 +140,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0xFFF3F5F9),
-        labelText: label,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFFD2D2D2), width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFFD2D2D2), width: 1),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 10,
-        ),
-      ),
+      decoration: InputDecoration(labelText: label),
     );
   }
 }
