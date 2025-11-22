@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,7 +71,9 @@ class _StartPageState extends State<StartPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(),
-          Center(child: Text("KeePass", style: TextStyle(fontSize: 32))),
+          Center(
+            child: Text(tr("start_page.title"), style: TextStyle(fontSize: 32)),
+          ),
           Padding(
             padding: const EdgeInsets.all(24),
             child: Container(color: Colors.black, height: 200),
@@ -129,7 +132,7 @@ class _StartPageState extends State<StartPage> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Color(0xFFF3F5F9),
-                                labelText: "Base de datos",
+                                labelText: tr("start_page.folder_hint"),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   borderSide: BorderSide(
@@ -154,7 +157,7 @@ class _StartPageState extends State<StartPage> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFF3F5F9),
-                        labelText: "Contraseña",
+                        labelText: tr("start_page.password_hint"),
                         suffixIcon: IconButton(
                           icon: Icon(
                             obscurePassword == true
@@ -230,7 +233,7 @@ class _StartPageState extends State<StartPage> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Open database",
+                              tr("start_page.open_database"),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -252,7 +255,7 @@ class _StartPageState extends State<StartPage> {
                       ),
                     );
                   },
-                  child: InkWell(child: Text("Crear base de datos")),
+                  child: InkWell(child: Text(tr("start_page.create_database"))),
                 ),
               ],
             ),

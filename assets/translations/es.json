@@ -1,1 +1,16 @@
-{}
+{
+  "start_page":{
+    "title": "KeePass",
+    "folder_hint": "Base de datos",
+    "password_hint": "Contraseña",
+    "open_database": "Abrir base de datos",
+    "create_database": "Crear base de datos"
+  },
+  "create_database_page": {
+    "title": "Crear base de datos",
+    "name_hint": "Nombre del archivo",
+    "password_hint": "Contraseña",
+    "open_database": "Abrir base de datos",
+    "create_database": "Crear base de datos"
+  }
+}

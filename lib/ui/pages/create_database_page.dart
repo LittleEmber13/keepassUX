@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,7 +70,10 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
         children: [
           SizedBox(),
           Center(
-            child: Text("Crear base de datos", style: TextStyle(fontSize: 32)),
+            child: Text(
+              tr("create_database_page.title"),
+              style: TextStyle(fontSize: 32),
+            ),
           ),
 
           Padding(
@@ -97,7 +101,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFF3F5F9),
-                        labelText: "Nombre del archivo",
+                        labelText: tr("create_database_page.name_hint"),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
@@ -125,7 +129,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFF3F5F9),
-                        labelText: "Contraseña",
+                        labelText: tr("create_database_page.password_hint"),
                         suffixIcon: IconButton(
                           icon: Icon(
                             obscurePassword == true
@@ -217,7 +221,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Create database",
+                              tr("create_database_page.create_database"),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -239,7 +243,9 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                       ),
                     );
                   },
-                  child: InkWell(child: Text("Abrir base de datos")),
+                  child: InkWell(
+                    child: Text(tr("create_database_page.open_database")),
+                  ),
                 ),
               ],
             ),
