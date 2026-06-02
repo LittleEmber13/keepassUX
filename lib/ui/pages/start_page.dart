@@ -20,6 +20,8 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
+  static const _safChannel = MethodChannel('com.example.keepassux/saf');
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController passwordController = TextEditingController();
@@ -29,11 +31,21 @@ class _StartPageState extends State<StartPage> {
 
   SharedPreferences? preferences;
 
+  Future<void> _takePersistablePermission(String uri) async {
+    try {
+      await _safChannel.invokeMethod('takePersistableUriPermission', {'uri': uri});
+    } catch (_) {}
+  }
+
   @override
   void initState() {
     SharedPreferences.getInstance().then((preferences) {
       this.preferences = preferences;
-      folderController.text = preferences.getString('kdbx_uri') ?? '';
+      final savedUri = preferences.getString('kdbx_uri') ?? '';
+      folderController.text = savedUri;
+      if (savedUri.isNotEmpty) {
+        _takePersistablePermission(savedUri);
+      }
     });
     super.initState();
   }
@@ -137,6 +149,7 @@ class _StartPageState extends State<StartPage> {
                             if (safUri != null) {
                               folderController.text = safUri;
                               await preferences!.setString('kdbx_uri', safUri);
+                              _takePersistablePermission(safUri);
                             }
                           }
                         },
@@ -201,14 +214,25 @@ class _StartPageState extends State<StartPage> {
                 InkWell(
                   onTap: () async {
                     if (_formKey.currentState!.validate()) {
-                      final uri = Uri.parse(folderController.text);
-                      final bytes = await UriContent().from(uri);
-                      context.read<KeePassBloc>().add(
-                        LoadDatabase(
-                          bytes: bytes,
-                          password: passwordController.text,
-                        ),
-                      );
+                      try {
+                        final uri = Uri.parse(folderController.text);
+                        final bytes = await UriContent().from(uri);
+                        context.read<KeePassBloc>().add(
+                          LoadDatabase(
+                            bytes: bytes,
+                            password: passwordController.text,
+                          ),
+                        );
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(tr("start_page.open_database_error")),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      }
                     }
                   },
                   child: Container(

@@ -11,6 +11,7 @@
     "folder_hint": "Database",
     "password_hint": "Password",
     "open_database": "Open database",
+    "open_database_error": "Could not open the database file. Please select it again.",
     "create_database": "Create database"
   },
   "create_database_page": {

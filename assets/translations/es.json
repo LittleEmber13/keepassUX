@@ -11,6 +11,7 @@
     "folder_hint": "Base de datos",
     "password_hint": "Contraseña",
     "open_database": "Abrir base de datos",
+    "open_database_error": "No se pudo abrir el archivo de base de datos. Por favor, selecciónalo de nuevo.",
     "create_database": "Crear base de datos"
   },
   "create_database_page": {
