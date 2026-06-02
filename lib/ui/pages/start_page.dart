@@ -1,12 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/create_database_page.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:keepassux/ui/services/biometric_service.dart';
+import 'package:keepassux/ui/services/saf_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uri_content/uri_content.dart';
 
@@ -20,41 +22,124 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  static const _safChannel = MethodChannel('com.example.keepassux/saf');
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final SafService _safService = SafService();
+  final BiometricService _biometricService = BiometricService();
 
   TextEditingController passwordController = TextEditingController();
   TextEditingController folderController = TextEditingController();
 
-  bool obscurePassword = false;
+  bool obscurePassword = true;
+  bool _hasBiometrics = false;
+  bool _hasSavedPassword = false;
 
   SharedPreferences? preferences;
 
-  Future<void> _takePersistablePermission(String uri) async {
-    try {
-      await _safChannel.invokeMethod('takePersistableUriPermission', {'uri': uri});
-    } catch (_) {}
+  Future<void> _initStateAsync() async {
+    preferences = await SharedPreferences.getInstance();
+    final savedUri = preferences!.getString('kdbx_uri') ?? '';
+    folderController.text = savedUri;
+    if (savedUri.isNotEmpty) {
+      _safService.takePersistablePermission(savedUri);
+    }
+    _hasBiometrics = await _biometricService.canAuthenticate();
+    _hasSavedPassword = await _biometricService.hasSavedPassword(savedUri);
+    setState(() {});
   }
 
   @override
   void initState() {
-    SharedPreferences.getInstance().then((preferences) {
-      this.preferences = preferences;
-      final savedUri = preferences.getString('kdbx_uri') ?? '';
-      folderController.text = savedUri;
-      if (savedUri.isNotEmpty) {
-        _takePersistablePermission(savedUri);
-      }
-    });
+    _initStateAsync();
     super.initState();
   }
 
   @override
   void dispose() {
-    folderController.dispose();
     passwordController.dispose();
+    folderController.dispose();
     super.dispose();
+  }
+
+  Future<void> _onFilePicked(String safUri) async {
+    folderController.text = safUri;
+    await preferences!.setString('kdbx_uri', safUri);
+    _safService.takePersistablePermission(safUri);
+    _hasSavedPassword = await _biometricService.hasSavedPassword(safUri);
+    setState(() {});
+  }
+
+  Future<void> _openDatabase() async {
+    if (!_formKey.currentState!.validate()) return;
+    try {
+      final uri = Uri.parse(folderController.text);
+      final bytes = await UriContent().from(uri);
+      context.read<KeePassBloc>().add(
+        LoadDatabase(bytes: bytes, password: passwordController.text),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(tr("start_page.open_database_error")),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _authenticateWithBiometric() async {
+    final password = await _biometricService.authenticateAndRetrievePassword(
+      folderController.text,
+    );
+    if (password == null || password.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(tr("start_page.biometric_error")),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
+    }
+    passwordController.text = password;
+    _openDatabase();
+  }
+
+  Future<void> _showSavePasswordDialog() async {
+    if (!_hasBiometrics) return;
+    final uri = folderController.text;
+    if (uri.isEmpty) return;
+
+    final existing = await _biometricService.hasSavedPassword(uri);
+    if (existing) return;
+
+    if (!mounted) return;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(tr("start_page.biometric_save_title")),
+        content: Text(tr("start_page.biometric_save_message")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(tr("start_page.biometric_save_no")),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(tr("start_page.biometric_save_yes")),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await _biometricService.savePassword(uri, passwordController.text);
+      _hasSavedPassword = await _biometricService.hasSavedPassword(uri);
+      setState(() {});
+    }
   }
 
   @override
@@ -62,6 +147,7 @@ class _StartPageState extends State<StartPage> {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
         if (state is KeePassLoaded) {
+          _showSavePasswordDialog();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const EntriesPage()),
@@ -96,198 +182,214 @@ class _StartPageState extends State<StartPage> {
     return Scaffold(
       body: SafeArea(
         child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(),
-          Center(
-            child: Text(tr("start_page.title"), style: TextStyle(fontSize: 32)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Container(color: Colors.black, height: 200),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                    offset: Offset(1, 2),
-                  ),
-                ],
-              ),
-              child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          if (preferences == null) {
-                            return;
-                          }
-
-                          final result = await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['kdbx'],
-                            withData: false,
-                          );
-
-                          if (result != null && result.files.isNotEmpty) {
-                            PlatformFile file = result.files.single;
-
-                            String? safUri = file.identifier;
-
-                            if (safUri != null) {
-                              folderController.text = safUri;
-                              await preferences!.setString('kdbx_uri', safUri);
-                              _takePersistablePermission(safUri);
-                            }
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            Icon(Icons.folder_open),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: TextFormField(
-                                controller: folderController,
-                                enabled: false,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return tr("form_error.required");
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                  labelText: tr("start_page.folder_hint"),
-                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        controller: passwordController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return tr("form_error.required");
-                          }
-                          return null;
-                        },
-                        obscureText: obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: tr("start_page.password_hint"),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              obscurePassword == true
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                obscurePassword = !obscurePassword;
-                              });
-                            },
-                          ),
-                       ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(),
+            Center(
+              child: Text(tr("start_page.title"), style: TextStyle(fontSize: 32)),
             ),
-          ),
-          Center(
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(color: Colors.black, height: 200),
+            ),
+            _buildFormCard(),
+            _buildActionButtons(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: Offset(1, 2),
+            ),
+          ],
+        ),
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                InkWell(
-                  onTap: () async {
-                    if (_formKey.currentState!.validate()) {
-                      try {
-                        final uri = Uri.parse(folderController.text);
-                        final bytes = await UriContent().from(uri);
-                        context.read<KeePassBloc>().add(
-                          LoadDatabase(
-                            bytes: bytes,
-                            password: passwordController.text,
-                          ),
-                        );
-                      } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(tr("start_page.open_database_error")),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        }
-                      }
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFF374151),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.arrow_forward),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              tr("start_page.open_database"),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                _buildFilePickerRow(),
                 SizedBox(height: 16),
-                InkWell(
-                  onTap: () async {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateDatabasePage(),
-                      ),
-                    );
-                  },
-                  child: InkWell(child: Text(tr("start_page.create_database"))),
-                ),
+                _buildPasswordField(),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilePickerRow() {
+    return InkWell(
+      onTap: () async {
+        if (preferences == null) return;
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['kdbx'],
+          withData: false,
+        );
+        if (result != null && result.files.isNotEmpty) {
+          final safUri = result.files.single.identifier;
+          if (safUri != null) {
+            _onFilePicked(safUri);
+          }
+        }
+      },
+      child: Row(
+        children: [
+          Icon(Icons.folder_open),
+          SizedBox(width: 16),
+          Expanded(
+            child: TextFormField(
+              controller: folderController,
+              enabled: false,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return tr("form_error.required");
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                labelText: tr("start_page.folder_hint"),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: passwordController,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return tr("form_error.required");
+        }
+        return null;
+      },
+      obscureText: obscurePassword,
+      decoration: InputDecoration(
+        labelText: tr("start_page.password_hint"),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+          onPressed: () {
+            setState(() {
+              obscurePassword = !obscurePassword;
+            });
+          },
+        ),
       ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildOpenDatabaseButton(),
+          SizedBox(height: 16),
+          if (_hasBiometrics && _hasSavedPassword) _buildBiometricButton(),
+          if (_hasBiometrics && _hasSavedPassword) SizedBox(height: 16),
+          _buildCreateDatabaseLink(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOpenDatabaseButton() {
+    return InkWell(
+      onTap: _openDatabase,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFF374151),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.arrow_forward),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  tr("start_page.open_database"),
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBiometricButton() {
+    return InkWell(
+      onTap: _authenticateWithBiometric,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFF374151),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(FontAwesomeIcons.fingerprint, color: Colors.white, size: 24),
+              SizedBox(width: 12),
+              Text(
+                tr("start_page.open_with_biometric"),
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreateDatabaseLink() {
+    return InkWell(
+      onTap: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const CreateDatabasePage()),
+        );
+      },
+      child: Text(tr("start_page.create_database")),
     );
   }
 }

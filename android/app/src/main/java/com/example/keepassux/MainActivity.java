@@ -3,11 +3,11 @@ package com.example.keepassux;
 import android.content.Intent;
 import android.net.Uri;
 
-import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.android.FlutterFragmentActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MainActivity extends FlutterActivity {
+public class MainActivity extends FlutterFragmentActivity {
     private static final String CHANNEL = "com.example.keepassux/saf";
 
     @Override

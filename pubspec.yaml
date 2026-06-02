@@ -44,6 +44,8 @@ dependencies:
   uri_content: ^3.1.1
   content_resolver: ^0.3.6
   easy_localization: ^3.0.8
+  local_auth: ^2.3.0
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:

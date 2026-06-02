@@ -12,7 +12,15 @@
     "password_hint": "Contraseña",
     "open_database": "Abrir base de datos",
     "open_database_error": "No se pudo abrir el archivo de base de datos. Por favor, selecciónalo de nuevo.",
-    "create_database": "Crear base de datos"
+    "create_database": "Crear base de datos",
+    "open_with_biometric": "Abrir con huella",
+    "biometric_reason": "Autentícate para abrir tu base de datos",
+    "biometric_error": "Error en la autenticación biométrica",
+    "biometric_locked": "Autenticación biométrica bloqueada temporalmente",
+    "biometric_save_title": "¿Guardar contraseña para biométricos?",
+    "biometric_save_message": "¿Quieres guardar tu contraseña para poder abrir la base de datos con tu huella la próxima vez?",
+    "biometric_save_yes": "Sí, guardar",
+    "biometric_save_no": "No, gracias"
   },
   "create_database_page": {
     "title": "Crear base de datos",

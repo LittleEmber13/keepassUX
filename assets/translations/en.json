@@ -12,7 +12,15 @@
     "password_hint": "Password",
     "open_database": "Open database",
     "open_database_error": "Could not open the database file. Please select it again.",
-    "create_database": "Create database"
+    "create_database": "Create database",
+    "open_with_biometric": "Open with fingerprint",
+    "biometric_reason": "Authenticate to open your database",
+    "biometric_error": "Biometric authentication failed",
+    "biometric_locked": "Biometric authentication temporarily locked",
+    "biometric_save_title": "Save password for biometrics?",
+    "biometric_save_message": "Do you want to save your password so you can open the database with your fingerprint next time?",
+    "biometric_save_yes": "Yes, save",
+    "biometric_save_no": "No, thanks"
   },
   "create_database_page": {
     "title": "Create database",
