@@ -12,6 +12,7 @@ import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:collection/collection.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
+import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({this.uuidGroup, super.key});
@@ -310,8 +311,9 @@ class _EntriesPageState extends State<EntriesPage> {
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
-                            Icon(
-                              FontAwesomeIcons.twitter,
+                            KDBXIconWidget(
+                              object: group!.entries[index],
+                              size: 24,
                               color: Colors.lightBlueAccent,
                             ),
                             SizedBox(width: 16),

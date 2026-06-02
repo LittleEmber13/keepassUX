@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kdbx/kdbx.dart';
+import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 
 class EntryData extends StatefulWidget {
   const EntryData({required this.entry, super.key});
@@ -29,10 +30,7 @@ class _EntryDataState extends State<EntryData> {
               },
               child: const Icon(Icons.arrow_back),
             ),
-            GestureDetector(
-              onTap: () {},
-              child: const Icon(Icons.star_border, size: 27),
-            ),
+            KDBXIconWidget(object: widget.entry, size: 27),
           ],
         ),
         const SizedBox(height: 24),
