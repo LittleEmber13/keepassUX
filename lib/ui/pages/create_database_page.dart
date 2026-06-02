@@ -80,7 +80,8 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
 
   Widget _page() {
     return Scaffold(
-      body: Column(
+      body: SafeArea(
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -246,6 +247,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

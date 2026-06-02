@@ -82,7 +82,8 @@ class _StartPageState extends State<StartPage> {
 
   Widget _page() {
     return Scaffold(
-      body: Column(
+      body: SafeArea(
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -261,6 +262,7 @@ class _StartPageState extends State<StartPage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

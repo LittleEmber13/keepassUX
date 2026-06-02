@@ -19,7 +19,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SafeArea(
+      child: Padding(
       padding: const EdgeInsets.only(bottom: 24, left: 24, right: 24, top: 24),
       child: Container(
         decoration: BoxDecoration(
@@ -174,6 +175,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -99,7 +99,8 @@ class _AddEntryPageState extends State<AddEntryPage> {
           ),
         ),
       ),
-      body: Form(
+      body: SafeArea(
+        child: Form(
         key: _formKey,
         child: Column(
           children: [
@@ -252,6 +253,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

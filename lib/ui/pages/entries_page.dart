@@ -121,7 +121,8 @@ class _EntriesPageState extends State<EntriesPage> {
         uuidGroup: widget.uuidGroup,
         selectedIndex: 0,
       ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -325,6 +326,7 @@ class _EntriesPageState extends State<EntriesPage> {
             ],
           ),
         ],
+      ),
       ),
     );
   }

@@ -81,7 +81,8 @@ class _AddGroupPageState extends State<AddGroupPage> {
           ),
         ),
       ),
-      body: Form(
+      body: SafeArea(
+        child: Form(
         key: _formKey,
         child: Column(
           children: [
@@ -142,6 +143,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

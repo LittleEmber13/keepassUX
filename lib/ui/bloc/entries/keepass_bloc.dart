@@ -56,12 +56,18 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   }
 
   Future<void> _onCreateDatabase(
-    CreateDatabase event,
-    Emitter<KeePassState> emit,
-  ) async {
+      CreateDatabase event,
+      Emitter<KeePassState> emit,
+      ) async {
     try {
       emit(KeePassLoading());
       print("Creating database...");
+
+      if (event.uri == null) {
+        throw Exception("URI is null");
+      }
+
+      print("URI: ${event.uri}");
 
       preferences = await SharedPreferences.getInstance();
 
@@ -69,13 +75,23 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
         Credentials(ProtectedValue.fromString(event.password)),
         'KeepassUX',
       );
-      Uint8List bytes = await kdbx!.save();
+
+      final Uint8List bytes = await kdbx!.save();
+
+      if (bytes.isEmpty) {
+        throw Exception("Generated database is empty");
+      }
+
       await ContentResolver.writeContent(event.uri, bytes);
 
-      print("Created database");
+      print("Created database successfully");
       emit(KeePassCreated());
     } catch (e, s) {
-      logger.e(e);
+      print("ERROR creating database: $e");
+      print(s);
+
+      logger.e(e, stackTrace: s);
+
       emit(KeePassError(tr("exception.unknown")));
     }
   }
