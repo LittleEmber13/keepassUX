@@ -38,7 +38,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
   @override
   void dispose() {
     titleController.dispose();
-    urlController.dispose();
+    userController.dispose();
     urlController.dispose();
     notesController.dispose();
     passwordController.dispose();

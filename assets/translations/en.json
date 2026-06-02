@@ -61,7 +61,8 @@
     "title": "Title",
     "user": "User",
     "password": "Password",
-    "url": "URL"
+    "url": "URL",
+    "notes": "Notes"
   },
   "settings_page": {
     "language": "Language"

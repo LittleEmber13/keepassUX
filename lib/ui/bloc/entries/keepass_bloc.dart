@@ -121,8 +121,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       entry.setString(KdbxKeyCommon.TITLE, PlainValue(event.title));
       entry.setString(KdbxKeyCommon.USER_NAME, PlainValue(event.userName));
       entry.setString(KdbxKeyCommon.URL, PlainValue(event.url));
-
-      /// TODO NOTES
+      entry.setString(KdbxKey('Notes'), PlainValue(event.notes ?? ''));
 
       entry.setString(
         KdbxKeyCommon.PASSWORD,

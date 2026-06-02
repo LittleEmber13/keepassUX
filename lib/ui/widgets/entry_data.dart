@@ -233,6 +233,37 @@ class _EntryDataState extends State<EntryData> {
                   ],
                 ),
               ],
+              if ((widget.entry.getString(KdbxKey('Notes'))?.getText() ??
+                      "")
+                  .isNotEmpty) ...[
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue:
+                      widget.entry
+                          .getString(KdbxKey('Notes'))
+                          ?.getText() ??
+                      "",
+                  readOnly: true,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    labelText: tr("entry_data.notes"),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
