@@ -1,6 +1,4 @@
-import 'dart:typed_data';
-
-import 'package:kdbx/kdbx.dart';
+import '../../model/db_group.dart';
 
 abstract class KeePassState {}
 
@@ -13,8 +11,8 @@ class KeePassLoaded extends KeePassState {}
 class KeePassCreated extends KeePassState {}
 
 class KeePassRootGroup extends KeePassState {
-  final KdbxGroup? group;
-  KeePassRootGroup(this.group);
+  final DbGroup? rootGroup;
+  KeePassRootGroup(this.rootGroup);
 }
 
 class KeePassError extends KeePassState {
@@ -28,4 +26,8 @@ class KeePassAddEntrySuccess extends KeePassState {
 
 class KeePassAddGroupSuccess extends KeePassState {
   KeePassAddGroupSuccess();
+}
+
+class KeePassUpdateEntrySuccess extends KeePassState {
+  KeePassUpdateEntrySuccess();
 }

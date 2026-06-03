@@ -1,13 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kdbx/kdbx.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
+import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+
+import '../model/db_entry.dart';
 
 class EntryData extends StatefulWidget {
   const EntryData({required this.entry, super.key});
 
-  final KdbxEntry entry;
+  final DbEntry entry;
 
   @override
   State<EntryData> createState() => _EntryDataState();
@@ -15,259 +21,267 @@ class EntryData extends StatefulWidget {
 
 class _EntryDataState extends State<EntryData> {
   bool obscurePassword = true;
+  bool _isEditing = false;
+
+  late TextEditingController _titleController;
+  late TextEditingController _userController;
+  late TextEditingController _urlController;
+  late TextEditingController _notesController;
+  late TextEditingController _passwordController;
+
+  final _inputBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: Colors.transparent, width: 1),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.entry.label);
+    _userController = TextEditingController(text: widget.entry.userName);
+    _urlController = TextEditingController(text: widget.entry.url);
+    _notesController = TextEditingController(text: widget.entry.notes);
+    _passwordController = TextEditingController(text: widget.entry.password);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _userController.dispose();
+    _urlController.dispose();
+    _notesController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _toggleEdit() {
+    if (_isEditing) {
+      context.read<KeePassBloc>().add(
+        UpdateEntry(
+          entryUuid: widget.entry.uuid,
+          title: _titleController.text,
+          userName: _userController.text,
+          url: _urlController.text,
+          notes: _notesController.text,
+          password: _passwordController.text,
+        ),
+      );
+    } else {
+      setState(() {
+        _isEditing = true;
+      });
+    }
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      _isEditing = false;
+      _titleController.text = widget.entry.label;
+      _userController.text = widget.entry.userName;
+      _urlController.text = widget.entry.url;
+      _notesController.text = widget.entry.notes;
+      _passwordController.text = widget.entry.password;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocListener<KeePassBloc, KeePassState>(
+      listener: (context, state) {
+        if (state is KeePassUpdateEntrySuccess) {
+          setState(() {
+            _isEditing = false;
+          });
+          Navigator.pop(context);
+        }
+      },
+      child: PopScope(
+        canPop: !_isEditing,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.arrow_back),
-            ),
-            KDBXIconWidget(object: widget.entry, size: 27),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Expanded(
-          child: ListView(
-            children: [
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      initialValue: widget.entry.label,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        labelText: tr("entry_data.title"),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Colors.transparent,
-                            width: 1,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Colors.transparent,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  InkWell(
+            Row(
+              children: [
+                if (_isEditing)
+                  KDBXIconWidget(
+                    icon: widget.entry.icon,
+                    customIconData: widget.entry.customIconData,
+                    size: 27,
+                  )
+                else ...[
+                  GestureDetector(
                     onTap: () {
-                      Clipboard.setData(
-                        ClipboardData(text: widget.entry.label ?? ""),
-                      );
+                      Navigator.pop(context);
                     },
-                    child: Icon(Icons.copy),
+                    child: const Icon(Icons.arrow_back),
+                  ),
+                  const Spacer(),
+                  KDBXIconWidget(
+                    icon: widget.entry.icon,
+                    customIconData: widget.entry.customIconData,
+                    size: 27,
                   ),
                 ],
-              ),
-              if ((widget.entry.getString(KdbxKeyCommon.USER_NAME)?.getText() ??
-                      "")
-                  .isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        initialValue:
-                            widget.entry
-                                .getString(KdbxKeyCommon.USER_NAME)
-                                ?.getText() ??
-                            "",
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: tr("entry_data.user"),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    InkWell(
-                      onTap: () {
-                        String? value =
-                            widget.entry
-                                .getString(KdbxKeyCommon.USER_NAME)
-                                ?.getText();
-                        if (value != null) {
-                          Clipboard.setData(ClipboardData(text: value));
-                        }
-                      },
-                      child: Icon(Icons.copy),
-                    ),
-                  ],
-                ),
               ],
-              if ((widget.entry.getString(KdbxKeyCommon.PASSWORD)?.getText() ??
-                      "")
-                  .isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        initialValue:
-                            widget.entry
-                                .getString(KdbxKeyCommon.PASSWORD)
-                                ?.getText() ??
-                            "",
-                        readOnly: true,
-                        obscureText: obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: tr("entry_data.password"),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              obscurePassword == true
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                obscurePassword = !obscurePassword;
-                              });
-                            },
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    InkWell(
-                      onTap: () {
-                        String? value =
-                            widget.entry
-                                .getString(KdbxKeyCommon.PASSWORD)
-                                ?.getText();
-                        if (value != null) {
-                          Clipboard.setData(ClipboardData(text: value));
-                        }
-                      },
-                      child: Icon(Icons.copy),
-                    ),
-                  ],
+            ),
+            const SizedBox(height: 24),
+            CustomAppScroll(
+              horizontalPadding: 0,
+              children: [
+                _buildField(
+                  controller: _titleController,
+                  label: tr("entry_data.title"),
+                  showCopy: !_isEditing,
+                  onCopy: () {
+                    Clipboard.setData(
+                      ClipboardData(text: widget.entry.label),
+                    );
+                  },
                 ),
-              ],
-              if ((widget.entry.getString(KdbxKeyCommon.URL)?.getText() ?? "")
-                  .isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        initialValue:
-                            widget.entry
-                                .getString(KdbxKeyCommon.URL)
-                                ?.getText() ??
-                            "",
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: tr("entry_data.url"),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: Colors.transparent,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    InkWell(
-                      onTap: () {
-                        String? value =
-                            widget.entry
-                                .getString(KdbxKeyCommon.URL)
-                                ?.getText();
-                        if (value != null) {
-                          Clipboard.setData(ClipboardData(text: value));
-                        }
-                      },
-                      child: Icon(Icons.copy),
-                    ),
-                  ],
+                _buildField(
+                  controller: _userController,
+                  label: tr("entry_data.user"),
+                  showCopy: !_isEditing,
+                  onCopy: () {
+                    Clipboard.setData(
+                      ClipboardData(text: widget.entry.userName),
+                    );
+                  },
                 ),
-              ],
-              if ((widget.entry.getString(KdbxKey('Notes'))?.getText() ??
-                      "")
-                  .isNotEmpty) ...[
-                const SizedBox(height: 16),
-                TextFormField(
-                  initialValue:
-                      widget.entry
-                          .getString(KdbxKey('Notes'))
-                          ?.getText() ??
-                      "",
-                  readOnly: true,
+                _buildField(
+                  controller: _passwordController,
+                  label: tr("entry_data.password"),
+                  showCopy: !_isEditing,
+                  obscure: obscurePassword,
+                  onToggleObscure: () {
+                    setState(() {
+                      obscurePassword = !obscurePassword;
+                    });
+                  },
+                  onCopy: () {
+                    Clipboard.setData(
+                      ClipboardData(text: widget.entry.password),
+                    );
+                  },
+                ),
+                _buildField(
+                  controller: _urlController,
+                  label: tr("entry_data.url"),
+                  showCopy: !_isEditing,
+                  onCopy: () {
+                    Clipboard.setData(
+                      ClipboardData(text: widget.entry.url),
+                    );
+                  },
+                ),
+                _buildField(
+                  controller: _notesController,
+                  label: tr("entry_data.notes"),
+                  showCopy: false,
                   maxLines: null,
-                  decoration: InputDecoration(
-                    labelText: tr("entry_data.notes"),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.transparent,
-                        width: 1,
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.transparent,
-                        width: 1,
+                      onPressed: _toggleEdit,
+                      child: Text(
+                        _isEditing
+                            ? tr("entry_data.save")
+                            : tr("entry_data.edit"),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ],
-          ),
+                  if (_isEditing) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: _cancelEdit,
+                        child: Text(
+                          tr("entry_data.cancel"),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required String label,
+    bool showCopy = true,
+    bool? obscure,
+    VoidCallback? onToggleObscure,
+    VoidCallback? onCopy,
+    int? maxLines,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              readOnly: !_isEditing,
+              obscureText: obscure ?? false,
+              maxLines: (obscure == true) ? 1 : maxLines,
+              decoration: InputDecoration(
+                labelText: label,
+                suffixIcon: onToggleObscure != null
+                    ? IconButton(
+                        icon: Icon(
+                          obscure == true
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: onToggleObscure,
+                      )
+                    : null,
+                enabledBorder: _inputBorder,
+                focusedBorder: _inputBorder,
+                disabledBorder: _inputBorder,
+              ),
+            ),
+          ),
+          if (showCopy && !_isEditing && onCopy != null) ...[
+            const SizedBox(width: 16),
+            InkWell(
+              onTap: onCopy,
+              child: const Icon(Icons.copy),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

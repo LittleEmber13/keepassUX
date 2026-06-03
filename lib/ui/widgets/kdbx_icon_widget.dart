@@ -1,30 +1,37 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/utils/kdbx_icons.dart';
 
 class KDBXIconWidget extends StatelessWidget {
   const KDBXIconWidget({
-    required this.object,
+    required this.icon,
+    this.customIconData,
     this.size = 24,
     this.color,
     super.key,
   });
 
-  final KdbxObject object;
+  final int icon;
+  final Uint8List? customIconData;
   final double size;
   final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final customData = object.customIcon?.data;
-    if (customData != null) {
+    if (customIconData != null) {
       return Image.memory(
-        customData,
+        customIconData!,
         width: size,
         height: size,
         fit: BoxFit.contain,
       );
     }
-    return Icon(kdbxIconToFlutter(object.icon.get()), size: size, color: color);
+    return Icon(
+      kdbxIconToFlutter(KdbxIcon.values[icon]),
+      size: size,
+      color: color,
+    );
   }
 }

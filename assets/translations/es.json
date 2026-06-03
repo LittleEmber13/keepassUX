@@ -62,7 +62,10 @@
     "user": "Usuario",
     "password": "Contraseña",
     "url": "URL",
-    "notes": "Notas"
+    "notes": "Notas",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar"
   },
   "settings_page": {
     "language": "Idioma"

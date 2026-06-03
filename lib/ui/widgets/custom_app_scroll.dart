@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CustomAppScroll extends StatefulWidget {
-  const CustomAppScroll({required this.children, super.key});
+  const CustomAppScroll({
+    required this.children,
+    this.horizontalPadding = 24,
+    super.key,
+  });
 
   final List<Widget> children;
+  final double horizontalPadding;
 
   @override
   State<CustomAppScroll> createState() => _CustomAppScrollState();
@@ -45,7 +50,7 @@ class _CustomAppScrollState extends State<CustomAppScroll> {
         builder: (context, constraints) {
           _checkIfExceedsHeight(constraints);
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: widget.horizontalPadding),
             child: Stack(
               alignment: Alignment.topRight,
               children: [
@@ -68,7 +73,6 @@ class _CustomAppScrollState extends State<CustomAppScroll> {
                   thumbVisibility: true,
                   thickness: 8.0,
                   trackVisibility: false,
-                  trackColor: Colors.black,
                   thumbColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(99)),

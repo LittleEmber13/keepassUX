@@ -47,3 +47,21 @@ class AddGroup extends KeePassEvent {
     required this.title,
   });
 }
+
+class UpdateEntry extends KeePassEvent {
+  final String entryUuid;
+  final String title;
+  final String? userName;
+  final String? url;
+  final String? notes;
+  final String password;
+
+  UpdateEntry({
+    required this.entryUuid,
+    required this.title,
+    this.userName,
+    this.url,
+    this.notes,
+    required this.password,
+  });
+}

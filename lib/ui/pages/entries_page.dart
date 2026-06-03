@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kdbx/kdbx.dart';
+import 'package:collection/collection.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
@@ -10,9 +10,10 @@ import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
-import 'package:collection/collection.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+
+import '../model/db_group.dart';
 
 class EntriesPage extends StatefulWidget {
   const EntriesPage({this.uuidGroup, super.key});
@@ -27,7 +28,7 @@ class _EntriesPageState extends State<EntriesPage> {
   final TextEditingController searchBarController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  KdbxGroup? group;
+  DbGroup? group;
 
   @override
   void dispose() {
@@ -51,13 +52,13 @@ class _EntriesPageState extends State<EntriesPage> {
         if (state is KeePassRootGroup) {
           if (widget.uuidGroup == null) {
             setState(() {
-              group = state.group;
+              group = state.rootGroup;
             });
           } else {
-            List<KdbxGroup> allGroups = state.group?.getAllGroups() ?? [];
+            List<DbGroup> allGroups = state.rootGroup?.getAllGroups() ?? [];
             setState(() {
               group = allGroups.firstWhereOrNull(
-                (g) => g.uuid.uuid == widget.uuidGroup,
+                (g) => g.uuid == widget.uuidGroup,
               );
             });
           }
@@ -241,7 +242,7 @@ class _EntriesPageState extends State<EntriesPage> {
                               MaterialPageRoute(
                                 builder:
                                     (context) => EntriesPage(
-                                      uuidGroup: group!.groups[index].uuid.uuid,
+                                      uuidGroup: group!.groups[index].uuid,
                                     ),
                               ),
                             );
@@ -262,7 +263,7 @@ class _EntriesPageState extends State<EntriesPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Text(
-                                group!.groups[index].name.get() ?? "-",
+                                group!.groups[index].name,
                               ),
                             ),
                           ),
@@ -286,10 +287,31 @@ class _EntriesPageState extends State<EntriesPage> {
                             top: Radius.circular(20),
                           ),
                         ),
+                        isScrollControlled: true,
                         builder: (BuildContext ctx) {
-                          return Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: EntryData(entry: group!.entries[index]),
+                          return SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.75,
+                            child: BlocBuilder<KeePassBloc, KeePassState>(
+                              builder: (context, state) {
+                                return Stack(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(24),
+                                      child: EntryData(
+                                        entry: group!.entries[index],
+                                      ),
+                                    ),
+                                    if (state is KeePassLoading)
+                                      Container(
+                                        color: Colors.black.withOpacity(0.5),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
                           );
                         },
                       );
@@ -312,7 +334,8 @@ class _EntriesPageState extends State<EntriesPage> {
                         child: Row(
                           children: [
                             KDBXIconWidget(
-                              object: group!.entries[index],
+                              icon: group!.entries[index].icon,
+                              customIconData: group!.entries[index].customIconData,
                               size: 24,
                               color: Colors.lightBlueAccent,
                             ),

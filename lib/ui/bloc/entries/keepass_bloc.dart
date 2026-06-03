@@ -1,15 +1,16 @@
-import 'dart:isolate';
-import 'dart:typed_data';
-
 import 'package:content_resolver/content_resolver.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kdbx/kdbx.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
+import 'package:keepassux/ui/utils/kdbx_isolate.dart';
 import 'package:logger/logger.dart';
-import 'package:collection/collection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../model/db_group.dart';
+import '../../model/db_root.dart';
+import '../../model/kdbx_action_result.dart';
+import '../../utils/kdbx_command.dart';
 
 class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   KeePassBloc() : super(KeePassInitial()) {
@@ -18,12 +19,19 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     on<AddGroup>(_onAddGroup);
     on<GetRootGroup>(_onGetRootGroup);
     on<CreateDatabase>(_onCreateDatabase);
+    on<UpdateEntry>(_onUpdateEntry);
+    _initIsolate();
   }
 
-  KdbxFile? kdbx;
+  final KdbxIsolate _kdbxIsolate = KdbxIsolate();
   SharedPreferences? preferences;
+  DbGroup? _currentRoot;
 
   Logger logger = Logger();
+
+  Future<void> _initIsolate() async {
+    await _kdbxIsolate.init();
+  }
 
   Future<void> _onLoadDatabase(
     LoadDatabase event,
@@ -31,106 +39,82 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   ) async {
     try {
       emit(KeePassLoading());
-      print("Loading database...");
 
       preferences = await SharedPreferences.getInstance();
 
-      final result = await Isolate.run(() async {
-        final credentials = Credentials(
-          ProtectedValue.fromString(event.password),
-        );
-        KdbxFile kdbx = await KdbxFormat().read(event.bytes, credentials);
-        return {'kdbx': kdbx};
-      });
+      final root = await _kdbxIsolate.send<DbRoot>(
+        LoadDatabaseCmd(bytes: event.bytes, password: event.password),
+      );
+      _currentRoot = root.rootGroup;
 
-      kdbx = result['kdbx'];
-
-      print("Loaded database");
       emit(KeePassLoaded());
-    } on KdbxInvalidKeyException catch (e) {
-      emit(KeePassError(tr("exception.invalid_password")));
-    } catch (e, s) {
+    } catch (e) {
       logger.e(e);
-      emit(KeePassError(tr("exception.unknown")));
+      if (e.toString().contains('Invalid key') ||
+          e.toString().contains('decrypt')) {
+        emit(KeePassError(tr("exception.invalid_password")));
+      } else {
+        emit(KeePassError(tr("exception.unknown")));
+      }
     }
   }
 
   Future<void> _onCreateDatabase(
-      CreateDatabase event,
-      Emitter<KeePassState> emit,
-      ) async {
-    try {
-      emit(KeePassLoading());
-      print("Creating database...");
-
-      if (event.uri == null) {
-        throw Exception("URI is null");
-      }
-
-      print("URI: ${event.uri}");
-
-      preferences = await SharedPreferences.getInstance();
-
-      kdbx = KdbxFormat().create(
-        Credentials(ProtectedValue.fromString(event.password)),
-        'KeepassUX',
-      );
-
-      final Uint8List bytes = await kdbx!.save();
-
-      if (bytes.isEmpty) {
-        throw Exception("Generated database is empty");
-      }
-
-      await ContentResolver.writeContent(event.uri, bytes);
-
-      print("Created database successfully");
-      emit(KeePassCreated());
-    } catch (e, s) {
-      print("ERROR creating database: $e");
-      print(s);
-
-      logger.e(e, stackTrace: s);
-
-      emit(KeePassError(tr("exception.unknown")));
-    }
-  }
-
-  Future<void> _onGetRootGroup(
-    GetRootGroup event,
+    CreateDatabase event,
     Emitter<KeePassState> emit,
   ) async {
     try {
-      emit(KeePassRootGroup(kdbx!.body.rootGroup));
+      emit(KeePassLoading());
+
+      if (event.uri.isEmpty) {
+        throw Exception("URI is null");
+      }
+
+      preferences = await SharedPreferences.getInstance();
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        CreateDatabaseCmd(password: event.password),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await ContentResolver.writeContent(event.uri, result.savedBytes);
+      await preferences!.setString('kdbx_uri', event.uri);
+
+      emit(KeePassCreated());
     } catch (e) {
       logger.e(e);
       emit(KeePassError(tr("exception.unknown")));
     }
   }
 
+  void _onGetRootGroup(
+    GetRootGroup event,
+    Emitter<KeePassState> emit,
+  ) {
+    if (_currentRoot != null) {
+      emit(KeePassRootGroup(_currentRoot!));
+    }
+  }
+
   Future<void> _onAddEntry(AddEntry event, Emitter<KeePassState> emit) async {
     try {
       emit(KeePassLoading());
-      List<KdbxGroup> allGroups = kdbx!.body.rootGroup.getAllGroups();
-      KdbxGroup? foundGroup = allGroups.firstWhereOrNull(
-        (g) => g.uuid.uuid == event.uuidGroup,
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        AddEntryCmd(
+          groupUuid: event.uuidGroup ?? _currentRoot!.uuid,
+          title: event.title,
+          userName: event.userName ?? '',
+          url: event.url ?? '',
+          notes: event.notes ?? '',
+          password: event.password,
+        ),
       );
-      KdbxGroup group = foundGroup ?? kdbx!.body.rootGroup;
-      KdbxEntry entry = KdbxEntry.create(kdbx!, group);
-      group.addEntry(entry);
-      entry.setString(KdbxKeyCommon.TITLE, PlainValue(event.title));
-      entry.setString(KdbxKeyCommon.USER_NAME, PlainValue(event.userName));
-      entry.setString(KdbxKeyCommon.URL, PlainValue(event.url));
-      entry.setString(KdbxKey('Notes'), PlainValue(event.notes ?? ''));
+      _currentRoot = result.root.rootGroup;
 
-      entry.setString(
-        KdbxKeyCommon.PASSWORD,
-        ProtectedValue.fromString(event.password),
-      );
+      await _saveBytes(result.savedBytes);
 
-      await _saveFile();
-
-      emit(KeePassRootGroup(kdbx!.body.rootGroup));
+      emit(KeePassRootGroup(_currentRoot!));
       emit(KeePassAddEntrySuccess());
     } catch (e) {
       logger.e(e);
@@ -141,21 +125,18 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   Future<void> _onAddGroup(AddGroup event, Emitter<KeePassState> emit) async {
     try {
       emit(KeePassLoading());
-      List<KdbxGroup> allGroups = kdbx!.body.rootGroup.getAllGroups();
-      KdbxGroup? foundGroup = allGroups.firstWhereOrNull(
-        (g) => g.uuid.uuid == event.uuidGroup,
-      );
-      KdbxGroup group = foundGroup ?? kdbx!.body.rootGroup;
-      KdbxGroup newGroup = KdbxGroup.create(
-        ctx: kdbx!.ctx,
-        parent: group,
-        name: event.title,
-      );
-      group.addGroup(newGroup);
 
-      await _saveFile();
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        AddGroupCmd(
+          parentUuid: event.uuidGroup ?? _currentRoot!.uuid,
+          name: event.title,
+        ),
+      );
+      _currentRoot = result.root.rootGroup;
 
-      emit(KeePassRootGroup(kdbx!.body.rootGroup));
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassRootGroup(_currentRoot!));
       emit(KeePassAddGroupSuccess());
     } catch (e) {
       logger.e(e);
@@ -163,15 +144,41 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     }
   }
 
-  _saveFile() async {
+  Future<void> _onUpdateEntry(
+    UpdateEntry event,
+    Emitter<KeePassState> emit,
+  ) async {
+    try {
+      emit(KeePassLoading());
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        UpdateEntryCmd(
+          entryUuid: event.entryUuid,
+          title: event.title,
+          userName: event.userName ?? '',
+          url: event.url ?? '',
+          notes: event.notes ?? '',
+          password: event.password,
+        ),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassRootGroup(_currentRoot!));
+      emit(KeePassUpdateEntrySuccess());
+    } catch (e) {
+      logger.e(e);
+      emit(KeePassError(tr("exception.unknown")));
+    }
+  }
+
+  Future<void> _saveBytes(dynamic bytes) async {
     String? uri = preferences?.getString('kdbx_uri');
     if (uri != null) {
-      Uint8List bytes = await kdbx!.save();
       await ContentResolver.writeContent(uri, bytes);
-      print("Archivo actualizado correctamente en su ubicación original");
     } else {
-      print("file unsaved");
-      throw Exception();
+      throw Exception('No URI saved');
     }
   }
 }

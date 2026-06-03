@@ -62,7 +62,10 @@
     "user": "User",
     "password": "Password",
     "url": "URL",
-    "notes": "Notes"
+    "notes": "Notes",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "settings_page": {
     "language": "Language"
