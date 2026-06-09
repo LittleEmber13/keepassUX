@@ -48,6 +48,30 @@ class AddGroup extends KeePassEvent {
   });
 }
 
+class MoveEntry extends KeePassEvent {
+  final String entryUuid;
+  final String fromGroupUuid;
+  final String toGroupUuid;
+
+  MoveEntry({
+    required this.entryUuid,
+    required this.fromGroupUuid,
+    required this.toGroupUuid,
+  });
+}
+
+class MoveGroup extends KeePassEvent {
+  final String groupUuid;
+  final String fromGroupUuid;
+  final String toGroupUuid;
+
+  MoveGroup({
+    required this.groupUuid,
+    required this.fromGroupUuid,
+    required this.toGroupUuid,
+  });
+}
+
 class UpdateEntry extends KeePassEvent {
   final String entryUuid;
   final String title;

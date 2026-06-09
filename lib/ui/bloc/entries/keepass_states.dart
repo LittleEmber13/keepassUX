@@ -31,3 +31,7 @@ class KeePassAddGroupSuccess extends KeePassState {
 class KeePassUpdateEntrySuccess extends KeePassState {
   KeePassUpdateEntrySuccess();
 }
+
+class KeePassMoveSuccess extends KeePassState {
+  KeePassMoveSuccess();
+}

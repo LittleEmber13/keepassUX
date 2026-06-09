@@ -52,6 +52,28 @@ class AddGroupCmd extends KdbxCommand {
   AddGroupCmd({required this.parentUuid, required this.name});
 }
 
+class MoveEntryCmd extends KdbxCommand {
+  final String entryUuid;
+  final String fromGroupUuid;
+  final String toGroupUuid;
+  MoveEntryCmd({
+    required this.entryUuid,
+    required this.fromGroupUuid,
+    required this.toGroupUuid,
+  });
+}
+
+class MoveGroupCmd extends KdbxCommand {
+  final String groupUuid;
+  final String fromGroupUuid;
+  final String toGroupUuid;
+  MoveGroupCmd({
+    required this.groupUuid,
+    required this.fromGroupUuid,
+    required this.toGroupUuid,
+  });
+}
+
 class CreateDatabaseCmd extends KdbxCommand {
   final String password;
   CreateDatabaseCmd({required this.password});

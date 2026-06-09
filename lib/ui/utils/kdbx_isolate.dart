@@ -111,6 +111,28 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         replyPort.send(
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
         );
+      } else if (command is MoveEntryCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final entry = _findEntry(kdbx!, command.entryUuid);
+        final toGroup = _findGroup(kdbx!, command.toGroupUuid);
+        kdbx!.move(entry, toGroup);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
+      } else if (command is MoveGroupCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final groupToMove = _findGroup(kdbx!, command.groupUuid);
+        final toParent = _findGroup(kdbx!, command.toGroupUuid);
+        final descendants = groupToMove.getAllGroups().map((g) => g.uuid.uuid).toList();
+        if (descendants.contains(toParent.uuid.uuid)) {
+          throw Exception('Cannot move group into its own descendant');
+        }
+        kdbx!.move(groupToMove, toParent);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
       } else if (command is CreateDatabaseCmd) {
         kdbx = KdbxFormat().create(
           Credentials(ProtectedValue.fromString(command.password)),
