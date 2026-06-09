@@ -187,12 +187,15 @@ class _StartPageState extends State<StartPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(),
-            Center(
-              child: Text(tr("start_page.title"), style: TextStyle(fontSize: 32)),
-            ),
             Padding(
               padding: const EdgeInsets.all(24),
-              child: Container(color: Colors.black, height: 200),
+              child: Center(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: MediaQuery.of(context).size.width / 2,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
             _buildFormCard(),
             _buildActionButtons(),
