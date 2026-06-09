@@ -69,5 +69,12 @@
   "settings_page": {
     "language": "Idioma",
     "biometric_login": "Login biométrico"
+  },
+  "icon_picker": {
+    "title": "Seleccionar icono",
+    "custom_icon": "Subir icono personalizado",
+    "change_custom_icon": "Cambiar icono personalizado",
+    "select": "Seleccionar",
+    "cancel": "Cancelar"
   }
 }

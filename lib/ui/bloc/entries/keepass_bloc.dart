@@ -159,6 +159,8 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
           url: event.url ?? '',
           notes: event.notes ?? '',
           password: event.password,
+          icon: event.icon ?? 0,
+          customIconData: event.customIconData,
         ),
       );
       _currentRoot = result.root.rootGroup;

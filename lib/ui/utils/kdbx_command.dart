@@ -32,6 +32,8 @@ class UpdateEntryCmd extends KdbxCommand {
   final String url;
   final String notes;
   final String password;
+  final int icon;
+  final Uint8List? customIconData;
   UpdateEntryCmd({
     required this.entryUuid,
     required this.title,
@@ -39,6 +41,8 @@ class UpdateEntryCmd extends KdbxCommand {
     required this.url,
     required this.notes,
     required this.password,
+    required this.icon,
+    this.customIconData,
   });
 }
 

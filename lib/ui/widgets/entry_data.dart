@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:keepassux/ui/widgets/icon_picker_dialog.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 
 import '../model/db_entry.dart';
@@ -28,6 +31,9 @@ class _EntryDataState extends State<EntryData> {
   late TextEditingController _urlController;
   late TextEditingController _notesController;
   late TextEditingController _passwordController;
+
+  int? _selectedIcon;
+  Uint8List? _selectedCustomIconData;
 
   final _inputBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(8),
@@ -64,6 +70,8 @@ class _EntryDataState extends State<EntryData> {
           url: _urlController.text,
           notes: _notesController.text,
           password: _passwordController.text,
+          icon: _selectedIcon ?? widget.entry.icon,
+          customIconData: _selectedCustomIconData,
         ),
       );
     } else {
@@ -76,12 +84,29 @@ class _EntryDataState extends State<EntryData> {
   void _cancelEdit() {
     setState(() {
       _isEditing = false;
+      _selectedIcon = null;
+      _selectedCustomIconData = null;
       _titleController.text = widget.entry.label;
       _userController.text = widget.entry.userName;
       _urlController.text = widget.entry.url;
       _notesController.text = widget.entry.notes;
       _passwordController.text = widget.entry.password;
     });
+  }
+
+  Future<void> _openIconPicker() async {
+    final result = await IconPickerDialog.show(
+      context,
+      currentIcon: _selectedIcon ?? widget.entry.icon,
+      currentCustomIconData:
+          _selectedCustomIconData ?? widget.entry.customIconData,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedIcon = result.icon;
+        _selectedCustomIconData = result.customIconData;
+      });
+    }
   }
 
   @override
@@ -102,13 +127,28 @@ class _EntryDataState extends State<EntryData> {
           children: [
             Row(
               children: [
-                if (_isEditing)
-                  KDBXIconWidget(
-                    icon: widget.entry.icon,
-                    customIconData: widget.entry.customIconData,
-                    size: 27,
-                  )
-                else ...[
+                if (_isEditing) ...[
+                  GestureDetector(
+                    onTap: _openIconPicker,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.teal,
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: KDBXIconWidget(
+                        icon: _selectedIcon ?? widget.entry.icon,
+                        customIconData:
+                            _selectedCustomIconData ??
+                            widget.entry.customIconData,
+                        size: 27,
+                      ),
+                    ),
+                  ),
+                ] else ...[
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);

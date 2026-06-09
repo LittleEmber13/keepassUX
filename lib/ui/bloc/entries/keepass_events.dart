@@ -55,6 +55,8 @@ class UpdateEntry extends KeePassEvent {
   final String? url;
   final String? notes;
   final String password;
+  final int? icon;
+  final Uint8List? customIconData;
 
   UpdateEntry({
     required this.entryUuid,
@@ -63,5 +65,7 @@ class UpdateEntry extends KeePassEvent {
     this.url,
     this.notes,
     required this.password,
+    this.icon,
+    this.customIconData,
   });
 }
