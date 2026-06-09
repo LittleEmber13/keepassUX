@@ -41,4 +41,8 @@ class BiometricService {
   Future<void> savePassword(String uri, String password) async {
     await _secureStorage.write(key: 'kdbx_password_$uri', value: password);
   }
+
+  Future<void> deleteSavedPassword(String uri) async {
+    await _secureStorage.delete(key: 'kdbx_password_$uri');
+  }
 }

@@ -32,6 +32,7 @@ class _StartPageState extends State<StartPage> {
   bool obscurePassword = true;
   bool _hasBiometrics = false;
   bool _hasSavedPassword = false;
+  bool _biometricLoginEnabled = false;
 
   SharedPreferences? preferences;
 
@@ -44,6 +45,7 @@ class _StartPageState extends State<StartPage> {
     }
     _hasBiometrics = await _biometricService.canAuthenticate();
     _hasSavedPassword = await _biometricService.hasSavedPassword(savedUri);
+    _biometricLoginEnabled = preferences!.getBool('biometric_login_enabled') ?? false;
     setState(() {});
   }
 
@@ -107,38 +109,41 @@ class _StartPageState extends State<StartPage> {
     _openDatabase();
   }
 
-  Future<void> _showSavePasswordDialog() async {
-    if (!_hasBiometrics) return;
-    final uri = folderController.text;
-    if (uri.isEmpty) return;
-
-    final existing = await _biometricService.hasSavedPassword(uri);
-    if (existing) return;
-
-    if (!mounted) return;
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(tr("start_page.biometric_save_title")),
-        content: Text(tr("start_page.biometric_save_message")),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(tr("start_page.biometric_save_no")),
+  Future<void> _onDatabaseLoaded() async {
+    if (_hasBiometrics) {
+      final alreadyAsked = preferences!.getBool('biometric_asked') ?? false;
+      if (!alreadyAsked) {
+        final result = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Text(tr("settings_page.biometric_login")),
+            content: Text(tr("start_page.biometric_save_message")),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(tr("start_page.biometric_save_no")),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(tr("start_page.biometric_save_yes")),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(tr("start_page.biometric_save_yes")),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      await _biometricService.savePassword(uri, passwordController.text);
-      _hasSavedPassword = await _biometricService.hasSavedPassword(uri);
-      setState(() {});
+        );
+        await preferences!.setBool('biometric_login_enabled', result == true);
+        await preferences!.setBool('biometric_asked', true);
+      }
+      final uri = folderController.text;
+      if (uri.isNotEmpty) {
+        await _biometricService.savePassword(uri, passwordController.text);
+      }
+    }
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const EntriesPage()),
+      );
     }
   }
 
@@ -147,11 +152,7 @@ class _StartPageState extends State<StartPage> {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
         if (state is KeePassLoaded) {
-          _showSavePasswordDialog();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const EntriesPage()),
-          );
+          _onDatabaseLoaded();
         }
         if (state is KeePassError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -310,8 +311,8 @@ class _StartPageState extends State<StartPage> {
         children: [
           _buildOpenDatabaseButton(),
           SizedBox(height: 16),
-          if (_hasBiometrics && _hasSavedPassword) _buildBiometricButton(),
-          if (_hasBiometrics && _hasSavedPassword) SizedBox(height: 16),
+          if (_hasBiometrics && _hasSavedPassword && _biometricLoginEnabled) _buildBiometricButton(),
+          if (_hasBiometrics && _hasSavedPassword && _biometricLoginEnabled) SizedBox(height: 16),
           _buildCreateDatabaseLink(),
         ],
       ),

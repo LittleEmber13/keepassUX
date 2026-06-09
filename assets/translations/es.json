@@ -17,9 +17,8 @@
     "biometric_reason": "Autentícate para abrir tu base de datos",
     "biometric_error": "Error en la autenticación biométrica",
     "biometric_locked": "Autenticación biométrica bloqueada temporalmente",
-    "biometric_save_title": "¿Guardar contraseña para biométricos?",
-    "biometric_save_message": "¿Quieres guardar tu contraseña para poder abrir la base de datos con tu huella la próxima vez?",
-    "biometric_save_yes": "Sí, guardar",
+    "biometric_save_message": "¿Quieres activar el acceso biométrico para abrir tu base de datos con tu huella?",
+    "biometric_save_yes": "Sí, activar",
     "biometric_save_no": "No, gracias"
   },
   "create_database_page": {
@@ -68,6 +67,7 @@
     "cancel": "Cancelar"
   },
   "settings_page": {
-    "language": "Idioma"
+    "language": "Idioma",
+    "biometric_login": "Login biométrico"
   }
 }

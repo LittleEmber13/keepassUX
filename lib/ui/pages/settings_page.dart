@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/custom_app_bar.dart';
 
@@ -13,24 +15,39 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final BiometricService _biometricService = BiometricService();
+
   String selectedLanguage = 'Español';
   bool autoTheme = false;
   bool darkTheme = false;
-  bool biometricLogin = true;
+  bool biometricLoginEnabled = false;
+  bool _hasBiometrics = false;
+  SharedPreferences? _prefs;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentLocale = context.locale;
-      setState(() {
-        if (currentLocale.languageCode == 'es') {
-          selectedLanguage = 'Español';
-        } else if (currentLocale.languageCode == 'en') {
-          selectedLanguage = 'Inglés';
-        }
-      });
+    _initStateAsync();
+  }
+
+  Future<void> _initStateAsync() async {
+    _prefs = await SharedPreferences.getInstance();
+    final currentLocale = context.locale;
+    _hasBiometrics = await _biometricService.canAuthenticate();
+    final savedEnabled = _prefs?.getBool('biometric_login_enabled') ?? false;
+    setState(() {
+      if (currentLocale.languageCode == 'es') {
+        selectedLanguage = 'Español';
+      } else if (currentLocale.languageCode == 'en') {
+        selectedLanguage = 'Inglés';
+      }
+      biometricLoginEnabled = savedEnabled;
     });
+  }
+
+  Future<void> _onBiometricToggle(bool value) async {
+    await _prefs?.setBool('biometric_login_enabled', value);
+    setState(() => biometricLoginEnabled = value);
   }
 
   @override
@@ -141,13 +158,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       //   title: const Text('Dark theme'),
                       //   value: darkTheme,
                       //   onChanged: (val) => setState(() => darkTheme = val),
-                      // ),
-                      // SwitchListTile(
-                      //   title: const Text('Login biometrico'),
-                      //   value: biometricLogin,
-                      //   onChanged:
-                      //       (val) => setState(() => biometricLogin = val),
-                      // ),
+                      if (_hasBiometrics) ...[
+                        const SizedBox(height: 12),
+                        SwitchListTile(
+                          title: Text(tr("settings_page.biometric_login")),
+                          value: biometricLoginEnabled,
+                          onChanged: _onBiometricToggle,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ],
                     ],
                   ),
                 ),
