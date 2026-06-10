@@ -46,6 +46,8 @@ dependencies:
   easy_localization: ^3.0.8
   local_auth: ^2.3.0
   flutter_secure_storage: ^9.2.4
+  zxcvbnm: ^1.1.1
+  zxcvbnm_flutter: ^1.1.1
 
 dev_dependencies:
   flutter_test:

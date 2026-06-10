@@ -8,6 +8,9 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/utils.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:zxcvbnm/languages/en.dart' as en;
+import 'package:zxcvbnm/languages/es_es.dart' as es;
+import 'package:zxcvbnm/zxcvbnm.dart';
 
 class AddEntryPage extends StatefulWidget {
   const AddEntryPage({this.uuidGroup, super.key});
@@ -20,6 +23,12 @@ class AddEntryPage extends StatefulWidget {
 
 class _AddEntryPageState extends State<AddEntryPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Zxcvbnm _zxcvbnm = Zxcvbnm(
+    dictionaries: <Dictionaries>{
+      ...en.dictionaries,
+      ...es.dictionaries,
+    },
+  );
 
   int passwordLength = 14;
   bool includeUppercase = true;
@@ -34,6 +43,48 @@ class _AddEntryPageState extends State<AddEntryPage> {
   TextEditingController passwordController = TextEditingController();
 
   bool obscurePassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  Color _getStrengthColor(int score) {
+    switch (score) {
+      case 0:
+        return Colors.red;
+      case 1:
+        return Colors.orange;
+      case 2:
+        return Colors.yellow[700]!;
+      case 3:
+        return Colors.lightGreen;
+      case 4:
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getStrengthLabel(int score) {
+    switch (score) {
+      case 0:
+        return 'Muy débil';
+      case 1:
+        return 'Débil';
+      case 2:
+        return 'Regular';
+      case 3:
+        return 'Fuerte';
+      case 4:
+        return 'Muy fuerte';
+      default:
+        return '';
+    }
+  }
 
   @override
   void dispose() {
@@ -166,13 +217,28 @@ class _AddEntryPageState extends State<AddEntryPage> {
                           Text(tr("add_entry.security")),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: LinearProgressIndicator(
-                              value: 0.8,
-                              color: Colors.greenAccent,
-                              backgroundColor: Colors.grey[300],
-                              minHeight: 6,
-                              borderRadius: BorderRadius.circular(10),
+                            child: Builder(
+                              builder: (context) {
+                                final result = _zxcvbnm(passwordController.text);
+                                return LinearProgressIndicator(
+                                  value: (result.score + 1) / 5,
+                                  color: _getStrengthColor(result.score),
+                                  backgroundColor: Colors.grey[300],
+                                  minHeight: 6,
+                                  borderRadius: BorderRadius.circular(10),
+                                );
+                              },
                             ),
+                          ),
+                          const SizedBox(width: 8),
+                          Builder(
+                            builder: (context) {
+                              final result = _zxcvbnm(passwordController.text);
+                              return Text(
+                                _getStrengthLabel(result.score),
+                                style: const TextStyle(fontSize: 12),
+                              );
+                            },
                           ),
                         ],
                       ),
