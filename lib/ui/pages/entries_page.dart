@@ -10,6 +10,8 @@ import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
+import 'package:keepassux/ui/model/alert_item.dart';
+import 'package:keepassux/ui/widgets/alert_stack.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 
@@ -368,62 +370,24 @@ class _EntriesPageState extends State<EntriesPage> {
             SizedBox(height: 24),
             CustomAppScroll(
               children: [
-                Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Container(
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: Color(0xFFEEFDFF),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              spreadRadius: 1,
-                              offset: Offset(1, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: AlertStack(
+                    alerts: const [
+                      AlertItem(
+                        title: "Title",
+                        text: "dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8, top: 8),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFEEFDFF),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              spreadRadius: 1,
-                              offset: Offset(1, 2),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [Text("Title"), Icon(Icons.close)],
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
-                              ),
-                            ],
-                          ),
-                        ),
+                      AlertItem(
+                        title: "Title2",
+                        text: "t, sed do eiusmod tempor incididunt ut et dolore magna aliqua. Ut enim ad minim veniam",
                       ),
-                    ),
-                  ],
+                      AlertItem(
+                        title: "Title3",
+                        text: "et dolore magna aliqua. Ut enim ad minim veniam",
+                      ),
+                    ],
+                  ),
                 ),
                 if (widget.uuidGroup != null) ...[
                   _buildParentGroupItem(),
