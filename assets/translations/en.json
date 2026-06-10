@@ -76,5 +76,13 @@
     "change_custom_icon": "Change custom icon",
     "select": "Select",
     "cancel": "Cancel"
+  },
+  "alerts": {
+    "biometric_title": "Biometric login available",
+    "biometric_text": "You can enable biometric access to open your database with your fingerprint. Find it in Settings.",
+    "drag_title": "Organize your entries",
+    "drag_text": "Long-press any entry or folder and drag it to another folder to move it.",
+    "empty_title": "Your database is empty",
+    "empty_text": "Tap the + button to add your first entries or folders."
   }
 }

@@ -7,6 +7,8 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/services/alert_service.dart';
+import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/widgets/custom_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
@@ -14,6 +16,7 @@ import 'package:keepassux/ui/model/alert_item.dart';
 import 'package:keepassux/ui/widgets/alert_stack.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/db_entry.dart';
 import '../model/db_group.dart';
@@ -44,9 +47,15 @@ class EntriesPage extends StatefulWidget {
 class _EntriesPageState extends State<EntriesPage> {
   final TextEditingController searchBarController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final AlertService _alertService = AlertService();
+  final BiometricService _biometricService = BiometricService();
 
   DbGroup? group;
   DbGroup? _rootGroup;
+  List<AlertItem> _alerts = [];
+  bool _hasBiometrics = false;
+  bool _biometricLoginEnabled = false;
+  late Future<void> _initFuture;
 
   @override
   void dispose() {
@@ -58,9 +67,26 @@ class _EntriesPageState extends State<EntriesPage> {
   @override
   void initState() {
     super.initState();
+    _initFuture = _initStateAsync();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<KeePassBloc>().add(GetRootGroup());
     });
+  }
+
+  Future<void> _initStateAsync() async {
+    final prefs = await SharedPreferences.getInstance();
+    _hasBiometrics = await _biometricService.canAuthenticate();
+    _biometricLoginEnabled = prefs.getBool('biometric_login_enabled') ?? false;
+  }
+
+  Future<void> _loadAlerts(DbGroup? rootGroup) async {
+    await _initFuture;
+    final alerts = await _alertService.getAlerts(
+      hasBiometrics: _hasBiometrics,
+      biometricLoginEnabled: _biometricLoginEnabled,
+      rootGroup: rootGroup,
+    );
+    setState(() => _alerts = alerts);
   }
 
   bool _isDescendantOf(String ancestorUuid, String descendantUuid) {
@@ -264,6 +290,7 @@ class _EntriesPageState extends State<EntriesPage> {
               );
             });
           }
+          _loadAlerts(state.rootGroup);
         }
         if (state is KeePassError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -373,20 +400,13 @@ class _EntriesPageState extends State<EntriesPage> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: AlertStack(
-                    alerts: const [
-                      AlertItem(
-                        title: "Title",
-                        text: "dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
-                      ),
-                      AlertItem(
-                        title: "Title2",
-                        text: "t, sed do eiusmod tempor incididunt ut et dolore magna aliqua. Ut enim ad minim veniam",
-                      ),
-                      AlertItem(
-                        title: "Title3",
-                        text: "et dolore magna aliqua. Ut enim ad minim veniam",
-                      ),
-                    ],
+                    alerts: _alerts,
+                    onDismiss: (alertId) async {
+                      await _alertService.dismissAlert(alertId);
+                      setState(() {
+                        _alerts = _alerts.where((a) => a.id != alertId).toList();
+                      });
+                    },
                   ),
                 ),
                 if (widget.uuidGroup != null) ...[

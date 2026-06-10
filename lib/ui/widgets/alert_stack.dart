@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:keepassux/ui/model/alert_item.dart';
 
 class AlertStack extends StatefulWidget {
-  const AlertStack({required this.alerts, super.key});
+  const AlertStack({required this.alerts, this.onDismiss, super.key});
 
   final List<AlertItem> alerts;
+  final Function(String alertId)? onDismiss;
 
   @override
   State<AlertStack> createState() => _AlertStackState();
@@ -12,9 +13,8 @@ class AlertStack extends StatefulWidget {
 
 class _AlertStackState extends State<AlertStack>
     with SingleTickerProviderStateMixin {
-  int _currentIndex = 0;
-  bool _settling = false;
   late AnimationController _controller;
+  bool _dismissing = false;
 
   @override
   void initState() {
@@ -26,27 +26,31 @@ class _AlertStackState extends State<AlertStack>
   }
 
   @override
+  void didUpdateWidget(AlertStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_dismissing && widget.alerts != oldWidget.alerts) {
+      _dismissing = false;
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-  bool get _hasCurrent => _currentIndex < widget.alerts.length;
+  bool get _hasCurrent => widget.alerts.isNotEmpty;
 
-  bool get _hasNext => _currentIndex + 1 < widget.alerts.length;
+  bool get _hasNext => widget.alerts.length > 1;
 
-  bool get _hasAfterNext => _currentIndex + 2 < widget.alerts.length;
+  bool get _hasAfterNext => widget.alerts.length > 2;
 
   void _dismiss() {
-    if (!_hasCurrent || _controller.isAnimating) return;
+    if (!_hasCurrent || _controller.isAnimating || _dismissing) return;
+    _dismissing = true;
+    final alertId = widget.alerts.first.id;
     _controller.forward(from: 0.0).then((_) {
-      setState(() {
-        _currentIndex++;
-        _settling = true;
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() { _settling = false; });
-      });
+      widget.onDismiss?.call(alertId);
     });
   }
 
@@ -99,52 +103,44 @@ class _AlertStackState extends State<AlertStack>
   Widget build(BuildContext context) {
     if (!_hasCurrent) return const SizedBox.shrink();
 
-    final frontAlert = widget.alerts[_currentIndex];
-
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
         final t = _controller.value;
-        final isAnimating = _controller.isAnimating;
-
-        final backTopPadding = isAnimating ? t * 8.0 : 0.0;
+        final isActive = _controller.isAnimating || _dismissing;
 
         return Stack(
           alignment: Alignment.topCenter,
           children: [
             if (_hasAfterNext)
               Padding(
-                padding: EdgeInsets.only(top: isAnimating ? (8.0 - t * 8.0) : 8.0),
+                padding: EdgeInsets.only(top: isActive ? (8.0 - t * 8.0) : 8.0),
                 child: Transform.scale(
                   scale: 0.95,
                   alignment: Alignment.topCenter,
-                  child: AnimatedOpacity(
-                    opacity: _settling ? 0.0 : 1.0,
-                    duration: const Duration(milliseconds: 300),
-                    child: Opacity(
-                      opacity: isAnimating ? (0.5 + t * 0.2) : 0.5,
-                      child: _buildAlertCard(widget.alerts[_currentIndex + 2]),
-                    ),
+                  child: Opacity(
+                    opacity: isActive ? (0.5 + t * 0.2) : 0.5,
+                    child: _buildAlertCard(widget.alerts[2]),
                   ),
                 ),
               ),
             if (_hasNext)
               Padding(
-                padding: EdgeInsets.only(top: backTopPadding),
+                padding: EdgeInsets.only(top: isActive ? t * 8.0 : 0.0),
                 child: Transform.scale(
-                  scale: isAnimating ? (0.95 + t * 0.05) : 0.95,
+                  scale: isActive ? (0.95 + t * 0.05) : 0.95,
                   alignment: Alignment.topCenter,
                   child: Opacity(
-                    opacity: isAnimating ? (0.7 + t * 0.3) : 0.7,
-                    child: _buildAlertCard(widget.alerts[_currentIndex + 1]),
+                    opacity: isActive ? (0.7 + t * 0.3) : 0.7,
+                    child: _buildAlertCard(widget.alerts[1]),
                   ),
                 ),
               ),
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Opacity(
-                opacity: isAnimating ? (1.0 - t) : 1.0,
-                child: _buildAlertCard(frontAlert, onClose: _dismiss),
+                opacity: isActive ? (1.0 - t) : 1.0,
+                child: _buildAlertCard(widget.alerts.first, onClose: _dismiss),
               ),
             ),
           ],

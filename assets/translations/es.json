@@ -76,5 +76,13 @@
     "change_custom_icon": "Cambiar icono personalizado",
     "select": "Seleccionar",
     "cancel": "Cancelar"
+  },
+  "alerts": {
+    "biometric_title": "Login biométrico disponible",
+    "biometric_text": "Puedes activar el acceso biométrico para abrir tu base de datos con tu huella. Encuéntralo en Ajustes.",
+    "drag_title": "Organiza tus entradas",
+    "drag_text": "Mantén pulsado cualquier entrada o carpeta y arrástrala a otra carpeta para moverla.",
+    "empty_title": "Tu base de datos está vacía",
+    "empty_text": "Pulsa el botón + para añadir tus primeras entradas o carpetas."
   }
 }
