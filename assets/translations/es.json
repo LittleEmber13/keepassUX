@@ -31,6 +31,10 @@
   "entries_page": {
     "search": "Buscar una entrada"
   },
+  "search_page": {
+    "hint": "Buscar grupos y entradas...",
+    "no_results": "No se encontraron resultados"
+  },
   "app_bar": {
     "hello": "Hola,",
     "welcome": "Bienvenido"

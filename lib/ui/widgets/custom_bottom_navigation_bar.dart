@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/pages/add_entry.dart';
 import 'package:keepassux/ui/pages/add_group.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:keepassux/ui/pages/search_page.dart';
 import 'package:keepassux/ui/pages/settings_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -54,7 +55,20 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   color: selectedIndex == 0 ? Colors.black : Colors.grey,
                 ),
               ),
-              Icon(FontAwesomeIcons.star, color: Colors.white),
+              InkWell(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SearchPage(),
+                    ),
+                  );
+                },
+                child: Icon(
+                  FontAwesomeIcons.magnifyingGlass,
+                  color: selectedIndex == 1 ? Colors.black : Colors.grey,
+                ),
+              ),
               InkWell(
                 onTap: () {
                   showModalBottomSheet(

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:collection/collection.dart';
@@ -28,7 +27,6 @@ class EntriesPage extends StatefulWidget {
 }
 
 class _EntriesPageState extends State<EntriesPage> {
-  final TextEditingController searchBarController = TextEditingController();
   final AlertService _alertService = AlertService();
   final BiometricService _biometricService = BiometricService();
 
@@ -38,12 +36,6 @@ class _EntriesPageState extends State<EntriesPage> {
   bool _hasBiometrics = false;
   bool _biometricLoginEnabled = false;
   late Future<void> _initFuture;
-
-  @override
-  void dispose() {
-    searchBarController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -153,47 +145,6 @@ class _EntriesPageState extends State<EntriesPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                      offset: Offset(1, 2),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: searchBarController,
-                          decoration: InputDecoration(
-                            hintText: tr("entries_page.search"),
-                            contentPadding: EdgeInsets.all(0),
-                            isDense: true,
-                            filled: false,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Icon(Icons.search),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 24),
             Expanded(
               child: Column(
                 children: [
