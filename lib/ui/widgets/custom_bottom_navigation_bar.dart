@@ -72,25 +72,46 @@ class CustomBottomNavigationBar extends StatelessWidget {
               InkWell(
                 onTap: () {
                   showModalBottomSheet(
-                    backgroundColor: Colors.transparent,
                     context: context,
+                    backgroundColor: Colors.white,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(20),
                       ),
                     ),
                     builder: (BuildContext ctx) {
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          left: 24,
-                          right: 24,
-                          bottom: 110,
-                        ),
+                      return SafeArea(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            InkWell(
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 24,
+                                bottom: 16,
+                                left: 24,
+                                right: 24,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    tr("nav_bar.add"),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () => Navigator.pop(ctx),
+                                    child: const Icon(Icons.close),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Divider(height: 1),
+                            ListTile(
+                              leading: const Icon(Icons.vpn_key),
+                              title: Text(tr("nav_bar.add_entry")),
                               onTap: () {
                                 Navigator.pop(ctx);
                                 Navigator.push(
@@ -102,27 +123,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 5,
-                                      spreadRadius: 1,
-                                      offset: Offset(1, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Text(tr("nav_bar.add_entry")),
-                                ),
-                              ),
                             ),
-                            SizedBox(height: 16),
-                            InkWell(
+                            const Divider(height: 1),
+                            ListTile(
+                              leading: const Icon(Icons.folder),
+                              title: Text(tr("nav_bar.add_group")),
                               onTap: () {
                                 Navigator.pop(ctx);
                                 Navigator.push(
@@ -134,25 +139,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 5,
-                                      spreadRadius: 1,
-                                      offset: Offset(1, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Text(tr("nav_bar.add_group")),
-                                ),
-                              ),
                             ),
+                            const Divider(height: 1),
                           ],
                         ),
                       );

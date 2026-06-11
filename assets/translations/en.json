@@ -40,6 +40,7 @@
     "welcome": "Welcome"
   },
   "nav_bar": {
+    "add": "Add",
     "add_group": "Add group",
     "add_entry": "Add entry"
   },
