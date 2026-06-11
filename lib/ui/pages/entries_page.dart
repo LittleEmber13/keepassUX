@@ -167,21 +167,19 @@ class _EntriesPageState extends State<EntriesPage> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: AnimatedEntryList(
-                      group: group,
-                      rootGroup: _rootGroup,
-                      onGroupTap: (g) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => GroupEntriesPage(
-                              uuidGroup: g.uuid,
-                            ),
+                  AnimatedEntryList(
+                    group: group,
+                    rootGroup: _rootGroup,
+                    onGroupTap: (g) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GroupEntriesPage(
+                            uuidGroup: g.uuid,
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

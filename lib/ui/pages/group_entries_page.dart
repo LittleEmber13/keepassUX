@@ -262,24 +262,22 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
         child: Column(
           children: [
             SizedBox(height: 8),
-            Expanded(
-              child: AnimatedEntryList(
-                group: group,
-                rootGroup: _rootGroup,
-                onGroupTap: (g) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GroupEntriesPage(
-                        uuidGroup: g.uuid,
-                      ),
+            AnimatedEntryList(
+              group: group,
+              rootGroup: _rootGroup,
+              onGroupTap: (g) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GroupEntriesPage(
+                      uuidGroup: g.uuid,
                     ),
-                  );
-                },
-                onDragStarted: () => _onDragStateChanged(true),
-                onDragEnded: () => _onDragStateChanged(false),
-                parentGroupItemBuilder: _buildParentGroupItem,
-              ),
+                  ),
+                );
+              },
+              onDragStarted: () => _onDragStateChanged(true),
+              onDragEnded: () => _onDragStateChanged(false),
+              parentGroupItemBuilder: _buildParentGroupItem,
             ),
           ],
         ),
