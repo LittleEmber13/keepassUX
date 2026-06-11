@@ -6,11 +6,13 @@ import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:keepassux/ui/model/db_group.dart';
 
 class AddGroupPage extends StatefulWidget {
-  const AddGroupPage({this.uuidGroup, super.key});
+  const AddGroupPage({this.uuidGroup, this.group, super.key});
 
   final String? uuidGroup;
+  final DbGroup? group;
 
   @override
   State<AddGroupPage> createState() => _AddGroupPageState();
@@ -20,6 +22,16 @@ class _AddGroupPageState extends State<AddGroupPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController titleController = TextEditingController();
+
+  bool get _isEditing => widget.group != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.group != null) {
+      titleController.text = widget.group!.name;
+    }
+  }
 
   @override
   void dispose() {
@@ -31,7 +43,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassAddGroupSuccess) {
+        if (state is KeePassAddGroupSuccess || state is KeePassUpdateGroupSuccess) {
           Navigator.pop(context);
         }
         if (state is KeePassError) {
@@ -124,12 +136,21 @@ class _AddGroupPageState extends State<AddGroupPage> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        context.read<KeePassBloc>().add(
-                          AddGroup(
-                            uuidGroup: widget.uuidGroup,
-                            title: titleController.text,
-                          ),
-                        );
+                        if (_isEditing) {
+                          context.read<KeePassBloc>().add(
+                            UpdateGroup(
+                              groupUuid: widget.group!.uuid,
+                              name: titleController.text,
+                            ),
+                          );
+                        } else {
+                          context.read<KeePassBloc>().add(
+                            AddGroup(
+                              uuidGroup: widget.uuidGroup,
+                              title: titleController.text,
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Text(

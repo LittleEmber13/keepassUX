@@ -97,3 +97,13 @@ class UpdateEntry extends KeePassEvent {
     this.customIconData,
   });
 }
+
+class UpdateGroup extends KeePassEvent {
+  final String groupUuid;
+  final String name;
+
+  UpdateGroup({
+    required this.groupUuid,
+    required this.name,
+  });
+}

@@ -78,6 +78,12 @@ class MoveGroupCmd extends KdbxCommand {
   });
 }
 
+class UpdateGroupCmd extends KdbxCommand {
+  final String groupUuid;
+  final String name;
+  UpdateGroupCmd({required this.groupUuid, required this.name});
+}
+
 class CreateDatabaseCmd extends KdbxCommand {
   final String password;
   CreateDatabaseCmd({required this.password});

@@ -140,6 +140,14 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         replyPort.send(
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
         );
+      } else if (command is UpdateGroupCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final group = _findGroup(kdbx!, command.groupUuid);
+        group.name.set(command.name);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
       } else if (command is CreateDatabaseCmd) {
         kdbx = KdbxFormat().create(
           Credentials(ProtectedValue.fromString(command.password)),

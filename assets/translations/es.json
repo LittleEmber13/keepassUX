@@ -63,7 +63,8 @@
   "add_group": {
     "information": "Información",
     "title": "Título",
-    "save": "Guardar"
+    "save": "Guardar",
+    "edit_group": "Editar grupo"
   },
   "entry_data": {
     "title": "Título",

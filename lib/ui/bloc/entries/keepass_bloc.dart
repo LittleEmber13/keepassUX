@@ -22,6 +22,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     on<UpdateEntry>(_onUpdateEntry);
     on<MoveEntry>(_onMoveEntry);
     on<MoveGroup>(_onMoveGroup);
+    on<UpdateGroup>(_onUpdateGroup);
     _initIsolate();
   }
 
@@ -219,6 +220,28 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
 
       emit(KeePassRootGroup(_currentRoot!));
       emit(KeePassMoveSuccess());
+    } catch (e) {
+      logger.e(e);
+      emit(KeePassError(tr("exception.unknown")));
+    }
+  }
+
+  Future<void> _onUpdateGroup(UpdateGroup event, Emitter<KeePassState> emit) async {
+    try {
+      emit(KeePassLoading());
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        UpdateGroupCmd(
+          groupUuid: event.groupUuid,
+          name: event.name,
+        ),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassRootGroup(_currentRoot!));
+      emit(KeePassUpdateGroupSuccess());
     } catch (e) {
       logger.e(e);
       emit(KeePassError(tr("exception.unknown")));

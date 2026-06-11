@@ -11,6 +11,7 @@ import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/widgets/animated_entry_list.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
+import 'package:keepassux/ui/pages/add_group.dart';
 
 import '../model/db_group.dart';
 
@@ -239,6 +240,16 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
             child: GroupAppBar(
               title: group?.name ?? '',
               onTapExit: () => Navigator.pop(context),
+              onTapEdit: group != null
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddGroupPage(group: group),
+                        ),
+                      );
+                    }
+                  : null,
             ),
           ),
         ),
