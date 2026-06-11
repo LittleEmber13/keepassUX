@@ -80,7 +80,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
     required String Function(T) getUuid,
     required void Function(List<T>) onUpdated,
   }) {
-    final oldUuids = oldList.map(getUuid).toList();
+    var oldUuids = oldList.map(getUuid).toList();
     final newUuids = newList.map(getUuid).toList();
 
     final itemsToRemove = <int>[];
@@ -105,6 +105,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
       );
       oldList.removeAt(index);
     }
+    oldUuids = oldList.map(getUuid).toList();
 
     for (int i = 0; i < newList.length; i++) {
       final newItem = newList[i];
