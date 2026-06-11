@@ -70,6 +70,13 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
           KdbxKeyCommon.PASSWORD,
           ProtectedValue.fromString(command.password),
         );
+        entry.icon.set(KdbxIcon.values[command.icon]);
+        if (command.customIconData != null) {
+          entry.customIcon = KdbxCustomIcon(
+            uuid: KdbxUuid.random(),
+            data: command.customIconData!,
+          );
+        }
         final bytes = await kdbx!.save();
         replyPort.send(
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),

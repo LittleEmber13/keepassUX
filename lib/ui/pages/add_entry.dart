@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +8,8 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/utils.dart';
+import 'package:keepassux/ui/widgets/icon_picker_dialog.dart';
+import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:zxcvbnm/languages/en.dart' as en;
@@ -43,6 +47,9 @@ class _AddEntryPageState extends State<AddEntryPage> {
   TextEditingController passwordController = TextEditingController();
 
   bool obscurePassword = false;
+
+  int? _selectedIcon;
+  Uint8List? _selectedCustomIconData;
 
   @override
   void initState() {
@@ -94,6 +101,20 @@ class _AddEntryPageState extends State<AddEntryPage> {
     notesController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _openIconPicker() async {
+    final result = await IconPickerDialog.show(
+      context,
+      currentIcon: _selectedIcon ?? 0,
+      currentCustomIconData: _selectedCustomIconData,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedIcon = result.icon;
+        _selectedCustomIconData = result.customIconData;
+      });
+    }
   }
 
   @override
@@ -161,7 +182,30 @@ class _AddEntryPageState extends State<AddEntryPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(tr("add_entry.information")),
+                      Row(
+                        children: [
+                          Text(tr("add_entry.information")),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: _openIconPicker,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.teal,
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: KDBXIconWidget(
+                                icon: _selectedIcon ?? 0,
+                                customIconData: _selectedCustomIconData,
+                                size: 27,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: titleController,
@@ -304,6 +348,8 @@ class _AddEntryPageState extends State<AddEntryPage> {
                             url: urlController.text,
                             notes: notesController.text,
                             password: passwordController.text,
+                            icon: _selectedIcon,
+                            customIconData: _selectedCustomIconData,
                           ),
                         );
                       }

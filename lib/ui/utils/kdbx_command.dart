@@ -15,6 +15,8 @@ class AddEntryCmd extends KdbxCommand {
   final String url;
   final String notes;
   final String password;
+  final int icon;
+  final Uint8List? customIconData;
   AddEntryCmd({
     required this.groupUuid,
     required this.title,
@@ -22,6 +24,8 @@ class AddEntryCmd extends KdbxCommand {
     required this.url,
     required this.notes,
     required this.password,
+    this.icon = 0,
+    this.customIconData,
   });
 }
 

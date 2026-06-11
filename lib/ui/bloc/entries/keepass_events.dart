@@ -27,6 +27,8 @@ class AddEntry extends KeePassEvent {
   final String? url;
   final String? notes;
   final String password;
+  final int? icon;
+  final Uint8List? customIconData;
 
   AddEntry({
     this.uuidGroup,
@@ -35,6 +37,8 @@ class AddEntry extends KeePassEvent {
     this.url,
     this.notes,
     required this.password,
+    this.icon,
+    this.customIconData,
   });
 }
 
