@@ -44,6 +44,7 @@
     "add_entry": "Añadir entrada"
   },
   "add_entry": {
+    "add_entry": "Añadir entrada",
     "information": "Información",
     "title": "Título",
     "user": "Usuario",
@@ -53,7 +54,10 @@
     "password_hint": "Contraseña",
     "security": "Seguridad",
     "special_characters": "Carácteres especiales",
-    "save": "Guardar"
+    "save": "Guardar",
+    "edit_icon": "Editar icono",
+    "generator_title": "Generador de contraseñas",
+    "apply": "Aplicar"
   },
   "add_group": {
     "information": "Información",
@@ -80,6 +84,13 @@
     "change_custom_icon": "Cambiar icono personalizado",
     "select": "Seleccionar",
     "cancel": "Cancelar"
+  },
+  "password_generator": {
+    "very_weak": "Muy débil",
+    "weak": "Débil",
+    "fair": "Regular",
+    "strong": "Fuerte",
+    "very_strong": "Muy fuerte"
   },
   "alerts": {
     "biometric_title": "Login biométrico disponible",

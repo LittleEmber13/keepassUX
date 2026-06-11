@@ -44,6 +44,7 @@
     "add_entry": "Add entry"
   },
   "add_entry": {
+    "add_entry": "Add entry",
     "information": "Information",
     "title": "Title",
     "user": "User",
@@ -53,7 +54,10 @@
     "password_hint": "Password",
     "security": "Security",
     "special_characters": "Special characters",
-    "save": "Save"
+    "save": "Save",
+    "edit_icon": "Edit icon",
+    "generator_title": "Password generator",
+    "apply": "Apply"
   },
   "add_group": {
     "information": "Information",
@@ -80,6 +84,13 @@
     "change_custom_icon": "Change custom icon",
     "select": "Select",
     "cancel": "Cancel"
+  },
+  "password_generator": {
+    "very_weak": "Very weak",
+    "weak": "Weak",
+    "fair": "Fair",
+    "strong": "Strong",
+    "very_strong": "Very strong"
   },
   "alerts": {
     "biometric_title": "Biometric login available",

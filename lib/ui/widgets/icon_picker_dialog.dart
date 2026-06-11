@@ -37,13 +37,14 @@ class IconPickerDialog extends StatefulWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
-      builder: (_) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.75,
-        child: IconPickerDialog(
-          currentIcon: currentIcon,
-          currentCustomIconData: currentCustomIconData,
-        ),
-      ),
+      builder:
+          (_) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.75,
+            child: IconPickerDialog(
+              currentIcon: currentIcon,
+              currentCustomIconData: currentCustomIconData,
+            ),
+          ),
     );
   }
 
@@ -112,7 +113,12 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+              padding: const EdgeInsets.only(
+                top: 24,
+                bottom: 16,
+                left: 24,
+                right: 24,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -123,9 +129,9 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close),
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.close),
                   ),
                 ],
               ),
@@ -133,7 +139,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
             const Divider(height: 1),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -154,13 +160,15 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                           onTap: () => _selectIcon(index),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? Colors.teal.withOpacity(0.15)
-                                  : Colors.transparent,
+                              color:
+                                  isSelected
+                                      ? Colors.teal.withOpacity(0.15)
+                                      : Colors.transparent,
                               border: Border.all(
-                                color: isSelected
-                                    ? Colors.teal
-                                    : Colors.grey.shade300,
+                                color:
+                                    isSelected
+                                        ? Colors.teal
+                                        : Colors.grey.shade300,
                                 width: isSelected ? 2 : 1,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -169,9 +177,10 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                               child: KDBXIconWidget(
                                 icon: index,
                                 size: 22,
-                                color: isSelected
-                                    ? Colors.teal
-                                    : Colors.grey.shade700,
+                                color:
+                                    isSelected
+                                        ? Colors.teal
+                                        : Colors.grey.shade700,
                               ),
                             ),
                           ),
@@ -188,9 +197,10 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: _isCustomSelected
-                                      ? Colors.teal
-                                      : Colors.grey.shade300,
+                                  color:
+                                      _isCustomSelected
+                                          ? Colors.teal
+                                          : Colors.grey.shade300,
                                   width: _isCustomSelected ? 2.5 : 1,
                                 ),
                                 borderRadius: BorderRadius.circular(8),
@@ -231,7 +241,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
             ),
             const Divider(height: 1),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
                   Expanded(

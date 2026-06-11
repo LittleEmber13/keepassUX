@@ -3,18 +3,14 @@ import 'dart:typed_data';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
-import 'package:keepassux/ui/utils.dart';
 import 'package:keepassux/ui/widgets/icon_picker_dialog.dart';
+import 'package:keepassux/ui/widgets/password_generator_dialog.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
-import 'package:keepassux/ui/widgets/root_app_bar.dart';
+import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
-import 'package:zxcvbnm/languages/en.dart' as en;
-import 'package:zxcvbnm/languages/es_es.dart' as es;
-import 'package:zxcvbnm/zxcvbnm.dart';
 
 class AddEntryPage extends StatefulWidget {
   const AddEntryPage({this.uuidGroup, super.key});
@@ -27,12 +23,6 @@ class AddEntryPage extends StatefulWidget {
 
 class _AddEntryPageState extends State<AddEntryPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final Zxcvbnm _zxcvbnm = Zxcvbnm(
-    dictionaries: <Dictionaries>{
-      ...en.dictionaries,
-      ...es.dictionaries,
-    },
-  );
 
   int passwordLength = 14;
   bool includeUppercase = true;
@@ -51,47 +41,10 @@ class _AddEntryPageState extends State<AddEntryPage> {
   int? _selectedIcon;
   Uint8List? _selectedCustomIconData;
 
-  @override
-  void initState() {
-    super.initState();
-    passwordController.addListener(() {
-      setState(() {});
-    });
-  }
-
-  Color _getStrengthColor(int score) {
-    switch (score) {
-      case 0:
-        return Colors.red;
-      case 1:
-        return Colors.orange;
-      case 2:
-        return Colors.yellow[700]!;
-      case 3:
-        return Colors.lightGreen;
-      case 4:
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getStrengthLabel(int score) {
-    switch (score) {
-      case 0:
-        return 'Muy débil';
-      case 1:
-        return 'Débil';
-      case 2:
-        return 'Regular';
-      case 3:
-        return 'Fuerte';
-      case 4:
-        return 'Muy fuerte';
-      default:
-        return '';
-    }
-  }
+  final _inputBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: Colors.transparent, width: 1),
+  );
 
   @override
   void dispose() {
@@ -162,210 +115,195 @@ class _AddEntryPageState extends State<AddEntryPage> {
               left: 24,
               right: 24,
             ),
-            child: RootAppBar(
-              isExit: false,
+            child: GroupAppBar(
               onTapExit: () {
                 Navigator.pop(context);
               },
+              title: tr("add_entry.add_entry"),
             ),
           ),
         ),
       ),
       body: SafeArea(
         child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            CustomAppScroll(
-              children: [
-                _buildCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(tr("add_entry.information")),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: _openIconPicker,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.teal,
-                                  width: 1.5,
+          key: _formKey,
+          child: Column(
+            children: [
+              CustomAppScroll(
+                children: [
+                  _buildCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: _openIconPicker,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.teal,
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                borderRadius: BorderRadius.circular(8),
+                                child: KDBXIconWidget(
+                                  icon: _selectedIcon ?? 0,
+                                  customIconData: _selectedCustomIconData,
+                                  size: 27,
+                                ),
                               ),
-                              child: KDBXIconWidget(
-                                icon: _selectedIcon ?? 0,
-                                customIconData: _selectedCustomIconData,
-                                size: 27,
+                            ),
+                            const SizedBox(width: 12),
+                            TextButton(
+                              onPressed: _openIconPicker,
+                              child: Text(tr("add_entry.edit_icon")),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: titleController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return tr("form_error.required");
+                            }
+                            return null;
+                          },
+                          maxLines: 1,
+                          decoration: InputDecoration(
+                            labelText: tr("add_entry.title"),
+                            enabledBorder: _inputBorder,
+                            focusedBorder: _inputBorder,
+                            disabledBorder: _inputBorder,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: userController,
+                          maxLines: 1,
+                          decoration: InputDecoration(
+                            labelText: tr("add_entry.user"),
+                            enabledBorder: _inputBorder,
+                            focusedBorder: _inputBorder,
+                            disabledBorder: _inputBorder,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: passwordController,
+                                obscureText: obscurePassword,
+                                decoration: InputDecoration(
+                                  labelText: tr("add_entry.password_hint"),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscurePassword
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        obscurePassword = !obscurePassword;
+                                      });
+                                    },
+                                  ),
+                                  enabledBorder: _inputBorder,
+                                  focusedBorder: _inputBorder,
+                                  disabledBorder: _inputBorder,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: titleController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return tr("form_error.required");
-                          }
-                          return null;
-                        },
-                        maxLines: 1,
-                        decoration: InputDecoration(
-                          labelText: tr("add_entry.title"),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: userController,
-                        maxLines: 1,
-                        decoration: InputDecoration(
-                          labelText: tr("add_entry.user"),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: urlController,
-                        maxLines: 1,
-                        decoration: InputDecoration(
-                          labelText: tr("add_entry.url"),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: notesController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          labelText: tr("add_entry.notes"),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(tr("add_entry.password")),
-                      const SizedBox(height: 16),
-                      _buildPasswordField(),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Text(tr("add_entry.security")),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Builder(
-                              builder: (context) {
-                                final result = _zxcvbnm(passwordController.text);
-                                return LinearProgressIndicator(
-                                  value: (result.score + 1) / 5,
-                                  color: _getStrengthColor(result.score),
-                                  backgroundColor: Colors.grey[300],
-                                  minHeight: 6,
-                                  borderRadius: BorderRadius.circular(10),
-                                );
-                              },
+                            const SizedBox(width: 8),
+                            InkWell(
+                              onTap: _openPasswordGeneratorDialog,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.teal,
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.casino_outlined,
+                                  color: Colors.teal,
+                                  size: 22,
+                                ),
+                              ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: urlController,
+                          maxLines: 1,
+                          decoration: InputDecoration(
+                            labelText: tr("add_entry.url"),
+                            enabledBorder: _inputBorder,
+                            focusedBorder: _inputBorder,
+                            disabledBorder: _inputBorder,
                           ),
-                          const SizedBox(width: 8),
-                          Builder(
-                            builder: (context) {
-                              final result = _zxcvbnm(passwordController.text);
-                              return Text(
-                                _getStrengthLabel(result.score),
-                                style: const TextStyle(fontSize: 12),
-                              );
-                            },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: notesController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText: tr("add_entry.notes"),
+                            enabledBorder: _inputBorder,
+                            focusedBorder: _inputBorder,
+                            disabledBorder: _inputBorder,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Text(
-                            passwordLength.toInt().toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                            child: Slider(
-                              value: passwordLength.toDouble(),
-                              min: 4,
-                              max: 32,
-                              activeColor: Colors.teal,
-                              onChanged: (v) {
-                                setState(() => passwordLength = v.toInt());
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      _buildToggle("A-Z", includeUppercase, (v) {
-                        setState(() => includeUppercase = v);
-                      }),
-                      _buildToggle("a-z", includeLowercase, (v) {
-                        setState(() => includeLowercase = v);
-                      }),
-                      _buildToggle("0-9", includeNumbers, (v) {
-                        setState(() => includeNumbers = v);
-                      }),
-                      _buildToggle(
-                        tr("add_entry.special_characters"),
-                        includeSpecial,
-                        (v) {
-                          setState(() => includeSpecial = v);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        context.read<KeePassBloc>().add(
-                          AddEntry(
-                            uuidGroup: widget.uuidGroup,
-                            title: titleController.text,
-                            userName: userController.text,
-                            url: urlController.text,
-                            notes: notesController.text,
-                            password: passwordController.text,
-                            icon: _selectedIcon,
-                            customIconData: _selectedCustomIconData,
-                          ),
-                        );
-                      }
-                    },
-                    child: Text(
-                      tr("add_entry.save"),
-                      style: TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ],
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          context.read<KeePassBloc>().add(
+                            AddEntry(
+                              uuidGroup: widget.uuidGroup,
+                              title: titleController.text,
+                              userName: userController.text,
+                              url: urlController.text,
+                              notes: notesController.text,
+                              password: passwordController.text,
+                              icon: _selectedIcon,
+                              customIconData: _selectedCustomIconData,
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        tr("add_entry.save"),
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -390,54 +328,24 @@ class _AddEntryPageState extends State<AddEntryPage> {
     );
   }
 
-  Widget _buildPasswordField() {
-    return Row(
-      children: [
-        InkWell(
-          onTap: () {
-            passwordController.text = generatePassword(
-              upperCase: includeUppercase,
-              lowerCase: includeLowercase,
-              numeric: includeNumbers,
-              special: includeSpecial,
-              length: passwordLength,
-            );
-          },
-          child: Icon(FeatherIcons.refreshCcw),
-        ),
-        SizedBox(width: 16),
-        Expanded(
-          child: TextFormField(
-            controller: passwordController,
-            obscureText: obscurePassword,
-            decoration: InputDecoration(
-              labelText: tr("add_entry.password_hint"),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  obscurePassword == true
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                ),
-                onPressed: () {
-                  setState(() {
-                    obscurePassword = !obscurePassword;
-                  });
-                },
-              ),
-            ),
-          ),
-        ),
-      ],
+  Future<void> _openPasswordGeneratorDialog() async {
+    final result = await PasswordGeneratorDialog.show(
+      context,
+      currentLength: passwordLength,
+      currentUppercase: includeUppercase,
+      currentLowercase: includeLowercase,
+      currentNumbers: includeNumbers,
+      currentSpecial: includeSpecial,
     );
-  }
-
-  Widget _buildToggle(String label, bool value, Function(bool) onChanged) {
-    return SwitchListTile(
-      title: Text(label),
-      value: value,
-      onChanged: onChanged,
-      activeColor: Colors.teal,
-      contentPadding: EdgeInsets.zero,
-    );
+    if (result != null) {
+      setState(() {
+        passwordLength = result.length;
+        includeUppercase = result.includeUppercase;
+        includeLowercase = result.includeLowercase;
+        includeNumbers = result.includeNumbers;
+        includeSpecial = result.includeSpecial;
+        passwordController.text = result.password;
+      });
+    }
   }
 }
