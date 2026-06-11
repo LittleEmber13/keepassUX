@@ -11,11 +11,13 @@ import 'package:keepassux/ui/widgets/password_generator_dialog.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:keepassux/ui/model/db_entry.dart';
 
 class AddEntryPage extends StatefulWidget {
-  const AddEntryPage({this.uuidGroup, super.key});
+  const AddEntryPage({this.uuidGroup, this.entry, super.key});
 
   final String? uuidGroup;
+  final DbEntry? entry;
 
   @override
   State<AddEntryPage> createState() => _AddEntryPageState();
@@ -41,10 +43,27 @@ class _AddEntryPageState extends State<AddEntryPage> {
   int? _selectedIcon;
   Uint8List? _selectedCustomIconData;
 
+  bool get _isEditing => widget.entry != null;
+
   final _inputBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(8),
     borderSide: BorderSide(color: Colors.transparent, width: 1),
   );
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.entry != null) {
+      final e = widget.entry!;
+      titleController.text = e.label;
+      userController.text = e.userName;
+      urlController.text = e.url;
+      notesController.text = e.notes;
+      passwordController.text = e.password;
+      _selectedIcon = e.icon;
+      _selectedCustomIconData = e.customIconData;
+    }
+  }
 
   @override
   void dispose() {
@@ -59,8 +78,9 @@ class _AddEntryPageState extends State<AddEntryPage> {
   Future<void> _openIconPicker() async {
     final result = await IconPickerDialog.show(
       context,
-      currentIcon: _selectedIcon ?? 0,
-      currentCustomIconData: _selectedCustomIconData,
+      currentIcon: _selectedIcon ?? widget.entry?.icon ?? 0,
+      currentCustomIconData:
+          _selectedCustomIconData ?? widget.entry?.customIconData,
     );
     if (result != null) {
       setState(() {
@@ -74,7 +94,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassAddEntrySuccess) {
+        if (state is KeePassAddEntrySuccess || state is KeePassUpdateEntrySuccess) {
           Navigator.pop(context);
         }
         if (state is KeePassError) {
@@ -119,7 +139,9 @@ class _AddEntryPageState extends State<AddEntryPage> {
               onTapExit: () {
                 Navigator.pop(context);
               },
-              title: tr("add_entry.add_entry"),
+              title: _isEditing
+                  ? tr("add_entry.edit_entry")
+                  : tr("add_entry.add_entry"),
             ),
           ),
         ),
@@ -149,8 +171,10 @@ class _AddEntryPageState extends State<AddEntryPage> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: KDBXIconWidget(
-                                  icon: _selectedIcon ?? 0,
-                                  customIconData: _selectedCustomIconData,
+                                  icon: _selectedIcon ?? widget.entry?.icon ?? 0,
+                                  customIconData:
+                                      _selectedCustomIconData ??
+                                      widget.entry?.customIconData,
                                   size: 27,
                                 ),
                               ),
@@ -278,18 +302,33 @@ class _AddEntryPageState extends State<AddEntryPage> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          context.read<KeePassBloc>().add(
-                            AddEntry(
-                              uuidGroup: widget.uuidGroup,
-                              title: titleController.text,
-                              userName: userController.text,
-                              url: urlController.text,
-                              notes: notesController.text,
-                              password: passwordController.text,
-                              icon: _selectedIcon,
-                              customIconData: _selectedCustomIconData,
-                            ),
-                          );
+                          if (_isEditing) {
+                            context.read<KeePassBloc>().add(
+                              UpdateEntry(
+                                entryUuid: widget.entry!.uuid,
+                                title: titleController.text,
+                                userName: userController.text,
+                                url: urlController.text,
+                                notes: notesController.text,
+                                password: passwordController.text,
+                                icon: _selectedIcon,
+                                customIconData: _selectedCustomIconData,
+                              ),
+                            );
+                          } else {
+                            context.read<KeePassBloc>().add(
+                              AddEntry(
+                                uuidGroup: widget.uuidGroup,
+                                title: titleController.text,
+                                userName: userController.text,
+                                url: urlController.text,
+                                notes: notesController.text,
+                                password: passwordController.text,
+                                icon: _selectedIcon,
+                                customIconData: _selectedCustomIconData,
+                              ),
+                            );
+                          }
                         }
                       },
                       child: Text(

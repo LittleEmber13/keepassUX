@@ -3,12 +3,8 @@ import 'dart:typed_data';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
-import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
-import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
+import 'package:keepassux/ui/pages/add_entry.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
-import 'package:keepassux/ui/widgets/icon_picker_dialog.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 
 import '../model/db_entry.dart';
@@ -24,16 +20,12 @@ class EntryData extends StatefulWidget {
 
 class _EntryDataState extends State<EntryData> {
   bool obscurePassword = true;
-  bool _isEditing = false;
 
   late TextEditingController _titleController;
   late TextEditingController _userController;
   late TextEditingController _urlController;
   late TextEditingController _notesController;
   late TextEditingController _passwordController;
-
-  int? _selectedIcon;
-  Uint8List? _selectedCustomIconData;
 
   final _inputBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(8),
@@ -60,219 +52,119 @@ class _EntryDataState extends State<EntryData> {
     super.dispose();
   }
 
-  void _toggleEdit() {
-    if (_isEditing) {
-      context.read<KeePassBloc>().add(
-        UpdateEntry(
-          entryUuid: widget.entry.uuid,
-          title: _titleController.text,
-          userName: _userController.text,
-          url: _urlController.text,
-          notes: _notesController.text,
-          password: _passwordController.text,
-          icon: _selectedIcon ?? widget.entry.icon,
-          customIconData: _selectedCustomIconData,
-        ),
-      );
-    } else {
-      setState(() {
-        _isEditing = true;
-      });
-    }
-  }
-
-  void _cancelEdit() {
-    setState(() {
-      _isEditing = false;
-      _selectedIcon = null;
-      _selectedCustomIconData = null;
-      _titleController.text = widget.entry.label;
-      _userController.text = widget.entry.userName;
-      _urlController.text = widget.entry.url;
-      _notesController.text = widget.entry.notes;
-      _passwordController.text = widget.entry.password;
-    });
-  }
-
-  Future<void> _openIconPicker() async {
-    final result = await IconPickerDialog.show(
+  void _openEditPage() {
+    Navigator.pop(context);
+    Navigator.push(
       context,
-      currentIcon: _selectedIcon ?? widget.entry.icon,
-      currentCustomIconData:
-          _selectedCustomIconData ?? widget.entry.customIconData,
+      MaterialPageRoute(
+        builder: (_) => AddEntryPage(entry: widget.entry),
+      ),
     );
-    if (result != null) {
-      setState(() {
-        _selectedIcon = result.icon;
-        _selectedCustomIconData = result.customIconData;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<KeePassBloc, KeePassState>(
-      listener: (context, state) {
-        if (state is KeePassUpdateEntrySuccess) {
-          setState(() {
-            _isEditing = false;
-          });
-          Navigator.pop(context);
-        }
-      },
-      child: PopScope(
-        canPop: !_isEditing,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                if (_isEditing) ...[
-                  GestureDetector(
-                    onTap: _openIconPicker,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.teal,
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: KDBXIconWidget(
-                        icon: _selectedIcon ?? widget.entry.icon,
-                        customIconData:
-                            _selectedCustomIconData ??
-                            widget.entry.customIconData,
-                        size: 27,
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  const Spacer(),
-                  KDBXIconWidget(
-                    icon: widget.entry.icon,
-                    customIconData: widget.entry.customIconData,
-                    size: 27,
-                  ),
-                ],
-              ],
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.arrow_back),
             ),
-            const SizedBox(height: 24),
-            CustomAppScroll(
-              horizontalPadding: 0,
-              children: [
-                _buildField(
-                  controller: _titleController,
-                  label: tr("entry_data.title"),
-                  showCopy: !_isEditing,
-                  onCopy: () {
-                    Clipboard.setData(
-                      ClipboardData(text: widget.entry.label),
-                    );
-                  },
-                ),
-                _buildField(
-                  controller: _userController,
-                  label: tr("entry_data.user"),
-                  showCopy: !_isEditing,
-                  onCopy: () {
-                    Clipboard.setData(
-                      ClipboardData(text: widget.entry.userName),
-                    );
-                  },
-                ),
-                _buildField(
-                  controller: _passwordController,
-                  label: tr("entry_data.password"),
-                  showCopy: !_isEditing,
-                  obscure: obscurePassword,
-                  onToggleObscure: () {
-                    setState(() {
-                      obscurePassword = !obscurePassword;
-                    });
-                  },
-                  onCopy: () {
-                    Clipboard.setData(
-                      ClipboardData(text: widget.entry.password),
-                    );
-                  },
-                ),
-                _buildField(
-                  controller: _urlController,
-                  label: tr("entry_data.url"),
-                  showCopy: !_isEditing,
-                  onCopy: () {
-                    Clipboard.setData(
-                      ClipboardData(text: widget.entry.url),
-                    );
-                  },
-                ),
-                _buildField(
-                  controller: _notesController,
-                  label: tr("entry_data.notes"),
-                  showCopy: false,
-                  maxLines: null,
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            const SizedBox(height: 8),
-            SafeArea(
-              top: false,
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: _toggleEdit,
-                      child: Text(
-                        _isEditing
-                            ? tr("entry_data.save")
-                            : tr("entry_data.edit"),
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  if (_isEditing) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        onPressed: _cancelEdit,
-                        child: Text(
-                          tr("entry_data.cancel"),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+            const Spacer(),
+            KDBXIconWidget(
+              icon: widget.entry.icon,
+              customIconData: widget.entry.customIconData,
+              size: 27,
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 24),
+        CustomAppScroll(
+          horizontalPadding: 0,
+          children: [
+            _buildField(
+              controller: _titleController,
+              label: tr("entry_data.title"),
+              showCopy: true,
+              onCopy: () {
+                Clipboard.setData(
+                  ClipboardData(text: widget.entry.label),
+                );
+              },
+            ),
+            _buildField(
+              controller: _userController,
+              label: tr("entry_data.user"),
+              showCopy: true,
+              onCopy: () {
+                Clipboard.setData(
+                  ClipboardData(text: widget.entry.userName),
+                );
+              },
+            ),
+            _buildField(
+              controller: _passwordController,
+              label: tr("entry_data.password"),
+              showCopy: true,
+              obscure: obscurePassword,
+              onToggleObscure: () {
+                setState(() {
+                  obscurePassword = !obscurePassword;
+                });
+              },
+              onCopy: () {
+                Clipboard.setData(
+                  ClipboardData(text: widget.entry.password),
+                );
+              },
+            ),
+            _buildField(
+              controller: _urlController,
+              label: tr("entry_data.url"),
+              showCopy: true,
+              onCopy: () {
+                Clipboard.setData(
+                  ClipboardData(text: widget.entry.url),
+                );
+              },
+            ),
+            _buildField(
+              controller: _notesController,
+              label: tr("entry_data.notes"),
+              showCopy: false,
+              maxLines: null,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+        const SizedBox(height: 8),
+        SafeArea(
+          top: false,
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: _openEditPage,
+              child: Text(
+                tr("entry_data.edit"),
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -292,7 +184,7 @@ class _EntryDataState extends State<EntryData> {
           Expanded(
             child: TextFormField(
               controller: controller,
-              readOnly: !_isEditing,
+              readOnly: true,
               obscureText: obscure ?? false,
               maxLines: (obscure == true) ? 1 : maxLines,
               decoration: InputDecoration(
@@ -313,7 +205,7 @@ class _EntryDataState extends State<EntryData> {
               ),
             ),
           ),
-          if (showCopy && !_isEditing && onCopy != null) ...[
+          if (showCopy && onCopy != null) ...[
             const SizedBox(width: 16),
             InkWell(
               onTap: onCopy,

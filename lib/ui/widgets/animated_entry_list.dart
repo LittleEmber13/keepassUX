@@ -109,9 +109,15 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
     for (int i = 0; i < newList.length; i++) {
       final newItem = newList[i];
       final newItemUuid = getUuid(newItem);
-      if (!oldUuids.contains(newItemUuid)) {
+      final oldIndex = oldUuids.indexOf(newItemUuid);
+      if (oldIndex == -1) {
         listKey.currentState?.insertItem(i, duration: const Duration(milliseconds: 300));
         oldList.insert(i, newItem);
+      } else if (oldIndex != i) {
+        oldList.removeAt(oldIndex);
+        oldList.insert(i, newItem);
+      } else {
+        oldList[i] = newItem;
       }
     }
 
