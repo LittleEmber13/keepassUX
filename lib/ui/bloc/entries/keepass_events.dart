@@ -107,3 +107,15 @@ class UpdateGroup extends KeePassEvent {
     required this.name,
   });
 }
+
+class DeleteEntry extends KeePassEvent {
+  final String entryUuid;
+
+  DeleteEntry({required this.entryUuid});
+}
+
+class DeleteGroup extends KeePassEvent {
+  final String groupUuid;
+
+  DeleteGroup({required this.groupUuid});
+}

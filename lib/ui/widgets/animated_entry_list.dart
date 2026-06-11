@@ -21,6 +21,7 @@ class AnimatedEntryList extends StatefulWidget {
     this.onDragStarted,
     this.onDragEnded,
     this.parentGroupItemBuilder,
+    this.trashGroup,
     super.key,
   });
 
@@ -30,6 +31,7 @@ class AnimatedEntryList extends StatefulWidget {
   final VoidCallback? onDragStarted;
   final VoidCallback? onDragEnded;
   final Widget Function()? parentGroupItemBuilder;
+  final DbGroup? trashGroup;
 
   @override
   State<AnimatedEntryList> createState() => _AnimatedEntryListState();
@@ -195,6 +197,42 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
         groupUuid: groupUuid,
         fromGroupUuid: fromUuid,
         toGroupUuid: toUuid,
+      ),
+    );
+  }
+
+  Widget _buildTrashGroupItem() {
+    final trash = widget.trashGroup!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(Icons.delete_outline, color: Colors.black54),
+          SizedBox(width: 16),
+          Expanded(
+            child: InkWell(
+              onTap: () => widget.onGroupTap?.call(trash),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                      offset: Offset(1, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(trash.name),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -469,6 +507,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
 
     return CustomAppScroll(
       children: [
+        if (widget.trashGroup != null) _buildTrashGroupItem(),
         if (widget.parentGroupItemBuilder != null)
           AnimatedSize(
             duration: const Duration(milliseconds: 300),

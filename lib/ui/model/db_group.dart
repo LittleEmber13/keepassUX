@@ -8,6 +8,7 @@ class DbGroup {
   final Uint8List? customIconData;
   final List<DbGroup> groups;
   final List<DbEntry> entries;
+  final bool isRecycleBin;
 
   DbGroup({
     required this.uuid,
@@ -16,6 +17,7 @@ class DbGroup {
     this.customIconData,
     required this.groups,
     required this.entries,
+    this.isRecycleBin = false,
   });
 
   List<DbGroup> getAllGroups() {

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
-import 'package:keepassux/ui/widgets/root_app_bar.dart';
+import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/model/db_group.dart';
 
@@ -39,11 +39,41 @@ class _AddGroupPageState extends State<AddGroupPage> {
     super.dispose();
   }
 
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr("delete.title")),
+        content: Text(tr("delete.confirm_group")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(tr("delete.cancel")),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<KeePassBloc>().add(
+                DeleteGroup(groupUuid: widget.group!.uuid),
+              );
+            },
+            child: Text(
+              tr("delete.delete"),
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassAddGroupSuccess || state is KeePassUpdateGroupSuccess) {
+        if (state is KeePassAddGroupSuccess ||
+            state is KeePassUpdateGroupSuccess ||
+            state is KeePassDeleteGroupSuccess) {
           Navigator.pop(context);
         }
         if (state is KeePassError) {
@@ -84,11 +114,14 @@ class _AddGroupPageState extends State<AddGroupPage> {
               left: 24,
               right: 24,
             ),
-            child: RootAppBar(
-              isExit: false,
+            child: GroupAppBar(
               onTapExit: () {
                 Navigator.pop(context);
               },
+              onTapDelete: _isEditing ? _showDeleteDialog : null,
+              title: _isEditing
+                  ? tr("add_group.edit_group")
+                  : tr("add_group.add_group"),
             ),
           ),
         ),

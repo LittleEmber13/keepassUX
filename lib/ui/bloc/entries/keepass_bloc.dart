@@ -23,6 +23,8 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     on<MoveEntry>(_onMoveEntry);
     on<MoveGroup>(_onMoveGroup);
     on<UpdateGroup>(_onUpdateGroup);
+    on<DeleteEntry>(_onDeleteEntry);
+    on<DeleteGroup>(_onDeleteGroup);
     _initIsolate();
   }
 
@@ -242,6 +244,44 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
 
       emit(KeePassRootGroup(_currentRoot!));
       emit(KeePassUpdateGroupSuccess());
+    } catch (e) {
+      logger.e(e);
+      emit(KeePassError(tr("exception.unknown")));
+    }
+  }
+
+  Future<void> _onDeleteEntry(DeleteEntry event, Emitter<KeePassState> emit) async {
+    try {
+      emit(KeePassLoading());
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        DeleteEntryCmd(entryUuid: event.entryUuid),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassRootGroup(_currentRoot!));
+      emit(KeePassDeleteEntrySuccess());
+    } catch (e) {
+      logger.e(e);
+      emit(KeePassError(tr("exception.unknown")));
+    }
+  }
+
+  Future<void> _onDeleteGroup(DeleteGroup event, Emitter<KeePassState> emit) async {
+    try {
+      emit(KeePassLoading());
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        DeleteGroupCmd(groupUuid: event.groupUuid),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassRootGroup(_currentRoot!));
+      emit(KeePassDeleteGroupSuccess());
     } catch (e) {
       logger.e(e);
       emit(KeePassError(tr("exception.unknown")));

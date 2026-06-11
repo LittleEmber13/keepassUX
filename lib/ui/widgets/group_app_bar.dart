@@ -6,11 +6,13 @@ class GroupAppBar extends StatelessWidget {
     required this.onTapExit,
     required this.title,
     this.onTapEdit,
+    this.onTapDelete,
   });
 
   final Function() onTapExit;
   final String title;
   final Function()? onTapEdit;
+  final Function()? onTapDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +77,32 @@ class GroupAppBar extends StatelessWidget {
                 ),
                 child: const Icon(
                   Icons.edit,
+                  color: Colors.black87,
+                  size: 20,
+                ),
+              ),
+            ),
+          ],
+          if (onTapDelete != null) ...[
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: onTapDelete,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.delete_outline,
                   color: Colors.black87,
                   size: 20,
                 ),

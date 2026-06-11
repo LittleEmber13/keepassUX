@@ -32,6 +32,7 @@ class _EntriesPageState extends State<EntriesPage> {
 
   DbGroup? group;
   DbGroup? _rootGroup;
+  DbGroup? _trashGroup;
   List<AlertItem> _alerts = [];
   bool _hasBiometrics = false;
   bool _biometricLoginEnabled = false;
@@ -71,6 +72,9 @@ class _EntriesPageState extends State<EntriesPage> {
             setState(() {
               _rootGroup = state.rootGroup;
               group = state.rootGroup;
+              _trashGroup = state.rootGroup?.groups.firstWhereOrNull(
+                (g) => g.isRecycleBin,
+              );
             });
           } else {
             List<DbGroup> allGroups = state.rootGroup?.getAllGroups() ?? [];
@@ -78,6 +82,9 @@ class _EntriesPageState extends State<EntriesPage> {
               _rootGroup = state.rootGroup;
               group = allGroups.firstWhereOrNull(
                 (g) => g.uuid == widget.uuidGroup,
+              );
+              _trashGroup = state.rootGroup?.groups.firstWhereOrNull(
+                (g) => g.isRecycleBin,
               );
             });
           }
@@ -170,6 +177,7 @@ class _EntriesPageState extends State<EntriesPage> {
                   AnimatedEntryList(
                     group: group,
                     rootGroup: _rootGroup,
+                    trashGroup: _trashGroup,
                     onGroupTap: (g) {
                       Navigator.push(
                         context,

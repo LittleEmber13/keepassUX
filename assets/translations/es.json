@@ -65,6 +65,7 @@
     "information": "Información",
     "title": "Título",
     "save": "Guardar",
+    "add_group": "Añadir grupo",
     "edit_group": "Editar grupo"
   },
   "entry_data": {
@@ -102,5 +103,12 @@
     "drag_text": "Mantén pulsado cualquier entrada o carpeta y arrástrala a otra carpeta para moverla.",
     "empty_title": "Tu base de datos está vacía",
     "empty_text": "Pulsa el botón + para añadir tus primeras entradas o carpetas."
+  },
+  "delete": {
+    "title": "Mover a la papelera",
+    "confirm_entry": "¿Estás seguro de que quieres mover esta entrada a la papelera?",
+    "confirm_group": "¿Estás seguro de que quieres mover este grupo y todo su contenido a la papelera?",
+    "cancel": "Cancelar",
+    "delete": "Mover a la papelera"
   }
 }

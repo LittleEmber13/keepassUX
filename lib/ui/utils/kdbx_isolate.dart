@@ -148,6 +148,22 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         replyPort.send(
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
         );
+      } else if (command is DeleteEntryCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final entry = _findEntry(kdbx!, command.entryUuid);
+        kdbx!.deleteEntry(entry);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
+      } else if (command is DeleteGroupCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final group = _findGroup(kdbx!, command.groupUuid);
+        kdbx!.deleteGroup(group);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
       } else if (command is CreateDatabaseCmd) {
         kdbx = KdbxFormat().create(
           Credentials(ProtectedValue.fromString(command.password)),
@@ -186,17 +202,19 @@ KdbxEntry _findEntry(KdbxFile kdbx, String uuid) {
 }
 
 DbRoot _serializeRoot(KdbxFile kdbx) {
-  return DbRoot(rootGroup: _serializeGroup(kdbx.body.rootGroup));
+  final recycleBinUuid = kdbx.recycleBin?.uuid.uuid;
+  return DbRoot(rootGroup: _serializeGroup(kdbx.body.rootGroup, recycleBinUuid));
 }
 
-DbGroup _serializeGroup(KdbxGroup group) {
+DbGroup _serializeGroup(KdbxGroup group, String? recycleBinUuid) {
   return DbGroup(
     uuid: group.uuid.uuid,
     name: group.name.get() ?? '',
     icon: group.icon.get()?.index ?? 0,
     customIconData: group.customIcon?.data,
-    groups: group.groups.map(_serializeGroup).toList(),
+    groups: group.groups.map((g) => _serializeGroup(g, recycleBinUuid)).toList(),
     entries: group.entries.map(_serializeEntry).toList(),
+    isRecycleBin: group.uuid.uuid == recycleBinUuid,
   );
 }
 

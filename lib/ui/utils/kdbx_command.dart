@@ -84,6 +84,16 @@ class UpdateGroupCmd extends KdbxCommand {
   UpdateGroupCmd({required this.groupUuid, required this.name});
 }
 
+class DeleteEntryCmd extends KdbxCommand {
+  final String entryUuid;
+  DeleteEntryCmd({required this.entryUuid});
+}
+
+class DeleteGroupCmd extends KdbxCommand {
+  final String groupUuid;
+  DeleteGroupCmd({required this.groupUuid});
+}
+
 class CreateDatabaseCmd extends KdbxCommand {
   final String password;
   CreateDatabaseCmd({required this.password});

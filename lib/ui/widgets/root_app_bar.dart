@@ -7,10 +7,12 @@ class RootAppBar extends StatelessWidget {
     super.key,
     required this.onTapExit,
     required this.isExit,
+    this.onTapDelete,
   });
 
   final Function() onTapExit;
   final bool isExit;
+  final Function()? onTapDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,36 @@ class RootAppBar extends StatelessWidget {
               ),
             ),
             SizedBox(width: 16),
+            if (onTapDelete != null) ...[
+              InkWell(
+                onTap: onTapDelete,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 5,
+                        spreadRadius: 1,
+                        offset: Offset(1, 2),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                    child: Icon(
+                      Icons.delete_outline,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+            ],
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,

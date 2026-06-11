@@ -90,11 +90,41 @@ class _AddEntryPageState extends State<AddEntryPage> {
     }
   }
 
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr("delete.title")),
+        content: Text(tr("delete.confirm_entry")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(tr("delete.cancel")),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<KeePassBloc>().add(
+                DeleteEntry(entryUuid: widget.entry!.uuid),
+              );
+            },
+            child: Text(
+              tr("delete.delete"),
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
-        if (state is KeePassAddEntrySuccess || state is KeePassUpdateEntrySuccess) {
+        if (state is KeePassAddEntrySuccess ||
+            state is KeePassUpdateEntrySuccess ||
+            state is KeePassDeleteEntrySuccess) {
           Navigator.pop(context);
         }
         if (state is KeePassError) {
@@ -139,6 +169,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
               onTapExit: () {
                 Navigator.pop(context);
               },
+              onTapDelete: _isEditing ? _showDeleteDialog : null,
               title: _isEditing
                   ? tr("add_entry.edit_entry")
                   : tr("add_entry.add_entry"),

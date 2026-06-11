@@ -39,3 +39,11 @@ class KeePassMoveSuccess extends KeePassState {
 class KeePassUpdateGroupSuccess extends KeePassState {
   KeePassUpdateGroupSuccess();
 }
+
+class KeePassDeleteEntrySuccess extends KeePassState {
+  KeePassDeleteEntrySuccess();
+}
+
+class KeePassDeleteGroupSuccess extends KeePassState {
+  KeePassDeleteGroupSuccess();
+}

@@ -65,6 +65,7 @@
     "information": "Information",
     "title": "Title",
     "save": "Save",
+    "add_group": "Add group",
     "edit_group": "Edit group"
   },
   "entry_data": {
@@ -102,5 +103,12 @@
     "drag_text": "Long-press any entry or folder and drag it to another folder to move it.",
     "empty_title": "Your database is empty",
     "empty_text": "Tap the + button to add your first entries or folders."
+  },
+  "delete": {
+    "title": "Move to trash",
+    "confirm_entry": "Are you sure you want to move this entry to the trash?",
+    "confirm_group": "Are you sure you want to move this group and all its contents to the trash?",
+    "cancel": "Cancel",
+    "delete": "Move to trash"
   }
 }
