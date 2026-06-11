@@ -5,7 +5,7 @@ import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../widgets/custom_app_bar.dart';
+import '../widgets/root_app_bar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -61,7 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomAppBar(
+              RootAppBar(
                 isExit: true,
                 onTapExit: () {
                   // TODO unload database

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
-import 'package:keepassux/ui/widgets/custom_app_bar.dart';
+import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 
 class AddGroupPage extends StatefulWidget {
@@ -72,7 +72,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
               left: 24,
               right: 24,
             ),
-            child: CustomAppBar(
+            child: RootAppBar(
               isExit: false,
               onTapExit: () {
                 Navigator.pop(context);

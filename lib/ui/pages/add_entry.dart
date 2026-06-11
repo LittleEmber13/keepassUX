@@ -6,7 +6,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/utils.dart';
-import 'package:keepassux/ui/widgets/custom_app_bar.dart';
+import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:zxcvbnm/languages/en.dart' as en;
 import 'package:zxcvbnm/languages/es_es.dart' as es;
@@ -141,7 +141,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
               left: 24,
               right: 24,
             ),
-            child: CustomAppBar(
+            child: RootAppBar(
               isExit: false,
               onTapExit: () {
                 Navigator.pop(context);
