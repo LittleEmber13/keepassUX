@@ -20,7 +20,10 @@ class AnimatedEntryList extends StatefulWidget {
     this.onGroupTap,
     this.onDragStarted,
     this.onDragEnded,
-    this.parentGroupItemBuilder,
+    this.parentGroup,
+    this.showParentGroup = false,
+    this.onParentGroupTap,
+    this.onParentGroupDragAccept,
     this.trashGroup,
     super.key,
   });
@@ -30,7 +33,10 @@ class AnimatedEntryList extends StatefulWidget {
   final void Function(DbGroup group)? onGroupTap;
   final VoidCallback? onDragStarted;
   final VoidCallback? onDragEnded;
-  final Widget Function()? parentGroupItemBuilder;
+  final DbGroup? parentGroup;
+  final bool showParentGroup;
+  final VoidCallback? onParentGroupTap;
+  final void Function(DragItem draggedItem)? onParentGroupDragAccept;
   final DbGroup? trashGroup;
 
   @override
@@ -264,6 +270,56 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
     );
   }
 
+  Widget _buildParentGroupItem() {
+    final parentGroup = widget.parentGroup!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: DragTarget<DragItem>(
+        onWillAcceptWithDetails: (details) {
+          final draggedItem = details.data;
+          if (draggedItem.type == DragType.group &&
+              draggedItem.uuid == parentGroup.uuid) {
+            return false;
+          }
+          return true;
+        },
+        onAcceptWithDetails: (details) {
+          widget.onParentGroupDragAccept?.call(details.data);
+        },
+        builder: (context, candidateData, rejectedData) {
+          final isHovering = candidateData.isNotEmpty;
+          return Row(
+            children: [
+              Icon(FontAwesomeIcons.folder),
+              SizedBox(width: 16),
+              Expanded(
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  decoration: kCardDecoration.copyWith(
+                    color: isHovering ? Color(0xFFEEFDFF) : Colors.white,
+                    border: isHovering
+                        ? Border.all(
+                            color: Colors.lightBlueAccent,
+                            width: 2,
+                          )
+                        : null,
+                  ),
+                  child: InkWell(
+                    onTap: widget.onParentGroupTap,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text("..."),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildDragFeedback({required Widget child}) {
     return Material(
       color: Colors.transparent,
@@ -343,11 +399,17 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
     return CustomAppScroll(
       children: [
         if (widget.trashGroup != null) _buildTrashGroupItem(),
-        if (widget.parentGroupItemBuilder != null)
+        if (widget.parentGroup != null)
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: widget.parentGroupItemBuilder!(),
+            child: AnimatedOpacity(
+              opacity: widget.showParentGroup ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              child: widget.showParentGroup
+                  ? _buildParentGroupItem()
+                  : const SizedBox.shrink(),
+            ),
           ),
         AnimatedList(
           key: _groupsListKey,

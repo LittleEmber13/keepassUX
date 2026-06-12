@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:collection/collection.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
@@ -12,7 +9,6 @@ import 'package:keepassux/ui/widgets/animated_entry_list.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/pages/add_group.dart';
-import 'package:keepassux/ui/theme/theme.dart';
 
 import '../model/db_group.dart';
 
@@ -29,15 +25,6 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
   DbGroup? group;
   DbGroup? _rootGroup;
   bool _isDragging = false;
-  bool _showParentSpace = false;
-  bool _showParentContent = false;
-  Timer? _parentItemTimer;
-
-  @override
-  void dispose() {
-    _parentItemTimer?.cancel();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -48,28 +35,9 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
   }
 
   void _onDragStateChanged(bool dragging) {
-    _parentItemTimer?.cancel();
-    if (dragging) {
-      setState(() {
-        _isDragging = true;
-        _showParentSpace = true;
-      });
-      _parentItemTimer = Timer(const Duration(milliseconds: 300), () {
-        if (_isDragging) {
-          setState(() => _showParentContent = true);
-        }
-      });
-    } else {
-      setState(() {
-        _isDragging = false;
-        _showParentContent = false;
-      });
-      _parentItemTimer = Timer(const Duration(milliseconds: 300), () {
-        if (!_isDragging) {
-          setState(() => _showParentSpace = false);
-        }
-      });
-    }
+    setState(() {
+      _isDragging = dragging;
+    });
   }
 
   DbGroup? _findParentGroup() {
@@ -94,77 +62,6 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
         groupUuid: groupUuid,
         fromGroupUuid: fromUuid,
         toGroupUuid: toUuid,
-      ),
-    );
-  }
-
-  Widget _buildParentGroupItem() {
-    final parentGroup = _findParentGroup();
-    final showItem = parentGroup != null && _showParentSpace;
-
-    return SizedBox(
-      height: showItem ? null : 0,
-      child: AnimatedOpacity(
-        opacity: _showParentContent ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 300),
-        child: showItem
-            ? Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: DragTarget<DragItem>(
-                  onWillAcceptWithDetails: (details) {
-                    final draggedItem = details.data;
-                    if (draggedItem.type == DragType.group &&
-                        draggedItem.uuid == parentGroup.uuid) {
-                      return false;
-                    }
-                    return true;
-                  },
-                  onAcceptWithDetails: (details) {
-                    final draggedItem = details.data;
-                    if (draggedItem.type == DragType.entry) {
-                      _moveEntry(
-                        draggedItem.uuid,
-                        draggedItem.sourceGroupUuid,
-                        parentGroup.uuid,
-                      );
-                    } else {
-                      _moveGroup(
-                        draggedItem.uuid,
-                        draggedItem.sourceGroupUuid,
-                        parentGroup.uuid,
-                      );
-                    }
-                  },
-                  builder: (context, candidateData, rejectedData) {
-                    final isHovering = candidateData.isNotEmpty;
-                    return Row(
-                      children: [
-                        Icon(FontAwesomeIcons.folder),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: AnimatedContainer(
-                            duration: Duration(milliseconds: 200),
-                            decoration: kCardDecoration.copyWith(
-                              color: isHovering ? Color(0xFFEEFDFF) : Colors.white,
-                              border: isHovering
-                                  ? Border.all(
-                                      color: Colors.lightBlueAccent,
-                                      width: 2,
-                                    )
-                                  : null,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text("..."),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              )
-            : null,
       ),
     );
   }
@@ -260,7 +157,38 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
               },
               onDragStarted: () => _onDragStateChanged(true),
               onDragEnded: () => _onDragStateChanged(false),
-              parentGroupItemBuilder: _buildParentGroupItem,
+              parentGroup: _findParentGroup(),
+              showParentGroup: _isDragging && _findParentGroup() != null,
+              onParentGroupTap: () {
+                final parentGroup = _findParentGroup();
+                if (parentGroup != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GroupEntriesPage(
+                        uuidGroup: parentGroup.uuid,
+                      ),
+                    ),
+                  );
+                }
+              },
+              onParentGroupDragAccept: (draggedItem) {
+                final parentGroup = _findParentGroup();
+                if (parentGroup == null) return;
+                if (draggedItem.type == DragType.entry) {
+                  _moveEntry(
+                    draggedItem.uuid,
+                    draggedItem.sourceGroupUuid,
+                    parentGroup.uuid,
+                  );
+                } else {
+                  _moveGroup(
+                    draggedItem.uuid,
+                    draggedItem.sourceGroupUuid,
+                    parentGroup.uuid,
+                  );
+                }
+              },
             ),
           ],
         ),
