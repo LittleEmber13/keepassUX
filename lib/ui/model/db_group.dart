@@ -28,4 +28,30 @@ class DbGroup {
     }
     return result;
   }
+
+  DbGroup? findByUuid(String uuid) {
+    if (this.uuid == uuid) return this;
+    for (final child in groups) {
+      final found = child.findByUuid(uuid);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  DbGroup? findParentOf(String childUuid) {
+    for (final child in groups) {
+      if (child.uuid == childUuid) return this;
+      final found = child.findParentOf(childUuid);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  bool isDescendantOf(String ancestorUuid) {
+    if (uuid == ancestorUuid) return true;
+    final ancestor = findByUuid(ancestorUuid);
+    if (ancestor == null) return false;
+    final descendants = ancestor.getAllGroups().map((g) => g.uuid).toList();
+    return descendants.contains(uuid);
+  }
 }

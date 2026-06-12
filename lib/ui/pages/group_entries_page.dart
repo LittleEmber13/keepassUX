@@ -12,6 +12,7 @@ import 'package:keepassux/ui/widgets/animated_entry_list.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/pages/add_group.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 import '../model/db_group.dart';
 
@@ -74,16 +75,7 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
   DbGroup? _findParentGroup() {
     if (_rootGroup == null) return null;
     if (_rootGroup!.uuid == widget.uuidGroup) return null;
-    return _findParentRecursive(_rootGroup!, widget.uuidGroup);
-  }
-
-  DbGroup? _findParentRecursive(DbGroup current, String targetUuid) {
-    for (final child in current.groups) {
-      if (child.uuid == targetUuid) return current;
-      final found = _findParentRecursive(child, targetUuid);
-      if (found != null) return found;
-    }
-    return null;
+    return _rootGroup!.findParentOf(widget.uuidGroup);
   }
 
   void _moveEntry(String entryUuid, String fromUuid, String toUuid) {
@@ -152,23 +144,14 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
                         Expanded(
                           child: AnimatedContainer(
                             duration: Duration(milliseconds: 200),
-                            decoration: BoxDecoration(
+                            decoration: kCardDecoration.copyWith(
                               color: isHovering ? Color(0xFFEEFDFF) : Colors.white,
-                              borderRadius: BorderRadius.circular(8),
                               border: isHovering
                                   ? Border.all(
                                       color: Colors.lightBlueAccent,
                                       width: 2,
                                     )
                                   : null,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                  offset: Offset(1, 2),
-                                ),
-                              ],
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16),

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/model/drag_item.dart';
-import 'package:keepassux/ui/pages/group_entries_page.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
-import 'package:keepassux/ui/widgets/entry_data.dart';
-import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+import 'package:keepassux/ui/widgets/draggable_group_item.dart';
+import 'package:keepassux/ui/widgets/draggable_entry_item.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
-import '../bloc/entries/keepass_states.dart';
 import '../model/db_entry.dart';
 import '../model/db_group.dart';
 
@@ -55,7 +55,9 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
   void _syncLists() {
     if (widget.group == null) return;
 
-    final newGroups = widget.group!.groups;
+    final newGroups = widget.group!.groups
+        .where((g) => g.uuid != widget.trashGroup?.uuid)
+        .toList();
     final newEntries = widget.group!.entries;
 
     _syncItems<DbGroup>(
@@ -137,18 +139,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
             SizedBox(width: 16),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                      offset: Offset(1, 2),
-                    ),
-                  ],
-                ),
+                decoration: kCardDecoration,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(item.name),
@@ -159,80 +150,116 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
         ),
       );
     } else if (item is DbEntry) {
-      return _buildEntryItem(item);
+      return DraggableEntryItem(
+        entry: item,
+        sourceGroupUuid: widget.group!.uuid,
+        onDragStarted: null,
+        onDragEnd: null,
+      );
     }
     return SizedBox.shrink();
-  }
-
-  bool _isDescendantOf(String ancestorUuid, String descendantUuid) {
-    if (ancestorUuid == descendantUuid) return true;
-    final ancestor = _findGroupByUuid(widget.group!, ancestorUuid);
-    if (ancestor == null) return false;
-    final descendants = ancestor.getAllGroups().map((g) => g.uuid).toList();
-    return descendants.contains(descendantUuid);
-  }
-
-  DbGroup? _findGroupByUuid(DbGroup root, String uuid) {
-    if (root.uuid == uuid) return root;
-    for (final child in root.groups) {
-      final found = _findGroupByUuid(child, uuid);
-      if (found != null) return found;
-    }
-    return null;
-  }
-
-  void _moveEntry(String entryUuid, String fromUuid, String toUuid) {
-    context.read<KeePassBloc>().add(
-      MoveEntry(
-        entryUuid: entryUuid,
-        fromGroupUuid: fromUuid,
-        toGroupUuid: toUuid,
-      ),
-    );
-  }
-
-  void _moveGroup(String groupUuid, String fromUuid, String toUuid) {
-    context.read<KeePassBloc>().add(
-      MoveGroup(
-        groupUuid: groupUuid,
-        fromGroupUuid: fromUuid,
-        toGroupUuid: toUuid,
-      ),
-    );
   }
 
   Widget _buildTrashGroupItem() {
     final trash = widget.trashGroup!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Icon(Icons.delete_outline, color: Colors.black54),
-          SizedBox(width: 16),
-          Expanded(
-            child: InkWell(
-              onTap: () => widget.onGroupTap?.call(trash),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                      offset: Offset(1, 2),
-                    ),
-                  ],
-                ),
-                child: Padding(
+      child: LongPressDraggable<DragItem>(
+        data: DragItem(
+          type: DragType.group,
+          uuid: trash.uuid,
+          sourceGroupUuid: widget.group!.uuid,
+        ),
+        onDragStarted: widget.onDragStarted,
+        onDragEnd: widget.onDragEnded != null ? (_) => widget.onDragEnded!() : null,
+        feedback: _buildDragFeedback(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(trash.name),
+                  child: Icon(Icons.delete_outline, color: Colors.black54),
                 ),
-              ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(trash.name),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.4,
+          child: Row(
+            children: [
+              Icon(Icons.delete_outline, color: Colors.black54),
+              SizedBox(width: 16),
+              Expanded(
+                child: Container(
+                  decoration: kCardDecoration,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(trash.name),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        child: DragTarget<DragItem>(
+          onWillAccept: (draggedItem) {
+            if (draggedItem == null) return false;
+            if (draggedItem.type == DragType.group &&
+                draggedItem.uuid == trash.uuid) {
+              return false;
+            }
+            return true;
+          },
+          onAccept: (draggedItem) {
+            _showMoveToTrashDialog(draggedItem);
+          },
+          builder: (context, candidateData, rejectedData) {
+            final isHovering = candidateData.isNotEmpty;
+            return Row(
+              children: [
+                Icon(Icons.delete_outline, color: Colors.black54),
+                SizedBox(width: 16),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => widget.onGroupTap?.call(trash),
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      decoration: kCardDecoration.copyWith(
+                        color: isHovering ? Color(0xFFFFF0F0) : null,
+                        border: isHovering
+                            ? Border.all(
+                                color: Colors.red,
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(trash.name),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -262,241 +289,49 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
     );
   }
 
-  Widget _buildEntryItem(DbEntry entry) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            spreadRadius: 1,
-            offset: Offset(1, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            KDBXIconWidget(
-              icon: entry.icon,
-              customIconData: entry.customIconData,
-              size: 24,
-              color: Colors.lightBlueAccent,
-            ),
-            SizedBox(width: 16),
-            Text(entry.label ?? ""),
-          ],
-        ),
-      ),
-    );
-  }
+  void _showMoveToTrashDialog(DragItem draggedItem) {
+    final isEntry = draggedItem.type == DragType.entry;
+    final confirmMessage = isEntry
+        ? tr("delete.confirm_entry")
+        : tr("delete.confirm_group");
 
-  Widget _buildGroupItem(DbGroup currentGroup) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: LongPressDraggable<DragItem>(
-        data: DragItem(
-          type: DragType.group,
-          uuid: currentGroup.uuid,
-          sourceGroupUuid: widget.group!.uuid,
-        ),
-        onDragStarted: widget.onDragStarted,
-        onDragEnd: widget.onDragEnded != null ? (_) => widget.onDragEnded!() : null,
-        feedback: _buildDragFeedback(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.7,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Icon(FontAwesomeIcons.folder),
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Text(currentGroup.name),
-                  ),
-                ),
-              ],
-            ),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr("delete.title")),
+        content: Text(confirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(tr("delete.cancel")),
           ),
-        ),
-        childWhenDragging: Opacity(
-          opacity: 0.4,
-          child: Row(
-            children: [
-              Icon(FontAwesomeIcons.folder),
-              SizedBox(width: 16),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                        spreadRadius: 1,
-                        offset: Offset(1, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(currentGroup.name),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        child: DragTarget<DragItem>(
-          onWillAccept: (draggedItem) {
-            if (draggedItem == null) return false;
-            if (draggedItem.type == DragType.group &&
-                draggedItem.uuid == currentGroup.uuid) {
-              return false;
-            }
-            if (draggedItem.type == DragType.group &&
-                _isDescendantOf(draggedItem.uuid, currentGroup.uuid)) {
-              return false;
-            }
-            return true;
-          },
-          onAccept: (draggedItem) {
-            final currentGroupUuid = currentGroup.uuid;
-            if (draggedItem.type == DragType.entry) {
-              _moveEntry(
-                draggedItem.uuid,
-                draggedItem.sourceGroupUuid,
-                currentGroupUuid,
-              );
-            } else {
-              if (draggedItem.uuid == currentGroupUuid) return;
-              _moveGroup(
-                draggedItem.uuid,
-                draggedItem.sourceGroupUuid,
-                currentGroupUuid,
-              );
-            }
-          },
-          builder: (context, candidateData, rejectedData) {
-            final isHovering = candidateData.isNotEmpty;
-            return Row(
-              children: [
-                Icon(FontAwesomeIcons.folder),
-                SizedBox(width: 16),
-                Expanded(
-                  child: InkWell(
-                    onTap: () => widget.onGroupTap?.call(currentGroup),
-                    child: AnimatedContainer(
-                      duration: Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: isHovering
-                            ? Border.all(
-                                color: Colors.lightBlueAccent,
-                                width: 2,
-                              )
-                            : null,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 5,
-                            spreadRadius: 1,
-                            offset: Offset(1, 2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(currentGroup.name),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEntryDragItem(DbEntry currentEntry) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: LongPressDraggable<DragItem>(
-        data: DragItem(
-          type: DragType.entry,
-          uuid: currentEntry.uuid,
-          sourceGroupUuid: widget.group!.uuid,
-        ),
-        onDragStarted: widget.onDragStarted,
-        onDragEnd: widget.onDragEnded != null ? (_) => widget.onDragEnded!() : null,
-        feedback: _buildDragFeedback(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.7,
-            child: _buildEntryItem(currentEntry),
-          ),
-        ),
-        childWhenDragging: Opacity(
-          opacity: 0.4,
-          child: _buildEntryItem(currentEntry),
-        ),
-        child: InkWell(
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-              ),
-              isScrollControlled: true,
-              builder: (BuildContext ctx) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.75,
-                  child: BlocBuilder<KeePassBloc, KeePassState>(
-                    builder: (context, state) {
-                      return Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: EntryData(
-                              entry: currentEntry,
-                            ),
-                          ),
-                          if (state is KeePassLoading)
-                            Container(
-                              color: Colors.black.withOpacity(0.5),
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (isEntry) {
+                context.read<KeePassBloc>().add(
+                  MoveEntry(
+                    entryUuid: draggedItem.uuid,
+                    fromGroupUuid: draggedItem.sourceGroupUuid,
+                    toGroupUuid: widget.trashGroup!.uuid,
                   ),
                 );
-              },
-            );
-          },
-          child: _buildEntryItem(currentEntry),
-        ),
+              } else {
+                context.read<KeePassBloc>().add(
+                  MoveGroup(
+                    groupUuid: draggedItem.uuid,
+                    fromGroupUuid: draggedItem.sourceGroupUuid,
+                    toGroupUuid: widget.trashGroup!.uuid,
+                  ),
+                );
+              }
+            },
+            child: Text(
+              tr("delete.delete"),
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -528,7 +363,40 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               sizeFactor: AlwaysStoppedAnimation(1.0),
               child: FadeTransition(
                 opacity: animation,
-                child: _buildGroupItem(currentGroup),
+                child: DraggableGroupItem(
+                  group: currentGroup,
+                  sourceGroupUuid: widget.group!.uuid,
+                  onTap: () => widget.onGroupTap?.call(currentGroup),
+                  onDragStarted: widget.onDragStarted,
+                  onDragEnd: widget.onDragEnded,
+                  isDescendantOf: (ancestorUuid, descendantUuid) {
+                    return widget.rootGroup
+                            ?.findByUuid(ancestorUuid)
+                            ?.isDescendantOf(descendantUuid) ??
+                        false;
+                  },
+                  onAccept: (draggedItem) {
+                    final currentGroupUuid = currentGroup.uuid;
+                    if (draggedItem.type == DragType.entry) {
+                      context.read<KeePassBloc>().add(
+                        MoveEntry(
+                          entryUuid: draggedItem.uuid,
+                          fromGroupUuid: draggedItem.sourceGroupUuid,
+                          toGroupUuid: currentGroupUuid,
+                        ),
+                      );
+                    } else {
+                      if (draggedItem.uuid == currentGroupUuid) return;
+                      context.read<KeePassBloc>().add(
+                        MoveGroup(
+                          groupUuid: draggedItem.uuid,
+                          fromGroupUuid: draggedItem.sourceGroupUuid,
+                          toGroupUuid: currentGroupUuid,
+                        ),
+                      );
+                    }
+                  },
+                ),
               ),
             );
           },
@@ -547,7 +415,12 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               sizeFactor: AlwaysStoppedAnimation(1.0),
               child: FadeTransition(
                 opacity: animation,
-                child: _buildEntryDragItem(currentEntry),
+                child: DraggableEntryItem(
+                  entry: currentEntry,
+                  sourceGroupUuid: widget.group!.uuid,
+                  onDragStarted: widget.onDragStarted,
+                  onDragEnd: widget.onDragEnded,
+                ),
               ),
             );
           },

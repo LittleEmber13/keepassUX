@@ -1,0 +1,171 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:keepassux/ui/model/drag_item.dart';
+import 'package:keepassux/ui/theme/theme.dart';
+
+class DraggableGroupItem extends StatelessWidget {
+  const DraggableGroupItem({
+    required this.group,
+    required this.sourceGroupUuid,
+    required this.onTap,
+    required this.onDragStarted,
+    required this.onDragEnd,
+    required this.onAccept,
+    required this.isDescendantOf,
+    super.key,
+  });
+
+  final dynamic group;
+  final String sourceGroupUuid;
+  final VoidCallback? onTap;
+  final VoidCallback? onDragStarted;
+  final VoidCallback? onDragEnd;
+  final void Function(DragItem draggedItem) onAccept;
+  final bool Function(String ancestorUuid, String descendantUuid) isDescendantOf;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: LongPressDraggable<DragItem>(
+        data: DragItem(
+          type: DragType.group,
+          uuid: group.uuid,
+          sourceGroupUuid: sourceGroupUuid,
+        ),
+        onDragStarted: onDragStarted,
+        onDragEnd: onDragEnd != null ? (_) => onDragEnd!() : null,
+        feedback: _buildDragFeedback(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Icon(FontAwesomeIcons.folder),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(group.name),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        childWhenDragging: Opacity(
+          opacity: 0.4,
+          child: Row(
+            children: [
+              Icon(FontAwesomeIcons.folder),
+              SizedBox(width: 16),
+              Expanded(
+                child: Container(
+                  decoration: kCardDecoration,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(group.name),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        child: DragTarget<DragItem>(
+          onWillAccept: (draggedItem) {
+            if (draggedItem == null) return false;
+            if (draggedItem.type == DragType.group &&
+                draggedItem.uuid == group.uuid) {
+              return false;
+            }
+            if (draggedItem.type == DragType.group &&
+                isDescendantOf(draggedItem.uuid, group.uuid)) {
+              return false;
+            }
+            return true;
+          },
+          onAccept: (draggedItem) {
+            final currentGroupUuid = group.uuid;
+            if (draggedItem.type == DragType.entry) {
+              onAccept(DragItem(
+                type: DragType.entry,
+                uuid: draggedItem.uuid,
+                sourceGroupUuid: draggedItem.sourceGroupUuid,
+              ));
+            } else {
+              if (draggedItem.uuid == currentGroupUuid) return;
+              onAccept(DragItem(
+                type: DragType.group,
+                uuid: draggedItem.uuid,
+                sourceGroupUuid: draggedItem.sourceGroupUuid,
+              ));
+            }
+          },
+          builder: (context, candidateData, rejectedData) {
+            final isHovering = candidateData.isNotEmpty;
+            return Row(
+              children: [
+                Icon(FontAwesomeIcons.folder),
+                SizedBox(width: 16),
+                Expanded(
+                  child: InkWell(
+                    onTap: onTap,
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 200),
+                      decoration: kCardDecoration.copyWith(
+                        border: isHovering
+                            ? Border.all(
+                                color: Colors.lightBlueAccent,
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(group.name),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDragFeedback({required Widget child}) {
+    return Material(
+      color: Colors.transparent,
+      child: Opacity(
+        opacity: 0.85,
+        child: Transform.scale(
+          scale: 1.05,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+}

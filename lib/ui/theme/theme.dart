@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
 
+const kCardDecoration = BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.all(Radius.circular(8)),
+  boxShadow: [
+    BoxShadow(
+      color: Color(0x0D000000),
+      blurRadius: 5,
+      spreadRadius: 1,
+      offset: Offset(1, 2),
+    ),
+  ],
+);
+
 ThemeData themeData = ThemeData(
   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
   inputDecorationTheme: InputDecorationTheme(
