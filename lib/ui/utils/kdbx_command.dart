@@ -94,6 +94,16 @@ class DeleteGroupCmd extends KdbxCommand {
   DeleteGroupCmd({required this.groupUuid});
 }
 
+class DeleteEntryPermanentlyCmd extends KdbxCommand {
+  final String entryUuid;
+  DeleteEntryPermanentlyCmd({required this.entryUuid});
+}
+
+class DeleteGroupPermanentlyCmd extends KdbxCommand {
+  final String groupUuid;
+  DeleteGroupPermanentlyCmd({required this.groupUuid});
+}
+
 class CreateDatabaseCmd extends KdbxCommand {
   final String password;
   CreateDatabaseCmd({required this.password});

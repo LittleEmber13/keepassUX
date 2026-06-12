@@ -6,6 +6,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/group_entries_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/pages/trash_page.dart';
 import 'package:keepassux/ui/services/alert_service.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/widgets/animated_entry_list.dart';
@@ -179,14 +180,23 @@ class _EntriesPageState extends State<EntriesPage> {
                     rootGroup: _rootGroup,
                     trashGroup: _trashGroup,
                     onGroupTap: (g) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GroupEntriesPage(
-                            uuidGroup: g.uuid,
+                      if (g.isRecycleBin) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TrashPage(),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GroupEntriesPage(
+                              uuidGroup: g.uuid,
+                            ),
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],

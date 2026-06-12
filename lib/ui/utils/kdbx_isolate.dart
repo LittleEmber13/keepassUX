@@ -164,6 +164,22 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         replyPort.send(
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
         );
+      } else if (command is DeleteEntryPermanentlyCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final entry = _findEntry(kdbx!, command.entryUuid);
+        kdbx!.deletePermanently(entry);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
+      } else if (command is DeleteGroupPermanentlyCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final group = _findGroup(kdbx!, command.groupUuid);
+        kdbx!.deletePermanently(group);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
       } else if (command is CreateDatabaseCmd) {
         kdbx = KdbxFormat().create(
           Credentials(ProtectedValue.fromString(command.password)),

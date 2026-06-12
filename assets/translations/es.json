@@ -37,7 +37,8 @@
   },
   "app_bar": {
     "hello": "Hola,",
-    "welcome": "Bienvenido"
+    "welcome": "Bienvenido",
+    "trash": "Papelera"
   },
   "nav_bar": {
     "add": "Añadir",
@@ -110,5 +111,13 @@
     "confirm_group": "¿Estás seguro de que quieres mover este grupo y todo su contenido a la papelera?",
     "cancel": "Cancelar",
     "delete": "Mover a la papelera"
+  },
+  "trash": {
+    "restore_message": "Arrastra el item hacia afuera para restaurarlo",
+    "confirm_delete_entry": "¿Estás seguro de que quieres eliminar permanentemente esta entrada?",
+    "confirm_delete_group": "¿Estás seguro de que quieres eliminar permanentemente este grupo y todo su contenido?",
+    "delete": "Eliminar permanentemente",
+    "info_delete": "Para eliminar un elemento de forma permanente, pulsa el botón de eliminar junto a él.",
+    "info_restore": "Para restaurar un elemento, mantenlo pulsado y arrástralo fuera de la papelera."
   }
 }

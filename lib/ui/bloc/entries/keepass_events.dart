@@ -119,3 +119,15 @@ class DeleteGroup extends KeePassEvent {
 
   DeleteGroup({required this.groupUuid});
 }
+
+class DeleteEntryPermanently extends KeePassEvent {
+  final String entryUuid;
+
+  DeleteEntryPermanently({required this.entryUuid});
+}
+
+class DeleteGroupPermanently extends KeePassEvent {
+  final String groupUuid;
+
+  DeleteGroupPermanently({required this.groupUuid});
+}

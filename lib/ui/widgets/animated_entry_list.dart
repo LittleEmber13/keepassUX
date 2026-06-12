@@ -8,6 +8,8 @@ import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/draggable_group_item.dart';
 import 'package:keepassux/ui/widgets/draggable_entry_item.dart';
+import 'package:keepassux/ui/widgets/trash_entry_item.dart';
+import 'package:keepassux/ui/widgets/trash_group_item.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
 import '../model/db_entry.dart';
@@ -25,6 +27,9 @@ class AnimatedEntryList extends StatefulWidget {
     this.onParentGroupTap,
     this.onParentGroupDragAccept,
     this.trashGroup,
+    this.isTrashMode = false,
+    this.onDeleteEntry,
+    this.onDeleteGroup,
     super.key,
   });
 
@@ -38,6 +43,9 @@ class AnimatedEntryList extends StatefulWidget {
   final VoidCallback? onParentGroupTap;
   final void Function(DragItem draggedItem)? onParentGroupDragAccept;
   final DbGroup? trashGroup;
+  final bool isTrashMode;
+  final void Function(String entryUuid)? onDeleteEntry;
+  final void Function(String groupUuid)? onDeleteGroup;
 
   @override
   State<AnimatedEntryList> createState() => _AnimatedEntryListState();
@@ -61,9 +69,11 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
   void _syncLists() {
     if (widget.group == null) return;
 
-    final newGroups = widget.group!.groups
-        .where((g) => g.uuid != widget.trashGroup?.uuid)
-        .toList();
+    final newGroups = widget.isTrashMode
+        ? widget.group!.groups.toList()
+        : widget.group!.groups
+            .where((g) => g.uuid != widget.trashGroup?.uuid)
+            .toList();
     final newEntries = widget.group!.entries;
 
     _syncItems<DbGroup>(
@@ -398,7 +408,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
 
     return CustomAppScroll(
       children: [
-        if (widget.trashGroup != null) _buildTrashGroupItem(),
+        if (!widget.isTrashMode && widget.trashGroup != null) _buildTrashGroupItem(),
         if (widget.parentGroup != null)
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
@@ -421,6 +431,22 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               return SizedBox.shrink();
             }
             final currentGroup = _displayedGroups[index];
+            if (widget.isTrashMode) {
+              return SizeTransition(
+                sizeFactor: AlwaysStoppedAnimation(1.0),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: TrashGroupItem(
+                    group: currentGroup,
+                    sourceGroupUuid: widget.group!.uuid,
+                    onTap: () => widget.onGroupTap?.call(currentGroup),
+                    onDragStarted: widget.onDragStarted,
+                    onDragEnd: widget.onDragEnded,
+                    onDelete: () => widget.onDeleteGroup?.call(currentGroup.uuid),
+                  ),
+                ),
+              );
+            }
             return SizeTransition(
               sizeFactor: AlwaysStoppedAnimation(1.0),
               child: FadeTransition(
@@ -473,6 +499,20 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               return SizedBox.shrink();
             }
             final currentEntry = _displayedEntries[index];
+            if (widget.isTrashMode) {
+              return SizeTransition(
+                sizeFactor: AlwaysStoppedAnimation(1.0),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: TrashEntryItem(
+                    entry: currentEntry,
+                    sourceGroupUuid: widget.group!.uuid,
+                    onDragStarted: widget.onDragStarted,
+                    onDragEnd: widget.onDragEnded,
+                  ),
+                ),
+              );
+            }
             return SizeTransition(
               sizeFactor: AlwaysStoppedAnimation(1.0),
               child: FadeTransition(
