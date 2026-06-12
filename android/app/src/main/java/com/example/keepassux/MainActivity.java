@@ -2,6 +2,7 @@ package com.example.keepassux;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.view.WindowManager;
 
 import io.flutter.embedding.android.FlutterFragmentActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -26,6 +27,14 @@ public class MainActivity extends FlutterFragmentActivity {
                     } catch (Exception e) {
                         result.success(false);
                     }
+                } else if (call.method.equals("setFlagSecure")) {
+                    Boolean enabled = call.argument("enabled");
+                    if (enabled != null && enabled) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                    }
+                    result.success(true);
                 } else {
                     result.notImplemented();
                 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/services/screenshot_protection_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:zxcvbnm/messages.dart';
 import 'package:zxcvbnm_flutter/zxcvbnm_flutter.dart';
@@ -11,6 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await initializeZxcvbnmMessages('es');
+  await ScreenshotProtectionService().enableProtection();
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en'), Locale('es')],
