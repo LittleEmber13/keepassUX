@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:keepassux/ui/pages/create_database_page.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
+import 'package:keepassux/ui/widgets/slide_to_open_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uri_content/uri_content.dart';
 import 'package:keepassux/ui/theme/theme.dart';
@@ -37,6 +40,11 @@ class _StartPageState extends State<StartPage> {
 
   SharedPreferences? preferences;
 
+  Completer<bool>? _openCompleter;
+
+  bool get _canOpenDatabase =>
+      folderController.text.isNotEmpty && passwordController.text.isNotEmpty;
+
   Future<void> _initStateAsync() async {
     preferences = await SharedPreferences.getInstance();
     final savedUri = preferences!.getString('kdbx_uri') ?? '';
@@ -53,11 +61,19 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     _initStateAsync();
+    passwordController.addListener(_onCredentialsChanged);
+    folderController.addListener(_onCredentialsChanged);
     super.initState();
+  }
+
+  void _onCredentialsChanged() {
+    setState(() {});
   }
 
   @override
   void dispose() {
+    passwordController.removeListener(_onCredentialsChanged);
+    folderController.removeListener(_onCredentialsChanged);
     passwordController.dispose();
     folderController.dispose();
     super.dispose();
@@ -71,14 +87,16 @@ class _StartPageState extends State<StartPage> {
     setState(() {});
   }
 
-  Future<void> _openDatabase() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<bool> _openDatabase() async {
+    if (!_formKey.currentState!.validate()) return false;
     try {
       final uri = Uri.parse(folderController.text);
       final bytes = await UriContent().from(uri);
+      _openCompleter = Completer<bool>();
       context.read<KeePassBloc>().add(
         LoadDatabase(bytes: bytes, password: passwordController.text),
       );
+      return await _openCompleter!.future;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -88,6 +106,7 @@ class _StartPageState extends State<StartPage> {
           ),
         );
       }
+      return false;
     }
   }
 
@@ -153,9 +172,13 @@ class _StartPageState extends State<StartPage> {
     return BlocConsumer<KeePassBloc, KeePassState>(
       listener: (context, state) {
         if (state is KeePassLoaded) {
+          _openCompleter?.complete(true);
+          _openCompleter = null;
           _onDatabaseLoaded();
         }
         if (state is KeePassError) {
+          _openCompleter?.complete(false);
+          _openCompleter = null;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -302,49 +325,16 @@ class _StartPageState extends State<StartPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildOpenDatabaseButton(),
+          SlideToOpenButton(
+            label: tr("start_page.open_database"),
+            enabled: _canOpenDatabase,
+            onConfirmed: _openDatabase,
+          ),
           SizedBox(height: 16),
           if (_hasBiometrics && _hasSavedPassword && _biometricLoginEnabled) _buildBiometricButton(),
           if (_hasBiometrics && _hasSavedPassword && _biometricLoginEnabled) SizedBox(height: 16),
           _buildCreateDatabaseLink(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildOpenDatabaseButton() {
-    return InkWell(
-      onTap: _openDatabase,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color(0xFF374151),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.arrow_forward),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  tr("start_page.open_database"),
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
