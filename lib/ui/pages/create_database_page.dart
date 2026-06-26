@@ -7,6 +7,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bloc/entries/keepass_events.dart';
@@ -69,7 +70,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
             _page(),
             if (state is KeePassLoading)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.scrim.withOpacity(0.5),
                 child: Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -95,18 +96,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                    offset: Offset(1, 2),
-                  ),
-                ],
-              ),
+              decoration: cardDecoration(context),
               child: Form(
                 key: _formKey,
                 child: Padding(

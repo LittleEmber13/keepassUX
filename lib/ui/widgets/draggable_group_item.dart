@@ -39,7 +39,7 @@ class DraggableGroupItem extends StatelessWidget {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.7,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.cardBackground,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -51,7 +51,7 @@ class DraggableGroupItem extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.appColors.cardBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.all(16),
@@ -70,7 +70,7 @@ class DraggableGroupItem extends StatelessWidget {
               SizedBox(width: 16),
               Expanded(
                 child: Container(
-                  decoration: kCardDecoration,
+                  decoration: cardDecoration(context),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(group.name),
@@ -121,7 +121,7 @@ class DraggableGroupItem extends StatelessWidget {
                     onTap: onTap,
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 200),
-                      decoration: kCardDecoration.copyWith(
+                      decoration: cardDecoration(context).copyWith(
                         border: isHovering
                             ? Border.all(
                                 color: Colors.lightBlueAccent,

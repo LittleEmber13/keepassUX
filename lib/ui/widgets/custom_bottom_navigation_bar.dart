@@ -7,6 +7,7 @@ import 'package:keepassux/ui/pages/add_group.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/search_page.dart';
 import 'package:keepassux/ui/pages/settings_page.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({
@@ -24,18 +25,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
       child: Padding(
       padding: const EdgeInsets.only(bottom: 24, left: 24, right: 24, top: 24),
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              spreadRadius: 1,
-              offset: Offset(1, 2),
-            ),
-          ],
-        ),
+        decoration: cardDecoration(context),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
           child: Row(
@@ -52,7 +42,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 },
                 child: Icon(
                   FontAwesomeIcons.folder,
-                  color: selectedIndex == 0 ? Colors.black : Colors.grey,
+                  color: selectedIndex == 0
+                      ? Theme.of(context).colorScheme.onSurface
+                      : context.appColors.secondaryText,
                 ),
               ),
               InkWell(
@@ -66,14 +58,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 },
                 child: Icon(
                   FontAwesomeIcons.magnifyingGlass,
-                  color: selectedIndex == 1 ? Colors.black : Colors.grey,
+                  color: selectedIndex == 1
+                      ? Theme.of(context).colorScheme.onSurface
+                      : context.appColors.secondaryText,
                 ),
               ),
               InkWell(
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(20),
@@ -149,16 +143,23 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     shape: BoxShape.circle,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(6),
-                    child: Icon(Icons.add, color: Colors.white, size: 39),
+                    child: Icon(
+                      Icons.add,
+                      color: Theme.of(context).colorScheme.surface,
+                      size: 39,
+                    ),
                   ),
                 ),
               ),
-              Icon(FontAwesomeIcons.user, color: Colors.white),
+              Icon(
+                FontAwesomeIcons.user,
+                color: context.appColors.secondaryText,
+              ),
               InkWell(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -170,7 +171,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 },
                 child: Icon(
                   FeatherIcons.settings,
-                  color: selectedIndex == 3 ? Colors.black : Colors.grey,
+                  color: selectedIndex == 3
+                      ? Theme.of(context).colorScheme.onSurface
+                      : context.appColors.secondaryText,
                   size: 26,
                 ),
               ),

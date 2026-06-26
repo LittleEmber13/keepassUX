@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class CustomAppScroll extends StatefulWidget {
   const CustomAppScroll({
@@ -61,7 +62,7 @@ class _CustomAppScrollState extends State<CustomAppScroll> {
                         child: Container(
                           width: 8,
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.20),
+                            color: context.appColors.secondaryText.withOpacity(0.20),
                             borderRadius: BorderRadius.circular(99),
                           ),
                         ),
@@ -73,7 +74,7 @@ class _CustomAppScrollState extends State<CustomAppScroll> {
                   thumbVisibility: true,
                   thickness: 8.0,
                   trackVisibility: false,
-                  thumbColor: Colors.white,
+                  thumbColor: context.appColors.cardBackground,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(99)),
                   ),

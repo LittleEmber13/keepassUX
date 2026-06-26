@@ -45,7 +45,7 @@ class TrashGroupItem extends StatelessWidget {
             },
             child: Text(
               tr("trash.delete"),
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: context.appColors.danger),
             ),
           ),
         ],
@@ -69,7 +69,7 @@ class TrashGroupItem extends StatelessWidget {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.7,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.cardBackground,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -81,7 +81,7 @@ class TrashGroupItem extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.appColors.cardBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.all(16),
@@ -100,7 +100,7 @@ class TrashGroupItem extends StatelessWidget {
               SizedBox(width: 16),
               Expanded(
                 child: Container(
-                  decoration: kCardDecoration,
+                  decoration: cardDecoration(context),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(group.name),
@@ -152,7 +152,7 @@ class TrashGroupItem extends StatelessWidget {
                     onTap: onTap,
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 200),
-                      decoration: kCardDecoration.copyWith(
+                      decoration: cardDecoration(context).copyWith(
                         border: isHovering
                             ? Border.all(
                                 color: Colors.lightBlueAccent,
@@ -174,12 +174,12 @@ class TrashGroupItem extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: context.appColors.danger.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.delete_outline,
-                      color: Colors.red,
+                      color: context.appColors.danger,
                       size: 20,
                     ),
                   ),

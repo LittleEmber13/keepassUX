@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class RootAppBar extends StatelessWidget {
   const RootAppBar({
@@ -25,18 +26,7 @@ class RootAppBar extends StatelessWidget {
             InkWell(
               onTap: onTapExit,
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                      offset: Offset(1, 2),
-                    ),
-                  ],
-                ),
+                decoration: cardDecoration(context),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -44,7 +34,7 @@ class RootAppBar extends StatelessWidget {
                   ),
                   child: Icon(
                     isExit ? FeatherIcons.logOut : Icons.arrow_back,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -54,18 +44,7 @@ class RootAppBar extends StatelessWidget {
               InkWell(
                 onTap: onTapDelete,
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                        spreadRadius: 1,
-                        offset: Offset(1, 2),
-                      ),
-                    ],
-                  ),
+                  decoration: cardDecoration(context),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -73,7 +52,7 @@ class RootAppBar extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.delete_outline,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -86,11 +65,17 @@ class RootAppBar extends StatelessWidget {
               children: [
                 Text(
                   tr("app_bar.hello"),
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 18,
+                  ),
                 ),
                 Text(
                   tr("app_bar.welcome"),
-                  style: TextStyle(color: Colors.black54, fontSize: 14),
+                  style: TextStyle(
+                    color: context.appColors.secondaryText,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -102,7 +87,7 @@ class RootAppBar extends StatelessWidget {
             width: 45,
             height: 45,
             decoration: BoxDecoration(
-              color: Colors.purple,
+              color: Theme.of(context).colorScheme.primary,
               shape: BoxShape.circle,
             ),
           ),

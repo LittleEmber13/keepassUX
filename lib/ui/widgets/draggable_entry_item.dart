@@ -37,18 +37,18 @@ class DraggableEntryItem extends StatelessWidget {
         feedback: _buildDragFeedback(
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
-            child: _buildEntryItem(),
+            child: _buildEntryItem(context),
           ),
         ),
         childWhenDragging: Opacity(
           opacity: 0.4,
-          child: _buildEntryItem(),
+          child: _buildEntryItem(context),
         ),
         child: InkWell(
           onTap: () {
             showModalBottomSheet(
               context: context,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(20),
@@ -68,7 +68,7 @@ class DraggableEntryItem extends StatelessWidget {
                           ),
                           if (state is KeePassLoading)
                             Container(
-                              color: Colors.black.withValues(alpha: 0.5),
+                              color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.5),
                               child: const Center(
                                 child: CircularProgressIndicator(),
                               ),
@@ -81,15 +81,15 @@ class DraggableEntryItem extends StatelessWidget {
               },
             );
           },
-          child: _buildEntryItem(),
+          child: _buildEntryItem(context),
         ),
       ),
     );
   }
 
-  Widget _buildEntryItem() {
+  Widget _buildEntryItem(BuildContext context) {
     return Container(
-      decoration: kCardDecoration,
+      decoration: cardDecoration(context),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(

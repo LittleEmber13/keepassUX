@@ -12,6 +12,7 @@ import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/model/db_entry.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class AddEntryPage extends StatefulWidget {
   const AddEntryPage({this.uuidGroup, this.entry, super.key});
@@ -45,8 +46,8 @@ class _AddEntryPageState extends State<AddEntryPage> {
 
   bool get _isEditing => widget.entry != null;
 
-  final _inputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8),
+  final OutlineInputBorder _inputBorder = const OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
     borderSide: BorderSide(color: Colors.transparent, width: 1),
   );
 
@@ -110,7 +111,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
             },
             child: Text(
               tr("delete.delete"),
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: context.appColors.danger),
             ),
           ),
         ],
@@ -143,7 +144,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
             _page(),
             if (state is KeePassLoading)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 child: Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -382,18 +383,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            spreadRadius: 1,
-            offset: Offset(1, 2),
-          ),
-        ],
-      ),
+      decoration: cardDecoration(context),
       child: child,
     );
   }

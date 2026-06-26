@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/utils.dart';
 import 'package:zxcvbnm/languages/en.dart' as en;
 import 'package:zxcvbnm/languages/es_es.dart' as es;
@@ -49,7 +50,7 @@ class PasswordGeneratorDialog extends StatefulWidget {
   }) {
     return showModalBottomSheet<PasswordGeneratorResult>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -124,10 +125,10 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
     );
   }
 
-  Color _getStrengthColor(int score) {
+  Color _getStrengthColor(BuildContext context, int score) {
     switch (score) {
       case 0:
-        return Colors.red;
+        return context.appColors.danger;
       case 1:
         return Colors.orange;
       case 2:
@@ -137,7 +138,7 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
       case 4:
         return Colors.green;
       default:
-        return Colors.grey;
+        return context.appColors.secondaryText;
     }
   }
 
@@ -206,7 +207,7 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: context.appColors.inputFill,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -245,8 +246,8 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
                       Expanded(
                         child: LinearProgressIndicator(
                           value: (result.score + 1) / 5,
-                          color: _getStrengthColor(result.score),
-                          backgroundColor: Colors.grey[300],
+                          color: _getStrengthColor(context, result.score),
+                          backgroundColor: context.appColors.border,
                           minHeight: 6,
                           borderRadius: BorderRadius.circular(10),
                         ),

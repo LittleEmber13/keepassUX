@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kdbx/kdbx.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 import 'kdbx_icon_widget.dart';
 
@@ -32,7 +33,7 @@ class IconPickerDialog extends StatefulWidget {
   }) {
     return showModalBottomSheet<IconPickerResult>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -168,7 +169,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                                 color:
                                     isSelected
                                         ? Colors.teal
-                                        : Colors.grey.shade300,
+                                        : context.appColors.border,
                                 width: isSelected ? 2 : 1,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -180,7 +181,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                                 color:
                                     isSelected
                                         ? Colors.teal
-                                        : Colors.grey.shade700,
+                                        : context.appColors.secondaryText,
                               ),
                             ),
                           ),
@@ -200,7 +201,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                                   color:
                                       _isCustomSelected
                                           ? Colors.teal
-                                          : Colors.grey.shade300,
+                                          : context.appColors.border,
                                   width: _isCustomSelected ? 2.5 : 1,
                                 ),
                                 borderRadius: BorderRadius.circular(8),
@@ -265,7 +266,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> {
                       onPressed: _confirm,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

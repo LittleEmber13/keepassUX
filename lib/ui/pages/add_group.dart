@@ -7,6 +7,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/model/db_group.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage({this.uuidGroup, this.group, super.key});
@@ -59,7 +60,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
             },
             child: Text(
               tr("delete.delete"),
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: context.appColors.danger),
             ),
           ),
         ],
@@ -92,7 +93,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
             _page(),
             if (state is KeePassLoading)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.scrim.withOpacity(0.5),
                 child: Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -206,18 +207,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            spreadRadius: 1,
-            offset: Offset(1, 2),
-          ),
-        ],
-      ),
+      decoration: cardDecoration(context),
       child: child,
     );
   }

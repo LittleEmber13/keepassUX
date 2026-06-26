@@ -5,6 +5,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/screenshot_protection_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
+import 'package:keepassux/ui/theme/theme_controller.dart';
 import 'package:zxcvbnm/messages.dart';
 import 'package:zxcvbnm_flutter/zxcvbnm_flutter.dart';
 
@@ -13,6 +14,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await initializeZxcvbnmMessages('es');
   await ScreenshotProtectionService().enableProtection();
+  await themeController.load();
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en'), Locale('es')],
@@ -30,16 +32,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => KeePassBloc(),
-      child: MaterialApp(
-        title: 'KeepassUX',
-        localizationsDelegates: [
-          ...context.localizationDelegates,
-          ZxcvbnmLocalizations.delegate,
-        ],
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        theme: themeData,
-        home: StartPage(),
+      child: ValueListenableBuilder<ThemeMode>(
+        valueListenable: themeController,
+        builder: (context, themeMode, _) {
+          return MaterialApp(
+            title: 'KeepassUX',
+            localizationsDelegates: [
+              ...context.localizationDelegates,
+              ZxcvbnmLocalizations.delegate,
+            ],
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: lightThemeData,
+            darkTheme: darkThemeData,
+            themeMode: themeMode,
+            home: StartPage(),
+          );
+        },
       ),
     );
   }

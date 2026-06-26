@@ -81,7 +81,8 @@
   },
   "settings_page": {
     "language": "Language",
-    "biometric_login": "Biometric login"
+    "biometric_login": "Biometric login",
+    "dark_theme": "Dark theme"
   },
   "icon_picker": {
     "title": "Select icon",

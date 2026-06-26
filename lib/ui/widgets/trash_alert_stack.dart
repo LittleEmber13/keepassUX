@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/model/alert_item.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class TrashAlertStack extends StatelessWidget {
   const TrashAlertStack({required this.alerts, super.key});
@@ -22,7 +23,7 @@ class TrashAlertStack extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: Opacity(
                 opacity: 0.5,
-                child: _buildAlertCard(alerts[2]),
+                child: _buildAlertCard(context, alerts[2]),
               ),
             ),
           ),
@@ -34,26 +35,26 @@ class TrashAlertStack extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: Opacity(
                 opacity: 0.7,
-                child: _buildAlertCard(alerts[1]),
+                child: _buildAlertCard(context, alerts[1]),
               ),
             ),
           ),
         Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: _buildAlertCard(alerts.first),
+          child: _buildAlertCard(context, alerts.first),
         ),
       ],
     );
   }
 
-  Widget _buildAlertCard(AlertItem alert) {
+  Widget _buildAlertCard(BuildContext context, AlertItem alert) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFEEFDFF),
+        color: context.appColors.infoCardBackground,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.appColors.cardShadow,
             blurRadius: 5,
             spreadRadius: 1,
             offset: const Offset(1, 2),
@@ -76,7 +77,7 @@ class TrashAlertStack extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(Icons.info_outline, color: Colors.black54),
+                Icon(Icons.info_outline, color: context.appColors.secondaryText),
               ],
             ),
             const SizedBox(height: 8),

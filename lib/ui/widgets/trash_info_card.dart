@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class TrashInfoCard extends StatelessWidget {
   const TrashInfoCard({super.key});
@@ -9,11 +10,11 @@ class TrashInfoCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFEEFDFF),
+        color: context.appColors.infoCardBackground,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.appColors.cardShadow,
             blurRadius: 5,
             spreadRadius: 1,
             offset: const Offset(1, 2),
@@ -28,7 +29,7 @@ class TrashInfoCard extends StatelessWidget {
           children: [
             _buildInstruction(
               icon: Icons.delete_outline,
-              iconColor: Colors.red,
+              iconColor: context.appColors.danger,
               text: tr("trash.info_delete"),
             ),
             const SizedBox(height: 8),

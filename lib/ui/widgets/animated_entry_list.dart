@@ -155,7 +155,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
             SizedBox(width: 16),
             Expanded(
               child: Container(
-                decoration: kCardDecoration,
+                decoration: cardDecoration(context),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(item.name),
@@ -192,19 +192,22 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.7,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.cardBackground,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Icon(Icons.delete_outline, color: Colors.black54),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: context.appColors.secondaryText,
+                  ),
                 ),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.appColors.cardBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.all(16),
@@ -219,11 +222,14 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
           opacity: 0.4,
           child: Row(
             children: [
-              Icon(Icons.delete_outline, color: Colors.black54),
+              Icon(
+                Icons.delete_outline,
+                color: context.appColors.secondaryText,
+              ),
               SizedBox(width: 16),
               Expanded(
                 child: Container(
-                  decoration: kCardDecoration,
+                  decoration: cardDecoration(context),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(trash.name),
@@ -249,18 +255,23 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
             final isHovering = candidateData.isNotEmpty;
             return Row(
               children: [
-                Icon(Icons.delete_outline, color: Colors.black54),
+                Icon(
+                  Icons.delete_outline,
+                  color: context.appColors.secondaryText,
+                ),
                 SizedBox(width: 16),
                 Expanded(
                   child: InkWell(
                     onTap: () => widget.onGroupTap?.call(trash),
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 200),
-                      decoration: kCardDecoration.copyWith(
-                        color: isHovering ? Color(0xFFFFF0F0) : null,
+                      decoration: cardDecoration(context).copyWith(
+                        color: isHovering
+                            ? context.appColors.danger.withOpacity(0.1)
+                            : null,
                         border: isHovering
                             ? Border.all(
-                                color: Colors.red,
+                                color: context.appColors.danger,
                                 width: 2,
                               )
                             : null,
@@ -305,8 +316,10 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               Expanded(
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 200),
-                  decoration: kCardDecoration.copyWith(
-                    color: isHovering ? Color(0xFFEEFDFF) : Colors.white,
+                  decoration: cardDecoration(context).copyWith(
+                    color: isHovering
+                        ? Colors.lightBlueAccent.withOpacity(0.15)
+                        : context.appColors.cardBackground,
                     border: isHovering
                         ? Border.all(
                             color: Colors.lightBlueAccent,
@@ -342,7 +355,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: context.appColors.cardShadow,
                   blurRadius: 12,
                   spreadRadius: 2,
                 ),
@@ -394,7 +407,7 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
             },
             child: Text(
               tr("delete.delete"),
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: context.appColors.danger),
             ),
           ),
         ],

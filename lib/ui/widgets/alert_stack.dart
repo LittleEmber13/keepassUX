@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/model/alert_item.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class AlertStack extends StatefulWidget {
   const AlertStack({required this.alerts, this.onDismiss, super.key});
@@ -54,14 +55,18 @@ class _AlertStackState extends State<AlertStack>
     });
   }
 
-  Widget _buildAlertCard(AlertItem alert, {VoidCallback? onClose}) {
+  Widget _buildAlertCard(
+    BuildContext context,
+    AlertItem alert, {
+    VoidCallback? onClose,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFEEFDFF),
+        color: context.appColors.infoCardBackground,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.appColors.cardShadow,
             blurRadius: 5,
             spreadRadius: 1,
             offset: const Offset(1, 2),
@@ -120,7 +125,7 @@ class _AlertStackState extends State<AlertStack>
                   alignment: Alignment.topCenter,
                   child: Opacity(
                     opacity: isActive ? (0.5 + t * 0.2) : 0.5,
-                    child: _buildAlertCard(widget.alerts[2]),
+                    child: _buildAlertCard(context, widget.alerts[2]),
                   ),
                 ),
               ),
@@ -132,7 +137,7 @@ class _AlertStackState extends State<AlertStack>
                   alignment: Alignment.topCenter,
                   child: Opacity(
                     opacity: isActive ? (0.7 + t * 0.3) : 0.7,
-                    child: _buildAlertCard(widget.alerts[1]),
+                    child: _buildAlertCard(context, widget.alerts[1]),
                   ),
                 ),
               ),
@@ -140,7 +145,11 @@ class _AlertStackState extends State<AlertStack>
               padding: const EdgeInsets.only(top: 8),
               child: Opacity(
                 opacity: isActive ? (1.0 - t) : 1.0,
-                child: _buildAlertCard(widget.alerts.first, onClose: _dismiss),
+                child: _buildAlertCard(
+                  context,
+                  widget.alerts.first,
+                  onClose: _dismiss,
+                ),
               ),
             ),
           ],

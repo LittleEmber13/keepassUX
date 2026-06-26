@@ -44,7 +44,7 @@ class TrashEntryItem extends StatelessWidget {
             },
             child: Text(
               tr("trash.delete"),
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: context.appColors.danger),
             ),
           ),
         ],
@@ -78,7 +78,7 @@ class TrashEntryItem extends StatelessWidget {
           onTap: () {
             showModalBottomSheet(
               context: context,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(20),
@@ -98,7 +98,7 @@ class TrashEntryItem extends StatelessWidget {
                           ),
                           if (state is KeePassLoading)
                             Container(
-                              color: Colors.black.withValues(alpha: 0.5),
+                              color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.5),
                               child: const Center(
                                 child: CircularProgressIndicator(),
                               ),
@@ -122,7 +122,7 @@ class TrashEntryItem extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            decoration: kCardDecoration,
+            decoration: cardDecoration(context),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -147,12 +147,12 @@ class TrashEntryItem extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
+              color: context.appColors.danger.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.delete_outline,
-              color: Colors.red,
+              color: context.appColors.danger,
               size: 20,
             ),
           ),

@@ -11,6 +11,7 @@ import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uri_content/uri_content.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 import '../bloc/entries/keepass_events.dart';
 
@@ -170,7 +171,7 @@ class _StartPageState extends State<StartPage> {
             _page(),
             if (state is KeePassLoading)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 child: Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -209,18 +210,7 @@ class _StartPageState extends State<StartPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              spreadRadius: 1,
-              offset: Offset(1, 2),
-            ),
-          ],
-        ),
+        decoration: cardDecoration(context),
         child: Form(
           key: _formKey,
           child: Padding(

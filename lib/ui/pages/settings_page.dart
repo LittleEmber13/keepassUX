@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
+import 'package:keepassux/ui/theme/theme.dart';
+import 'package:keepassux/ui/theme/theme_controller.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,8 +20,6 @@ class _SettingsPageState extends State<SettingsPage> {
   final BiometricService _biometricService = BiometricService();
 
   String selectedLanguage = 'Español';
-  bool autoTheme = false;
-  bool darkTheme = false;
   bool biometricLoginEnabled = false;
   bool _hasBiometrics = false;
   SharedPreferences? _prefs;
@@ -48,6 +48,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _onBiometricToggle(bool value) async {
     await _prefs?.setBool('biometric_login_enabled', value);
     setState(() => biometricLoginEnabled = value);
+  }
+
+  Future<void> _onDarkThemeToggle(bool value) async {
+    await themeController.setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
   }
 
   @override
@@ -115,7 +119,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Text(
                         tr("settings_page.language"),
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: context.appColors.secondaryText),
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
@@ -148,16 +152,18 @@ class _SettingsPageState extends State<SettingsPage> {
                           }
                         },
                       ),
-                      // const SizedBox(height: 16),
-                      // SwitchListTile(
-                      //   title: const Text('Automatic app theme'),
-                      //   value: autoTheme,
-                      //   onChanged: (val) => setState(() => autoTheme = val),
-                      // ),
-                      // SwitchListTile(
-                      //   title: const Text('Dark theme'),
-                      //   value: darkTheme,
-                      //   onChanged: (val) => setState(() => darkTheme = val),
+                      const SizedBox(height: 12),
+                      ValueListenableBuilder<ThemeMode>(
+                        valueListenable: themeController,
+                        builder: (context, mode, _) {
+                          return SwitchListTile(
+                            title: Text(tr("settings_page.dark_theme")),
+                            value: mode == ThemeMode.dark,
+                            onChanged: _onDarkThemeToggle,
+                            contentPadding: EdgeInsets.zero,
+                          );
+                        },
+                      ),
                       if (_hasBiometrics) ...[
                         const SizedBox(height: 12),
                         SwitchListTile(
@@ -172,8 +178,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Center(
-                child: Text('v0.0.0', style: TextStyle(color: Colors.grey)),
+              Center(
+                child: Text(
+                  'v0.0.0',
+                  style: TextStyle(color: context.appColors.secondaryText),
+                ),
               ),
             ],
           ),

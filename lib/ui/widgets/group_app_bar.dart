@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class GroupAppBar extends StatelessWidget {
   const GroupAppBar({
@@ -26,19 +27,19 @@ class GroupAppBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.appColors.cardBackground,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: context.appColors.cardShadow,
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_back_ios_new,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 20,
               ),
             ),
@@ -47,8 +48,8 @@ class GroupAppBar extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.black,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.3,
@@ -65,19 +66,19 @@ class GroupAppBar extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.appColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: context.appColors.cardShadow,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.edit,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 20,
                 ),
               ),
@@ -91,19 +92,19 @@ class GroupAppBar extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.appColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: context.appColors.cardShadow,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.delete_outline,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 20,
                 ),
               ),

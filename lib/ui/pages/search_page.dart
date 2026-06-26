@@ -12,6 +12,7 @@ import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -94,18 +95,7 @@ class _SearchPageState extends State<SearchPage> {
                 Padding(
                   padding: const EdgeInsets.all(24),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 5,
-                          spreadRadius: 1,
-                          offset: Offset(1, 2),
-                        ),
-                      ],
-                    ),
+                    decoration: cardDecoration(context),
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Row(
@@ -142,13 +132,13 @@ class _SearchPageState extends State<SearchPage> {
                               Icon(
                                 Icons.search,
                                 size: 64,
-                                color: Colors.grey.withOpacity(0.5),
+                                color: context.appColors.secondaryText.withOpacity(0.5),
                               ),
                               SizedBox(height: 16),
                               Text(
                                 tr("search_page.hint"),
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: context.appColors.secondaryText,
                                   fontSize: 16,
                                 ),
                               ),
@@ -160,7 +150,7 @@ class _SearchPageState extends State<SearchPage> {
                               child: Text(
                                 tr("search_page.no_results"),
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: context.appColors.secondaryText,
                                   fontSize: 16,
                                 ),
                               ),
@@ -189,21 +179,8 @@ class _SearchPageState extends State<SearchPage> {
                                                   );
                                                 },
                                                 child: Container(
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.05),
-                                                        blurRadius: 5,
-                                                        spreadRadius: 1,
-                                                        offset: Offset(1, 2),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                  decoration:
+                                                      cardDecoration(context),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -225,7 +202,9 @@ class _SearchPageState extends State<SearchPage> {
                                           onTap: () {
                                             showModalBottomSheet(
                                               context: context,
-                                              backgroundColor: Colors.white,
+                                              backgroundColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .surface,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.vertical(
@@ -259,8 +238,10 @@ class _SearchPageState extends State<SearchPage> {
                                                           if (state
                                                               is KeePassLoading)
                                                             Container(
-                                                              color: Colors
-                                                                  .black
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .onSurface
                                                                   .withOpacity(
                                                                       0.5),
                                                               child:
@@ -278,20 +259,8 @@ class _SearchPageState extends State<SearchPage> {
                                             );
                                           },
                                           child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.05),
-                                                  blurRadius: 5,
-                                                  spreadRadius: 1,
-                                                  offset: Offset(1, 2),
-                                                ),
-                                              ],
-                                            ),
+                                            decoration:
+                                                cardDecoration(context),
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(16),

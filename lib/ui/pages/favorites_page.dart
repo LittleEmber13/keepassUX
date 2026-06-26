@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:keepassux/ui/theme/theme.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -41,24 +42,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 5,
-                            spreadRadius: 1,
-                            offset: Offset(1, 2),
-                          ),
-                        ],
-                      ),
+                      decoration: cardDecoration(context),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 16,
                         ),
-                        child: Icon(FeatherIcons.logOut, color: Colors.black),
+                        child: Icon(
+                          FeatherIcons.logOut,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                     ),
                     SizedBox(width: 16),
@@ -68,11 +61,17 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       children: [
                         Text(
                           'Hola,',
-                          style: TextStyle(color: Colors.black, fontSize: 18),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 18,
+                          ),
                         ),
                         Text(
                           'Bienvenido',
-                          style: TextStyle(color: Colors.black54, fontSize: 14),
+                          style: TextStyle(
+                            color: context.appColors.secondaryText,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -84,7 +83,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     width: 45,
                     height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.purple,
+                      color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -102,37 +101,40 @@ class _FavoritesPageState extends State<FavoritesPage> {
           top: 24,
         ),
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 5,
-                spreadRadius: 1,
-                offset: Offset(1, 2),
-              ),
-            ],
-          ),
+          decoration: cardDecoration(context),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(FontAwesomeIcons.star),
-                Icon(FontAwesomeIcons.folder, color: Colors.grey),
+                Icon(
+                  FontAwesomeIcons.folder,
+                  color: context.appColors.secondaryText,
+                ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                     shape: BoxShape.circle,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(6),
-                    child: Icon(Icons.add, color: Colors.white, size: 39),
+                    child: Icon(
+                      Icons.add,
+                      color: Theme.of(context).colorScheme.surface,
+                      size: 39,
+                    ),
                   ),
                 ),
-                Icon(FontAwesomeIcons.user, color: Colors.grey),
-                Icon(FeatherIcons.settings, color: Colors.grey, size: 26),
+                Icon(
+                  FontAwesomeIcons.user,
+                  color: context.appColors.secondaryText,
+                ),
+                Icon(
+                  FeatherIcons.settings,
+                  color: context.appColors.secondaryText,
+                  size: 26,
+                ),
               ],
             ),
           ),
@@ -143,18 +145,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                    offset: Offset(1, 2),
-                  ),
-                ],
-              ),
+              decoration: cardDecoration(context),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Row(
@@ -192,7 +183,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                         child: Container(
                           width: 8,
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
+                            color: context.appColors.secondaryText.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(99),
                           ),
                         ),
@@ -204,8 +195,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     thumbVisibility: true,
                     thickness: 8.0,
                     trackVisibility: false,
-                    trackColor: Colors.black,
-                    thumbColor: Colors.white,
+                    trackColor: Theme.of(context).colorScheme.onSurface,
+                    thumbColor: context.appColors.cardBackground,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(99)),
                     ),
@@ -225,18 +216,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   ),
                                   child: Container(
                                     height: 32,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFEEFDFF),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 5,
-                                          spreadRadius: 1,
-                                          offset: Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
+                                    decoration: cardDecoration(context),
                                     child: Row(),
                                   ),
                                 ),
@@ -246,18 +226,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                     top: 8,
                                   ),
                                   child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFEEFDFF),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 5,
-                                          spreadRadius: 1,
-                                          offset: Offset(1, 2),
-                                        ),
-                                      ],
-                                    ),
+                                    decoration: cardDecoration(context),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
                                       child: Column(
@@ -287,18 +256,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                               (index) => Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 5,
-                                        spreadRadius: 1,
-                                        offset: Offset(1, 2),
-                                      ),
-                                    ],
-                                  ),
+                                  decoration: cardDecoration(context),
                                   child: Padding(
                                     padding: const EdgeInsets.all(16),
                                     child: Row(
