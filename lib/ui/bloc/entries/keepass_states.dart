@@ -47,3 +47,7 @@ class KeePassDeleteEntrySuccess extends KeePassState {
 class KeePassDeleteGroupSuccess extends KeePassState {
   KeePassDeleteGroupSuccess();
 }
+
+class KeePassChangeMasterPasswordSuccess extends KeePassState {
+  KeePassChangeMasterPasswordSuccess();
+}

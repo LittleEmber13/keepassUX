@@ -82,7 +82,18 @@
   "settings_page": {
     "language": "Idioma",
     "biometric_login": "Login biométrico",
-    "dark_theme": "Tema oscuro"
+    "dark_theme": "Tema oscuro",
+    "change_password": "Cambiar contraseña maestra"
+  },
+  "change_password_page": {
+    "title": "Cambiar contraseña maestra",
+    "current_password_hint": "Contraseña actual",
+    "new_password_hint": "Nueva contraseña",
+    "confirm_password_hint": "Confirmar nueva contraseña",
+    "save": "Cambiar contraseña",
+    "success": "Contraseña maestra cambiada correctamente",
+    "error_wrong_current": "La contraseña actual es incorrecta",
+    "error_mismatch": "Las contraseñas no coinciden"
   },
   "icon_picker": {
     "title": "Seleccionar icono",

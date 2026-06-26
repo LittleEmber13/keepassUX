@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/pages/change_password_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
@@ -173,6 +174,21 @@ class _SettingsPageState extends State<SettingsPage> {
                           contentPadding: EdgeInsets.zero,
                         ),
                       ],
+                      const SizedBox(height: 12),
+                      ListTile(
+                        leading: const Icon(Icons.lock_outline),
+                        title: Text(tr("settings_page.change_password")),
+                        trailing: const Icon(Icons.chevron_right),
+                        contentPadding: EdgeInsets.zero,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChangePasswordPage(),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),

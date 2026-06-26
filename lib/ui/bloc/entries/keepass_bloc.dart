@@ -27,6 +27,7 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     on<DeleteGroup>(_onDeleteGroup);
     on<DeleteEntryPermanently>(_onDeleteEntryPermanently);
     on<DeleteGroupPermanently>(_onDeleteGroupPermanently);
+    on<ChangeMasterPassword>(_onChangeMasterPassword);
     _initIsolate();
   }
 
@@ -325,6 +326,34 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     } catch (e) {
       logger.e(e);
       emit(KeePassError(tr("exception.unknown")));
+    }
+  }
+
+  Future<void> _onChangeMasterPassword(
+    ChangeMasterPassword event,
+    Emitter<KeePassState> emit,
+  ) async {
+    try {
+      emit(KeePassLoading());
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        ChangeMasterPasswordCmd(
+          oldPassword: event.oldPassword,
+          newPassword: event.newPassword,
+        ),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassChangeMasterPasswordSuccess());
+    } catch (e) {
+      logger.e(e);
+      if (e.toString().contains('Invalid current password')) {
+        emit(KeePassError(tr("change_password_page.error_wrong_current")));
+      } else {
+        emit(KeePassError(tr("exception.unknown")));
+      }
     }
   }
 

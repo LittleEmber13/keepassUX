@@ -131,3 +131,10 @@ class DeleteGroupPermanently extends KeePassEvent {
 
   DeleteGroupPermanently({required this.groupUuid});
 }
+
+class ChangeMasterPassword extends KeePassEvent {
+  final String oldPassword;
+  final String newPassword;
+
+  ChangeMasterPassword({required this.oldPassword, required this.newPassword});
+}

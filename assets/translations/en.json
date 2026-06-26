@@ -82,7 +82,18 @@
   "settings_page": {
     "language": "Language",
     "biometric_login": "Biometric login",
-    "dark_theme": "Dark theme"
+    "dark_theme": "Dark theme",
+    "change_password": "Change master password"
+  },
+  "change_password_page": {
+    "title": "Change master password",
+    "current_password_hint": "Current password",
+    "new_password_hint": "New password",
+    "confirm_password_hint": "Confirm new password",
+    "save": "Change password",
+    "success": "Master password changed successfully",
+    "error_wrong_current": "The current password is incorrect",
+    "error_mismatch": "Passwords do not match"
   },
   "icon_picker": {
     "title": "Select icon",

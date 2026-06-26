@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'package:collection/collection.dart';
 import 'package:kdbx/kdbx.dart';
 
 import '../error/kdbx_isolate_error.dart';
@@ -184,6 +185,25 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         kdbx = KdbxFormat().create(
           Credentials(ProtectedValue.fromString(command.password)),
           'KeepassUX',
+        );
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
+      } else if (command is ChangeMasterPasswordCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final oldCredentials = Credentials(
+          ProtectedValue.fromString(command.oldPassword),
+        );
+        final matches = const ListEquality<int>().equals(
+          oldCredentials.getHash(),
+          kdbx!.credentials.getHash(),
+        );
+        if (!matches) {
+          throw Exception('Invalid current password');
+        }
+        kdbx!.credentials = Credentials(
+          ProtectedValue.fromString(command.newPassword),
         );
         final bytes = await kdbx!.save();
         replyPort.send(

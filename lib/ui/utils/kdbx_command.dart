@@ -108,3 +108,9 @@ class CreateDatabaseCmd extends KdbxCommand {
   final String password;
   CreateDatabaseCmd({required this.password});
 }
+
+class ChangeMasterPasswordCmd extends KdbxCommand {
+  final String oldPassword;
+  final String newPassword;
+  ChangeMasterPasswordCmd({required this.oldPassword, required this.newPassword});
+}
