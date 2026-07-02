@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:keepassux/ui/pages/about_page.dart';
 import 'package:keepassux/ui/pages/add_entry.dart';
 import 'package:keepassux/ui/pages/add_group.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
@@ -156,9 +157,22 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(
-                FontAwesomeIcons.user,
-                color: context.appColors.secondaryText,
+              InkWell(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AboutPage(),
+                    ),
+                  );
+                },
+                child: Icon(
+                  Icons.info_outline,
+                  size: 30,
+                  color: selectedIndex == 2
+                      ? Theme.of(context).colorScheme.onSurface
+                      : context.appColors.secondaryText,
+                ),
               ),
               InkWell(
                 onTap: () {

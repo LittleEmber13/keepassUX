@@ -8,10 +8,12 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/model/db_entry.dart';
 import 'package:keepassux/ui/model/db_group.dart';
 import 'package:keepassux/ui/pages/group_entries_page.dart';
+import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
 class SearchPage extends StatefulWidget {
@@ -36,7 +38,6 @@ class _SearchPageState extends State<SearchPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<KeePassBloc>().add(GetRootGroup());
     });
-    _searchFocusNode.requestFocus();
   }
 
   @override
@@ -92,6 +93,19 @@ class _SearchPageState extends State<SearchPage> {
           body: SafeArea(
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 28, left: 24, right: 24),
+                  child: RootAppBar(
+                    isExit: true,
+                    onTapExit: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => StartPage()),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(24),
                   child: Container(

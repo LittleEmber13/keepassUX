@@ -229,13 +229,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              Center(
-                child: Text(
-                  'v0.0.0',
-                  style: TextStyle(color: context.appColors.secondaryText),
-                ),
-              ),
             ],
           ),
         ),
