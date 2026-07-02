@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +29,9 @@ class AutofillApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'KeepassUX Autofill',
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
           theme: lightThemeData,
           darkTheme: darkThemeData,
           themeMode: themeMode,
@@ -76,11 +80,7 @@ class _AutofillGateState extends State<_AutofillGate> {
       _metadata = await AutofillService().autofillMetadata;
 
       if (_kdbxUri.isEmpty) {
-        return _setPhase(
-          _Phase.needsSetup,
-          'Abre KeepassUX y selecciona tu base de datos antes de usar el '
-          'autocompletado.',
-        );
+        return _setPhase(_Phase.needsSetup, tr('autofill.needs_setup_message'));
       }
 
       _bytes = await UriContent().from(Uri.parse(_kdbxUri));
@@ -110,10 +110,7 @@ class _AutofillGateState extends State<_AutofillGate> {
       _setPhase(_Phase.unlock, '');
     } catch (e) {
       debugPrint('AutofillApp bootstrap failed: $e');
-      _setPhase(
-        _Phase.error,
-        'No se pudo abrir la base de datos. Inténtalo de nuevo.',
-      );
+      _setPhase(_Phase.error, tr('autofill.open_database_error'));
     }
   }
 
@@ -155,8 +152,8 @@ class _AutofillGateState extends State<_AutofillGate> {
           biometricEligible: _biometricEligible,
           onUnlocked: _onUnlocked,
           subtitle: _metadata?.saveInfo != null
-              ? 'Desbloquea para guardar la contraseña'
-              : 'Desbloquea para rellenar la contraseña',
+              ? tr('autofill.unlock_subtitle_save')
+              : tr('autofill.unlock_subtitle_fill'),
         );
       case _Phase.fill:
         return AutofillFillPage(

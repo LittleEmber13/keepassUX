@@ -1,4 +1,5 @@
 import 'package:content_resolver/content_resolver.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
@@ -50,7 +51,7 @@ class _AutofillSavePageState extends State<AutofillSavePage> {
     _url = _initialUrl();
     _groupName = widget.root.rootGroup.name.isNotEmpty
         ? widget.root.rootGroup.name
-        : 'Base de datos';
+        : tr('autofill.default_group_name');
     _autoSave();
   }
 
@@ -99,7 +100,7 @@ class _AutofillSavePageState extends State<AutofillSavePage> {
       if (!mounted) return;
       setState(() {
         _phase = _SavePhase.error;
-        _errorMessage = 'No se pudo guardar la entrada.';
+        _errorMessage = tr('autofill.save_error');
       });
     }
   }
@@ -138,10 +139,10 @@ class _AutofillSavePageState extends State<AutofillSavePage> {
       case _SavePhase.saving:
         return Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text('Guardando contraseña…'),
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            Text(tr('autofill.saving_status')),
           ],
         );
       case _SavePhase.saved:
@@ -150,25 +151,25 @@ class _AutofillSavePageState extends State<AutofillSavePage> {
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 64),
             const SizedBox(height: 16),
-            const Text(
-              'Contraseña guardada',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              tr('autofill.saved_status'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text('Grupo: $_groupName'),
+            Text(tr('autofill.group_label', namedArgs: {'group': _groupName})),
             const SizedBox(height: 32),
             FilledButton.icon(
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               ),
               icon: const Icon(Icons.open_in_new),
-              label: const Text('Abrir en KeepassUX'),
+              label: Text(tr('autofill.open_in_app')),
               onPressed: _launchMainApp,
             ),
             const SizedBox(height: 12),
             TextButton(
               onPressed: _close,
-              child: const Text('Cerrar'),
+              child: Text(tr('autofill.close')),
             ),
           ],
         );
@@ -182,7 +183,7 @@ class _AutofillSavePageState extends State<AutofillSavePage> {
             const SizedBox(height: 24),
             TextButton(
               onPressed: _close,
-              child: const Text('Cerrar'),
+              child: Text(tr('autofill.close')),
             ),
           ],
         );

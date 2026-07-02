@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -50,7 +51,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
   Future<void> _unlockWithPassword() async {
     final password = _passwordController.text;
     if (password.isEmpty) {
-      setState(() => _error = 'Introduce la contraseña maestra.');
+      setState(() => _error = tr('autofill.unlock_empty_password_error'));
       return;
     }
     await _tryUnlock(password);
@@ -62,7 +63,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
     );
     if (password == null || password.isEmpty) {
       if (mounted) {
-        setState(() => _error = 'No se pudo verificar tu identidad.');
+        setState(() => _error = tr('autofill.unlock_biometric_error'));
       }
       return;
     }
@@ -84,7 +85,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = 'Contraseña incorrecta.';
+        _error = tr('autofill.unlock_wrong_password_error');
       });
     }
   }
@@ -106,7 +107,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                widget.subtitle ?? 'Desbloquea tu base de datos',
+                widget.subtitle ?? tr('autofill.unlock_default_subtitle'),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16),
               ),
@@ -118,7 +119,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
                 enabled: !_busy,
                 onSubmitted: (_) => _unlockWithPassword(),
                 decoration: InputDecoration(
-                  labelText: 'Contraseña maestra',
+                  labelText: tr('autofill.master_password_hint'),
                   errorText: _error,
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -139,7 +140,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
                   ),
                   onPressed: _busy ? null : _unlockWithPassword,
                   icon: const Icon(Icons.lock_open),
-                  label: const Text('Desbloquear'),
+                  label: Text(tr('autofill.unlock_button')),
                 ),
               ),
               if (widget.biometricEligible) ...[
@@ -152,7 +153,7 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
                     ),
                     onPressed: _busy ? null : _unlockWithBiometric,
                     icon: const Icon(FontAwesomeIcons.fingerprint),
-                    label: const Text('Usar huella'),
+                    label: Text(tr('autofill.use_fingerprint_button')),
                   ),
                 ),
               ],

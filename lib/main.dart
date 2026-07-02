@@ -15,9 +15,17 @@ import 'package:zxcvbnm_flutter/zxcvbnm_flutter.dart';
 @pragma('vm:entry-point')
 Future<void> autofillEntryPoint() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   _configureAutofillPreferences();
   await themeController.load();
-  runApp(const AutofillApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: [Locale('en'), Locale('es')],
+      path: 'assets/translations',
+      fallbackLocale: Locale('en'),
+      child: const AutofillApp(),
+    ),
+  );
 }
 
 void main() async {

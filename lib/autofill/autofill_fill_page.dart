@@ -1,4 +1,5 @@
 import 'package:content_resolver/content_resolver.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_autofill_service/flutter_autofill_service.dart';
@@ -99,22 +100,25 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
   }
 
   Future<bool?> _confirmAssociate(DbEntry entry) {
-    final label = entry.label.isNotEmpty ? entry.label : '(sin título)';
+    final label = entry.label.isNotEmpty ? entry.label : tr('autofill.untitled_entry');
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Recordar para esta app'),
+        title: Text(tr('autofill.confirm_associate_title')),
         content: Text(
-          '¿Asociar "$label" con $_sourceLabel para que aparezca automáticamente la próxima vez?',
+          tr(
+            'autofill.confirm_associate_message',
+            namedArgs: {'label': label, 'source': _sourceLabel},
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Solo rellenar'),
+            child: Text(tr('autofill.fill_only')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Asociar y rellenar'),
+            child: Text(tr('autofill.associate_and_fill')),
           ),
         ],
       ),
@@ -161,27 +165,27 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
     final enabled = await keyboard.isEnabled();
     if (!mounted) return;
 
-    final label = entry.label.isNotEmpty ? entry.label : '(sin título)';
-    final where = _sourceLabel.isNotEmpty ? _sourceLabel : 'esta app';
+    final label = entry.label.isNotEmpty ? entry.label : tr('autofill.untitled_entry');
+    final where = _sourceLabel.isNotEmpty ? _sourceLabel : tr('autofill.this_app_fallback');
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('No se puede autorrellenar aquí'),
+        title: Text(tr('autofill.cannot_autofill_title')),
         content: Text(
           enabled
-              ? 'El formulario de $where no admite el autocompletado directo '
-                  '(es habitual en apps hechas con Jetpack Compose).\n\n'
-                  'Cambia al teclado de KeepassUX y pulsa Usuario o Contraseña para '
-                  'escribir los datos de "$label".'
-              : 'El formulario de $where no admite el autocompletado directo '
-                  '(es habitual en apps hechas con Jetpack Compose).\n\n'
-                  'Para rellenarlo necesitas activar una vez el teclado de KeepassUX. '
-                  'Después podrás cambiar a él y pulsar Usuario o Contraseña.',
+              ? tr(
+                  'autofill.cannot_autofill_message_keyboard_enabled',
+                  namedArgs: {'where': where, 'label': label},
+                )
+              : tr(
+                  'autofill.cannot_autofill_message_keyboard_disabled',
+                  namedArgs: {'where': where},
+                ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cerrar'),
+            child: Text(tr('autofill.close')),
           ),
           if (!enabled)
             TextButton(
@@ -189,7 +193,7 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
                 await keyboard.openSettings();
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              child: const Text('Activar teclado'),
+              child: Text(tr('autofill.enable_keyboard')),
             ),
           if (enabled)
             TextButton(
@@ -197,7 +201,7 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
                 await keyboard.showPicker();
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              child: const Text('Cambiar teclado'),
+              child: Text(tr('autofill.switch_keyboard')),
             ),
         ],
       ),
@@ -213,17 +217,17 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
 
     final String header;
     if (showingMatches) {
-      header = 'Coincidencias';
+      header = tr('autofill.matches_header');
     } else if (noAssociations) {
-      header = 'Sin coincidencias para esta app';
+      header = tr('autofill.no_matches_header');
     } else {
-      header = 'Resultados';
+      header = tr('autofill.results_header');
     }
 
     final colors = context.appColors;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Rellenar contraseña')),
+      appBar: AppBar(title: Text(tr('autofill.fill_password_title'))),
       body: Stack(
         children: [
           Column(
@@ -243,7 +247,7 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
                       vertical: 10,
                     ),
                     child: Text(
-                      'Para: $_sourceLabel',
+                      tr('autofill.for_source', namedArgs: {'source': _sourceLabel}),
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -253,9 +257,9 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
                 child: TextField(
                   controller: _searchController,
                   onChanged: (v) => setState(() => _query = v),
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Buscar entrada',
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    hintText: tr('autofill.search_entry_hint'),
                   ),
                 ),
               ),
@@ -328,7 +332,7 @@ class _EntryCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(entry.label.isNotEmpty ? entry.label : '(sin título)'),
+                      Text(entry.label.isNotEmpty ? entry.label : tr('autofill.untitled_entry')),
                       if (subtitle.isNotEmpty)
                         Text(
                           subtitle,
@@ -360,7 +364,7 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     if (!noAssociations) {
-      return const Center(child: Text('Sin resultados'));
+      return Center(child: Text(tr('autofill.no_results')));
     }
     return Padding(
       padding: const EdgeInsets.all(32),
@@ -370,8 +374,7 @@ class _EmptyState extends StatelessWidget {
           Icon(Icons.search, size: 48, color: colors.secondaryText),
           const SizedBox(height: 16),
           Text(
-            'Ninguna entrada coincide con esta app.\n'
-            'Búscala arriba para asociarla.',
+            tr('autofill.empty_no_matches'),
             textAlign: TextAlign.center,
             style: TextStyle(color: colors.secondaryText),
           ),
