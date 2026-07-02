@@ -2,7 +2,7 @@ package com.example.keepassux;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodInfo;
@@ -12,40 +12,48 @@ import io.flutter.embedding.android.FlutterFragmentActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MainActivity extends FlutterFragmentActivity {
-    private static final String CHANNEL = "com.example.keepassux/saf";
+public class AutofillActivity extends FlutterFragmentActivity {
+    private static final String CHANNEL = "com.example.keepassux/autofill";
     private static final String KEYBOARD_CHANNEL = "com.example.keepassux/keyboard";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+    }
 
     @Override
     public void configureFlutterEngine(FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
+        new MethodChannel(
+                flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
             .setMethodCallHandler((call, result) -> {
-                if (call.method.equals("takePersistableUriPermission")) {
-                    String uriString = call.argument("uri");
-                    try {
-                        Uri uri = Uri.parse(uriString);
-                        int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-                        getContentResolver().takePersistableUriPermission(uri, takeFlags);
-                        result.success(true);
-                    } catch (Exception e) {
-                        result.success(false);
-                    }
-                } else if (call.method.equals("setFlagSecure")) {
-                    Boolean enabled = call.argument("enabled");
-                    if (enabled != null && enabled) {
-                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                    } else {
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                    }
+                if (call.method.equals("launchMainActivity")) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                     result.success(true);
+                } else if (call.method.equals("fillDataset")) {
+                    String label = call.argument("label");
+                    String username = call.argument("username");
+                    String password = call.argument("password");
+                    String status = AutofillFiller.INSTANCE.fill(
+                            this,
+                            label != null ? label : "",
+                            username != null ? username : "",
+                            password != null ? password : "");
+                    result.success(status);
+                    if (AutofillFiller.RESULT_DATASET.equals(status)) {
+                        finish();
+                    }
                 } else {
                     result.notImplemented();
                 }
             });
 
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), KEYBOARD_CHANNEL)
+        new MethodChannel(
+                flutterEngine.getDartExecutor().getBinaryMessenger(), KEYBOARD_CHANNEL)
             .setMethodCallHandler((call, result) -> {
                 switch (call.method) {
                     case "setKeyboardEntry":
@@ -82,7 +90,6 @@ public class MainActivity extends FlutterFragmentActivity {
             });
     }
 
-    /** Whether this app's IME is enabled in Android's input-method settings. */
     private boolean isKeyboardEnabled() {
         InputMethodManager imm =
                 (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -93,5 +100,10 @@ public class MainActivity extends FlutterFragmentActivity {
             }
         }
         return false;
+    }
+
+    @Override
+    public String getDartEntrypointFunctionName() {
+        return "autofillEntryPoint";
     }
 }

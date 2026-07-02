@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English strings for the native KeepassUX keyboard (IME). -->
+<resources>
+    <string name="keyboard_name">KeepassUX Keyboard</string>
+    <string name="kb_entry_ready">Entry ready</string>
+    <string name="kb_no_entry">Open KeepassUX to pick an entry</string>
+    <string name="kb_username">Username</string>
+    <string name="kb_password">Password</string>
+    <string name="kb_open_app">Open KeepassUX</string>
+    <string name="kb_switch">Switch keyboard</string>
+</resources>

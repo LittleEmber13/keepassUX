@@ -15,10 +15,22 @@ import 'package:keepassux/ui/model/db_entry.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
 class AddEntryPage extends StatefulWidget {
-  const AddEntryPage({this.uuidGroup, this.entry, super.key});
+  const AddEntryPage({
+    this.uuidGroup,
+    this.entry,
+    this.prefillTitle,
+    this.prefillUsername,
+    this.prefillPassword,
+    this.prefillUrl,
+    super.key,
+  });
 
   final String? uuidGroup;
   final DbEntry? entry;
+  final String? prefillTitle;
+  final String? prefillUsername;
+  final String? prefillPassword;
+  final String? prefillUrl;
 
   @override
   State<AddEntryPage> createState() => _AddEntryPageState();
@@ -63,6 +75,11 @@ class _AddEntryPageState extends State<AddEntryPage> {
       passwordController.text = e.password;
       _selectedIcon = e.icon;
       _selectedCustomIconData = e.customIconData;
+    } else {
+      titleController.text = widget.prefillTitle ?? '';
+      userController.text = widget.prefillUsername ?? '';
+      urlController.text = widget.prefillUrl ?? '';
+      passwordController.text = widget.prefillPassword ?? '';
     }
   }
 

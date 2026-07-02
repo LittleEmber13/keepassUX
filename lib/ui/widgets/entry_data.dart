@@ -1,9 +1,10 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keepassux/ui/pages/add_entry.dart';
+import 'package:keepassux/ui/services/keyboard_fill_service.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 
@@ -19,6 +20,8 @@ class EntryData extends StatefulWidget {
 }
 
 class _EntryDataState extends State<EntryData> {
+  final KeyboardFillService _keyboardService = KeyboardFillService();
+
   bool obscurePassword = true;
 
   late TextEditingController _titleController;
@@ -58,6 +61,61 @@ class _EntryDataState extends State<EntryData> {
       context,
       MaterialPageRoute(
         builder: (_) => AddEntryPage(entry: widget.entry),
+      ),
+    );
+  }
+
+  Future<void> _useWithKeyboard() async {
+    final enabled = await _keyboardService.isEnabled();
+    if (!mounted) return;
+
+    if (!enabled) {
+      final go = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(tr("entry_data.keyboard_enable_title")),
+          content: Text(tr("entry_data.keyboard_enable_message")),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(tr("entry_data.keyboard_cancel")),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(tr("entry_data.keyboard_open_settings")),
+            ),
+          ],
+        ),
+      );
+      if (go == true) await _keyboardService.openSettings();
+      return;
+    }
+
+    await _keyboardService.setEntry(
+      label: widget.entry.label,
+      username: widget.entry.userName,
+      password: widget.entry.password,
+    );
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(tr("entry_data.keyboard_ready_title")),
+        content: Text(tr("entry_data.keyboard_ready_message")),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(tr("entry_data.keyboard_done")),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _keyboardService.showPicker();
+            },
+            child: Text(tr("entry_data.keyboard_switch")),
+          ),
+        ],
       ),
     );
   }
@@ -145,23 +203,50 @@ class _EntryDataState extends State<EntryData> {
         const SizedBox(height: 8),
         SafeArea(
           top: false,
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (Platform.isAndroid) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF374151),
+                      side: const BorderSide(color: Color(0xFF374151)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: _useWithKeyboard,
+                    icon: const Icon(Icons.keyboard_alt_outlined),
+                    label: Text(
+                      tr("entry_data.use_with_keyboard"),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                const SizedBox(height: 8),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: _openEditPage,
+                  child: Text(
+                    tr("entry_data.edit"),
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
               ),
-              onPressed: _openEditPage,
-              child: Text(
-                tr("entry_data.edit"),
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
+            ],
           ),
         ),
       ],

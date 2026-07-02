@@ -214,6 +214,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_autofill_service:
+    dependency: "direct main"
+    description:
+      name: flutter_autofill_service
+      sha256: d791c9d29b1a6b0daa37f21604c63a6a16f445d4c96382c9d68e3210c44a9d8f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.21.0"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -802,6 +810,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  universal_platform:
+    dependency: transitive
+    description:
+      name: universal_platform
+      sha256: "64e16458a0ea9b99260ceb5467a214c1f298d647c659af1bff6d3bf82536b1ec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   uri_content:
     dependency: "direct main"
     description:

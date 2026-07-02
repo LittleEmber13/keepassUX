@@ -49,6 +49,7 @@ dependencies:
   zxcvbnm: ^1.1.1
   collection: ^1.18.0
   zxcvbnm_flutter: ^1.1.1
+  flutter_autofill_service: ^0.21.0
 
 dev_dependencies:
   flutter_test:

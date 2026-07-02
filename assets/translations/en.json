@@ -77,13 +77,35 @@
     "notes": "Notes",
     "edit": "Edit",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "use_with_keyboard": "Use with keyboard",
+    "keyboard_enable_title": "Enable the KeepassUX keyboard",
+    "keyboard_enable_message": "To fill in browsers and other apps, enable the KeepassUX keyboard in Android settings.",
+    "keyboard_open_settings": "Open settings",
+    "keyboard_cancel": "Cancel",
+    "keyboard_ready_title": "Credentials ready",
+    "keyboard_ready_message": "Tap the username or password field, switch to the KeepassUX keyboard and press Username or Password.",
+    "keyboard_switch": "Switch keyboard",
+    "keyboard_done": "Done"
   },
   "settings_page": {
     "language": "Language",
     "biometric_login": "Biometric login",
     "dark_theme": "Dark theme",
-    "change_password": "Change master password"
+    "change_password": "Change master password",
+    "autofill_settings": "Autofill",
+    "autofill_settings_active": "Active",
+    "autofill_settings_inactive": "Inactive — tap to configure"
+  },
+  "autofill_settings_page": {
+    "title": "Autofill",
+    "intro": "Autofill lets KeepassUX suggest and fill your saved usernames and passwords in other apps and in your browser. For autocomplete to work correctly you must activate the following options.",
+    "autofill_toggle_title": "Android autofill service",
+    "autofill_toggle_description": "Makes KeepassUX the autofill service Android uses, so it can suggest and fill your saved credentials directly in login fields across apps and browsers.",
+    "keyboard_toggle_title": "KeepassUX keyboard",
+    "keyboard_toggle_description": "A companion keyboard that types your credentials into the focused field. Some browsers only let a third-party service read login fields once their own autofill is turned off, so the keyboard covers those cases.",
+    "keyboard_status_enabled": "Enabled",
+    "keyboard_status_disabled": "Disabled — tap to enable"
   },
   "change_password_page": {
     "title": "Change master password",

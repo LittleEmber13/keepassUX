@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:keepassux/autofill/autofill_app.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/screenshot_protection_service.dart';
@@ -9,11 +12,20 @@ import 'package:keepassux/ui/theme/theme_controller.dart';
 import 'package:zxcvbnm/messages.dart';
 import 'package:zxcvbnm_flutter/zxcvbnm_flutter.dart';
 
+@pragma('vm:entry-point')
+Future<void> autofillEntryPoint() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  _configureAutofillPreferences();
+  await themeController.load();
+  runApp(const AutofillApp());
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await initializeZxcvbnmMessages('es');
   await ScreenshotProtectionService().enableProtection();
+  await _configureAutofillPreferences();
   await themeController.load();
   runApp(
     EasyLocalization(
@@ -23,6 +35,20 @@ void main() async {
       child: const MyApp(),
     ),
   );
+}
+
+Future<void> _configureAutofillPreferences() async {
+  try {
+    await AutofillService().setPreferences(
+      AutofillPreferences(
+        enableDebug: kDebugMode,
+        enableSaving: true,
+        enableIMERequests: true,
+      ),
+    );
+  } catch (e) {
+    debugPrint('Could not set autofill preferences: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {

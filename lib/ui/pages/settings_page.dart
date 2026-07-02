@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:keepassux/ui/pages/autofill_settings_page.dart';
 import 'package:keepassux/ui/pages/change_password_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/services/autofill_settings_service.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
+import 'package:keepassux/ui/services/keyboard_fill_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/theme/theme_controller.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
@@ -19,10 +24,16 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final BiometricService _biometricService = BiometricService();
+  final AutofillSettingsService _autofillService = AutofillSettingsService();
+  final KeyboardFillService _keyboardService = KeyboardFillService();
 
   String selectedLanguage = 'Español';
   bool biometricLoginEnabled = false;
   bool _hasBiometrics = false;
+  bool _autofillSupported = false;
+  bool _autofillEnabled = false;
+  final bool _keyboardSupported = Platform.isAndroid;
+  bool _keyboardEnabled = false;
   SharedPreferences? _prefs;
 
   @override
@@ -36,6 +47,13 @@ class _SettingsPageState extends State<SettingsPage> {
     final currentLocale = context.locale;
     _hasBiometrics = await _biometricService.canAuthenticate();
     final savedEnabled = _prefs?.getBool('biometric_login_enabled') ?? false;
+    _autofillSupported = await _autofillService.isSupported;
+    if (_autofillSupported) {
+      _autofillEnabled = await _autofillService.isEnabled;
+    }
+    if (_keyboardSupported) {
+      _keyboardEnabled = await _keyboardService.isEnabled();
+    }
     setState(() {
       if (currentLocale.languageCode == 'es') {
         selectedLanguage = 'Español';
@@ -49,6 +67,20 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _onBiometricToggle(bool value) async {
     await _prefs?.setBool('biometric_login_enabled', value);
     setState(() => biometricLoginEnabled = value);
+  }
+
+  Future<void> _onAutofillSettingsTap() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AutofillSettingsPage()),
+    );
+    if (_autofillSupported) {
+      _autofillEnabled = await _autofillService.isEnabled;
+    }
+    if (_keyboardSupported) {
+      _keyboardEnabled = await _keyboardService.isEnabled();
+    }
+    if (mounted) setState(() {});
   }
 
   Future<void> _onDarkThemeToggle(bool value) async {
@@ -172,6 +204,21 @@ class _SettingsPageState extends State<SettingsPage> {
                           value: biometricLoginEnabled,
                           onChanged: _onBiometricToggle,
                           contentPadding: EdgeInsets.zero,
+                        ),
+                      ],
+                      if (_autofillSupported || _keyboardSupported) ...[
+                        const SizedBox(height: 12),
+                        ListTile(
+                          leading: const Icon(Icons.auto_fix_high_outlined),
+                          title: Text(tr("settings_page.autofill_settings")),
+                          subtitle: Text(
+                            _autofillEnabled && _keyboardEnabled
+                                ? tr("settings_page.autofill_settings_active")
+                                : tr("settings_page.autofill_settings_inactive"),
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          contentPadding: EdgeInsets.zero,
+                          onTap: _onAutofillSettingsTap,
                         ),
                       ],
                       const SizedBox(height: 12),

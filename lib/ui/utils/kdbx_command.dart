@@ -114,3 +114,9 @@ class ChangeMasterPasswordCmd extends KdbxCommand {
   final String newPassword;
   ChangeMasterPasswordCmd({required this.oldPassword, required this.newPassword});
 }
+
+class AssociateAppCmd extends KdbxCommand {
+  final String entryUuid;
+  final String association;
+  AssociateAppCmd({required this.entryUuid, required this.association});
+}

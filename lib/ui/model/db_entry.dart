@@ -10,6 +10,8 @@ class DbEntry {
   final int icon;
   final Uint8List? customIconData;
 
+  final List<String> additionalUrls;
+
   DbEntry({
     required this.uuid,
     required this.label,
@@ -19,5 +21,6 @@ class DbEntry {
     required this.notes,
     required this.icon,
     this.customIconData,
+    this.additionalUrls = const [],
   });
 }

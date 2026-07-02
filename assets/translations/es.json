@@ -77,13 +77,35 @@
     "notes": "Notas",
     "edit": "Editar",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "use_with_keyboard": "Usar con teclado",
+    "keyboard_enable_title": "Activa el teclado de KeepassUX",
+    "keyboard_enable_message": "Para rellenar en navegadores y otras apps, activa el teclado de KeepassUX en los ajustes de Android.",
+    "keyboard_open_settings": "Abrir ajustes",
+    "keyboard_cancel": "Cancelar",
+    "keyboard_ready_title": "Credenciales listas",
+    "keyboard_ready_message": "Toca el campo de usuario o contraseña, cambia al teclado de KeepassUX y pulsa Usuario o Contraseña.",
+    "keyboard_switch": "Cambiar teclado",
+    "keyboard_done": "Hecho"
   },
   "settings_page": {
     "language": "Idioma",
     "biometric_login": "Login biométrico",
     "dark_theme": "Tema oscuro",
-    "change_password": "Cambiar contraseña maestra"
+    "change_password": "Cambiar contraseña maestra",
+    "autofill_settings": "Autocompletar",
+    "autofill_settings_active": "Activado",
+    "autofill_settings_inactive": "Desactivado — toca para configurar"
+  },
+  "autofill_settings_page": {
+    "title": "Autocompletar",
+    "intro": "El autocompletado permite que KeepassUX sugiera y rellene tus usuarios y contraseñas guardados en otras apps y en el navegador. Para que el autocompletar funcione correctamente debes activar las siguientes opciones.",
+    "autofill_toggle_title": "Servicio de autocompletado de Android",
+    "autofill_toggle_description": "Convierte a KeepassUX en el servicio de autocompletado de Android, para que pueda sugerir y rellenar tus credenciales guardadas directamente en los campos de inicio de sesión de apps y navegadores.",
+    "keyboard_toggle_title": "Teclado de KeepassUX",
+    "keyboard_toggle_description": "Un teclado adicional que escribe tus credenciales en el campo que tengas seleccionado. Algunos navegadores solo dejan que un servicio externo lea los campos de inicio de sesión si desactivas su propio autocompletado; el teclado cubre esos casos.",
+    "keyboard_status_enabled": "Activado",
+    "keyboard_status_disabled": "Desactivado — toca para activarlo"
   },
   "change_password_page": {
     "title": "Cambiar contraseña maestra",

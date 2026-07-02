@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  flutter_autofill_service loads these drawables by name (string) at runtime, so
+  the AGP resource shrinker would otherwise strip them from release builds.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_autofill_key" />

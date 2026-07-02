@@ -181,6 +181,14 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         replyPort.send(
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
         );
+      } else if (command is AssociateAppCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final entry = _findEntry(kdbx!, command.entryUuid);
+        _addAssociation(entry, command.association);
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
       } else if (command is CreateDatabaseCmd) {
         kdbx = KdbxFormat().create(
           Credentials(ProtectedValue.fromString(command.password)),
@@ -264,5 +272,36 @@ DbEntry _serializeEntry(KdbxEntry entry) {
     notes: entry.getString(KdbxKey('Notes'))?.getText() ?? '',
     icon: entry.icon.get()?.index ?? 0,
     customIconData: entry.customIcon?.data,
+    additionalUrls: _readAdditionalUrls(entry),
   );
+}
+
+List<String> _readAdditionalUrls(KdbxEntry entry) {
+  final urls = <String>[];
+  for (final e in entry.stringEntries) {
+    if (e.key.key.startsWith('KP2A_URL')) {
+      final value = e.value?.getText();
+      if (value != null && value.isNotEmpty) urls.add(value);
+    }
+  }
+  return urls;
+}
+
+void _addAssociation(KdbxEntry entry, String association) {
+  final mainUrl = entry.getString(KdbxKeyCommon.URL)?.getText() ?? '';
+  final existing = <String>[
+    mainUrl,
+    ..._readAdditionalUrls(entry),
+  ].map((u) => u.toLowerCase()).toList();
+  if (existing.contains(association.toLowerCase())) return;
+
+  if (mainUrl.isEmpty) {
+    entry.setString(KdbxKeyCommon.URL, PlainValue(association));
+    return;
+  }
+  var n = 1;
+  while (entry.getString(KdbxKey('KP2A_URL_$n')) != null) {
+    n++;
+  }
+  entry.setString(KdbxKey('KP2A_URL_$n'), PlainValue(association));
 }
