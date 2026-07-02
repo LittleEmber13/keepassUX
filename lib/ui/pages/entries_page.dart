@@ -14,6 +14,7 @@ import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/model/alert_item.dart';
 import 'package:keepassux/ui/widgets/alert_stack.dart';
+import 'package:keepassux/ui/widgets/fade_in_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/db_group.dart';
@@ -158,21 +159,23 @@ class _EntriesPageState extends State<EntriesPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: AlertStack(
-                          alerts: _alerts,
-                          onDismiss: (alertId) async {
-                            await _alertService.dismissAlert(alertId);
-                            setState(() {
-                              _alerts = _alerts.where((a) => a.id != alertId).toList();
-                            });
-                          },
-                        ),
-                      ),
+                    child: FadeInItem(
+                      child: _alerts.isEmpty
+                          ? const SizedBox.shrink()
+                          : Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: AlertStack(
+                                alerts: _alerts,
+                                onDismiss: (alertId) async {
+                                  await _alertService.dismissAlert(alertId);
+                                  setState(() {
+                                    _alerts = _alerts
+                                        .where((a) => a.id != alertId)
+                                        .toList();
+                                  });
+                                },
+                              ),
+                            ),
                     ),
                   ),
                   AnimatedEntryList(

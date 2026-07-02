@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +7,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/draggable_group_item.dart';
+import 'package:keepassux/ui/widgets/fade_in_item.dart';
 import 'package:keepassux/ui/widgets/draggable_entry_item.dart';
 import 'package:keepassux/ui/widgets/trash_entry_item.dart';
 import 'package:keepassux/ui/widgets/trash_group_item.dart';
@@ -423,16 +424,10 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
       children: [
         if (!widget.isTrashMode && widget.trashGroup != null) _buildTrashGroupItem(),
         if (widget.parentGroup != null)
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: AnimatedOpacity(
-              opacity: widget.showParentGroup ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: widget.showParentGroup
-                  ? _buildParentGroupItem()
-                  : const SizedBox.shrink(),
-            ),
+          FadeInItem(
+            child: widget.showParentGroup
+                ? _buildParentGroupItem()
+                : const SizedBox.shrink(),
           ),
         AnimatedList(
           key: _groupsListKey,
@@ -446,7 +441,8 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
             final currentGroup = _displayedGroups[index];
             if (widget.isTrashMode) {
               return SizeTransition(
-                sizeFactor: AlwaysStoppedAnimation(1.0),
+                sizeFactor: animation,
+              axisAlignment: -1.0,
                 child: FadeTransition(
                   opacity: animation,
                   child: TrashGroupItem(
@@ -461,7 +457,8 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               );
             }
             return SizeTransition(
-              sizeFactor: AlwaysStoppedAnimation(1.0),
+              sizeFactor: animation,
+              axisAlignment: -1.0,
               child: FadeTransition(
                 opacity: animation,
                 child: DraggableGroupItem(
@@ -514,7 +511,8 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
             final currentEntry = _displayedEntries[index];
             if (widget.isTrashMode) {
               return SizeTransition(
-                sizeFactor: AlwaysStoppedAnimation(1.0),
+                sizeFactor: animation,
+              axisAlignment: -1.0,
                 child: FadeTransition(
                   opacity: animation,
                   child: TrashEntryItem(
@@ -527,7 +525,8 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
               );
             }
             return SizeTransition(
-              sizeFactor: AlwaysStoppedAnimation(1.0),
+              sizeFactor: animation,
+              axisAlignment: -1.0,
               child: FadeTransition(
                 opacity: animation,
                 child: DraggableEntryItem(
