@@ -1,10 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeController extends ValueNotifier<ThemeMode> {
   static const _prefsKey = 'theme_mode';
 
-  ThemeController() : super(ThemeMode.system);
+  ThemeController() : super(ThemeMode.light);
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -12,7 +14,9 @@ class ThemeController extends ValueNotifier<ThemeMode> {
     value = switch (saved) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
+      _ => PlatformDispatcher.instance.platformBrightness == Brightness.dark
+          ? ThemeMode.dark
+          : ThemeMode.light,
     };
   }
 

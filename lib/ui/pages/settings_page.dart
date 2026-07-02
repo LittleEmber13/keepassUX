@@ -133,18 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                      offset: Offset(1, 2),
-                    ),
-                  ],
-                ),
+                decoration: cardDecoration(context),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
