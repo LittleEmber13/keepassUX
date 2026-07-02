@@ -97,6 +97,13 @@
     "autofill_settings_active": "Activado",
     "autofill_settings_inactive": "Desactivado — toca para configurar"
   },
+  "about_page": {
+    "title": "Información",
+    "secure_title": "Segura por diseño",
+    "secure_text": "Tu base de datos está cifrada con el formato KeePass (.kdbx). Tu contraseña maestra y tu bóveda nunca salen de tu dispositivo.",
+    "open_source_title": "Código abierto",
+    "open_source_text": "KeepassUX es software libre y de código abierto. Cualquiera puede revisar el código, contribuir o reportar problemas en el repositorio oficial."
+  },
   "autofill_settings_page": {
     "title": "Autocompletar",
     "intro": "El autocompletado permite que KeepassUX sugiera y rellene tus usuarios y contraseñas guardados en otras apps y en el navegador. Para que el autocompletar funcione correctamente debes activar las siguientes opciones.",

@@ -97,6 +97,13 @@
     "autofill_settings_active": "Active",
     "autofill_settings_inactive": "Inactive — tap to configure"
   },
+  "about_page": {
+    "title": "About",
+    "secure_title": "Secure by design",
+    "secure_text": "Your database is encrypted with the KeePass (.kdbx) format. Your master password and vault never leave your device.",
+    "open_source_title": "Open source",
+    "open_source_text": "KeepassUX is free and open source software. Anyone can review the code, contribute, or report issues on the official repository."
+  },
   "autofill_settings_page": {
     "title": "Autofill",
     "intro": "Autofill lets KeepassUX suggest and fill your saved usernames and passwords in other apps and in your browser. For autocomplete to work correctly you must activate the following options.",
