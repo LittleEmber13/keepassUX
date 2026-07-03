@@ -11,6 +11,7 @@ import 'package:keepassux/ui/widgets/password_generator_dialog.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/model/db_entry.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
@@ -159,11 +160,7 @@ class _AddEntryPageState extends State<AddEntryPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

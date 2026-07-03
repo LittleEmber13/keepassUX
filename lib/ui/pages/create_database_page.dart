@@ -7,6 +7,7 @@ import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bloc/entries/keepass_events.dart';
@@ -68,11 +69,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Theme.of(context).colorScheme.scrim.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

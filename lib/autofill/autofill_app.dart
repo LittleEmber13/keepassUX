@@ -10,6 +10,7 @@ import '../ui/model/db_root.dart';
 import '../ui/services/biometric_service.dart';
 import '../ui/theme/theme.dart';
 import '../ui/theme/theme_controller.dart';
+import '../ui/widgets/loading_overlay.dart';
 import '../ui/utils/kdbx_command.dart';
 import '../ui/utils/kdbx_isolate.dart';
 import 'autofill_fill_page.dart';
@@ -142,7 +143,7 @@ class _AutofillGateState extends State<_AutofillGate> {
     switch (_phase) {
       case _Phase.loading:
         return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+          body: LoadingOverlay(isLoading: true),
         );
       case _Phase.unlock:
         return AutofillUnlockPage(

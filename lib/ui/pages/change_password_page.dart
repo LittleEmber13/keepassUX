@@ -7,6 +7,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -78,11 +79,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

@@ -6,6 +6,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/model/db_group.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
@@ -91,11 +92,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Theme.of(context).colorScheme.scrim.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

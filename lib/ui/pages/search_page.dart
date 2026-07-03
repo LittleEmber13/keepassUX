@@ -13,6 +13,7 @@ import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/widgets/root_app_bar.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
@@ -249,21 +250,10 @@ class _SearchPageState extends State<SearchPage> {
                                                               entry: entry,
                                                             ),
                                                           ),
-                                                          if (state
-                                                              is KeePassLoading)
-                                                            Container(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .onSurface
-                                                                  .withOpacity(
-                                                                      0.5),
-                                                              child:
-                                                                  const Center(
-                                                                child:
-                                                                    CircularProgressIndicator(),
-                                                              ),
-                                                            ),
+                                                          LoadingOverlay(
+                                                            isLoading: state
+                                                                is KeePassLoading,
+                                                          ),
                                                         ],
                                                       );
                                                     },

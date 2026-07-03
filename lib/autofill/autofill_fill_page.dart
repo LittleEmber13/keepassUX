@@ -12,6 +12,7 @@ import '../ui/theme/theme.dart';
 import '../ui/utils/kdbx_command.dart';
 import '../ui/utils/kdbx_isolate.dart';
 import '../ui/widgets/kdbx_icon_widget.dart';
+import '../ui/widgets/loading_overlay.dart';
 import 'autofill_matcher.dart';
 
 const _channel = MethodChannel('com.example.keepassux/autofill');
@@ -288,14 +289,7 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
               ),
             ],
           ),
-          if (_busy)
-            Container(
-              color: Theme.of(context)
-                  .colorScheme
-                  .scrim
-                  .withValues(alpha: 0.5),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
+          LoadingOverlay(isLoading: _busy),
         ],
       ),
     );

@@ -12,6 +12,7 @@ import 'package:keepassux/ui/widgets/animated_entry_list.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/trash_info_card.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 
 class TrashPage extends StatefulWidget {
   const TrashPage({this.uuidGroup, super.key});
@@ -114,11 +115,7 @@ class _TrashPageState extends State<TrashPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Colors.black.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

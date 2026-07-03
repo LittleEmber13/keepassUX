@@ -15,6 +15,7 @@ import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:keepassux/ui/model/alert_item.dart';
 import 'package:keepassux/ui/widgets/alert_stack.dart';
 import 'package:keepassux/ui/widgets/fade_in_item.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/db_group.dart';
@@ -106,11 +107,7 @@ class _EntriesPageState extends State<EntriesPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Colors.black.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

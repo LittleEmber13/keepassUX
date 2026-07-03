@@ -8,6 +8,7 @@ import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/widgets/animated_entry_list.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/pages/add_group.dart';
 
 import '../model/db_group.dart';
@@ -93,11 +94,7 @@ class _GroupEntriesPageState extends State<GroupEntriesPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Colors.black.withValues(alpha: 0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },

@@ -7,6 +7,7 @@ import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 
 class DraggableEntryItem extends StatelessWidget {
   const DraggableEntryItem({
@@ -66,13 +67,7 @@ class DraggableEntryItem extends StatelessWidget {
                             padding: const EdgeInsets.all(24),
                             child: EntryData(entry: entry),
                           ),
-                          if (state is KeePassLoading)
-                            Container(
-                              color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.5),
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ),
+                          LoadingOverlay(isLoading: state is KeePassLoading),
                         ],
                       );
                     },

@@ -10,6 +10,7 @@ import 'package:keepassux/ui/pages/create_database_page.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
+import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/widgets/slide_to_open_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uri_content/uri_content.dart';
@@ -191,11 +192,7 @@ class _StartPageState extends State<StartPage> {
           fit: StackFit.expand,
           children: [
             _page(),
-            if (state is KeePassLoading)
-              Container(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            LoadingOverlay(isLoading: state is KeePassLoading),
           ],
         );
       },
