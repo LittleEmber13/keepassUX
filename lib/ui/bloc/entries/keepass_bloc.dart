@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/db_group.dart';
 import '../../model/db_root.dart';
 import '../../model/kdbx_action_result.dart';
+import '../../model/kdf_info.dart';
 import '../../utils/kdbx_command.dart';
 
 class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
@@ -28,6 +29,8 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
     on<DeleteEntryPermanently>(_onDeleteEntryPermanently);
     on<DeleteGroupPermanently>(_onDeleteGroupPermanently);
     on<ChangeMasterPassword>(_onChangeMasterPassword);
+    on<GetKdfParameters>(_onGetKdfParameters);
+    on<ChangeKdfParameters>(_onChangeKdfParameters);
     _initIsolate();
   }
 
@@ -351,6 +354,51 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       logger.e(e);
       if (e.toString().contains('Invalid current password')) {
         emit(KeePassError(tr("change_password_page.error_wrong_current")));
+      } else {
+        emit(KeePassError(tr("exception.unknown")));
+      }
+    }
+  }
+
+  Future<void> _onGetKdfParameters(
+    GetKdfParameters event,
+    Emitter<KeePassState> emit,
+  ) async {
+    try {
+      emit(KeePassLoading());
+
+      final info = await _kdbxIsolate.send<KdfInfo>(GetKdfParametersCmd());
+
+      emit(KeePassKdfParameters(info));
+    } catch (e) {
+      logger.e(e);
+      emit(KeePassError(tr("exception.unknown")));
+    }
+  }
+
+  Future<void> _onChangeKdfParameters(
+    ChangeKdfParameters event,
+    Emitter<KeePassState> emit,
+  ) async {
+    try {
+      emit(KeePassLoading());
+
+      final result = await _kdbxIsolate.send<KdbxActionResult>(
+        ChangeKdfParametersCmd(
+          memoryBytes: event.memoryBytes,
+          iterations: event.iterations,
+          parallelism: event.parallelism,
+        ),
+      );
+      _currentRoot = result.root.rootGroup;
+
+      await _saveBytes(result.savedBytes);
+
+      emit(KeePassChangeKdfParametersSuccess());
+    } catch (e) {
+      logger.e(e);
+      if (e.toString().contains('Unsupported KDF type')) {
+        emit(KeePassError(tr("kdf_settings_page.error_unsupported_aes")));
       } else {
         emit(KeePassError(tr("exception.unknown")));
       }

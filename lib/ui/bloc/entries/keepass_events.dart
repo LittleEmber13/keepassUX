@@ -138,3 +138,19 @@ class ChangeMasterPassword extends KeePassEvent {
 
   ChangeMasterPassword({required this.oldPassword, required this.newPassword});
 }
+
+class GetKdfParameters extends KeePassEvent {
+  GetKdfParameters();
+}
+
+class ChangeKdfParameters extends KeePassEvent {
+  final int memoryBytes;
+  final int iterations;
+  final int parallelism;
+
+  ChangeKdfParameters({
+    required this.memoryBytes,
+    required this.iterations,
+    required this.parallelism,
+  });
+}

@@ -93,6 +93,7 @@
     "biometric_login": "Login biométrico",
     "dark_theme": "Tema oscuro",
     "change_password": "Cambiar contraseña maestra",
+    "kdf_settings": "Seguridad de la base de datos",
     "autofill_settings": "Autocompletar",
     "autofill_settings_active": "Activado",
     "autofill_settings_inactive": "Desactivado — toca para configurar"
@@ -123,6 +124,17 @@
     "success": "Contraseña maestra cambiada correctamente",
     "error_wrong_current": "La contraseña actual es incorrecta",
     "error_mismatch": "Las contraseñas no coinciden"
+  },
+  "kdf_settings_page": {
+    "title": "Seguridad de la base de datos",
+    "help_text": "Estos valores controlan cuánto tarda en abrirse la base de datos y qué tan resistente es frente a ataques de fuerza bruta.",
+    "memory_hint": "Memoria Argon2 (MiB)",
+    "iterations_hint": "Iteraciones",
+    "parallelism_hint": "Paralelismo",
+    "save": "Guardar",
+    "success": "Configuración de seguridad actualizada",
+    "error_unsupported_aes": "Esta base usa AES-KDF (obsoleto).",
+    "error_out_of_range": "Debe ser un número entre {} y {}"
   },
   "icon_picker": {
     "title": "Seleccionar icono",

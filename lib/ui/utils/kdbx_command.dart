@@ -115,6 +115,19 @@ class ChangeMasterPasswordCmd extends KdbxCommand {
   ChangeMasterPasswordCmd({required this.oldPassword, required this.newPassword});
 }
 
+class GetKdfParametersCmd extends KdbxCommand {}
+
+class ChangeKdfParametersCmd extends KdbxCommand {
+  final int memoryBytes;
+  final int iterations;
+  final int parallelism;
+  ChangeKdfParametersCmd({
+    required this.memoryBytes,
+    required this.iterations,
+    required this.parallelism,
+  });
+}
+
 class AssociateAppCmd extends KdbxCommand {
   final String entryUuid;
   final String association;

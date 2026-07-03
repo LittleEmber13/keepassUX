@@ -1,4 +1,5 @@
 import '../../model/db_group.dart';
+import '../../model/kdf_info.dart';
 
 abstract class KeePassState {}
 
@@ -50,4 +51,13 @@ class KeePassDeleteGroupSuccess extends KeePassState {
 
 class KeePassChangeMasterPasswordSuccess extends KeePassState {
   KeePassChangeMasterPasswordSuccess();
+}
+
+class KeePassKdfParameters extends KeePassState {
+  final KdfInfo info;
+  KeePassKdfParameters(this.info);
+}
+
+class KeePassChangeKdfParametersSuccess extends KeePassState {
+  KeePassChangeKdfParametersSuccess();
 }

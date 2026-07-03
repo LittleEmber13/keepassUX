@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/pages/autofill_settings_page.dart';
 import 'package:keepassux/ui/pages/change_password_page.dart';
+import 'package:keepassux/ui/pages/kdf_settings_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/autofill_settings_service.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
@@ -221,6 +222,21 @@ class _SettingsPageState extends State<SettingsPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const ChangePasswordPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ListTile(
+                        leading: const Icon(Icons.security_outlined),
+                        title: Text(tr("settings_page.kdf_settings")),
+                        trailing: const Icon(Icons.chevron_right),
+                        contentPadding: EdgeInsets.zero,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const KdfSettingsPage(),
                             ),
                           );
                         },

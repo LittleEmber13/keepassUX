@@ -93,6 +93,7 @@
     "biometric_login": "Biometric login",
     "dark_theme": "Dark theme",
     "change_password": "Change master password",
+    "kdf_settings": "Database security",
     "autofill_settings": "Autofill",
     "autofill_settings_active": "Active",
     "autofill_settings_inactive": "Inactive — tap to configure"
@@ -123,6 +124,17 @@
     "success": "Master password changed successfully",
     "error_wrong_current": "The current password is incorrect",
     "error_mismatch": "Passwords do not match"
+  },
+  "kdf_settings_page": {
+    "title": "Database security",
+    "help_text": "These values control how long the database takes to unlock and how resistant it is against brute-force attacks.",
+    "memory_hint": "Argon2 memory (MiB)",
+    "iterations_hint": "Iterations",
+    "parallelism_hint": "Parallelism",
+    "save": "Save",
+    "success": "Security settings updated",
+    "error_unsupported_aes": "This database uses AES-KDF (legacy).",
+    "error_out_of_range": "Must be a number between {} and {}"
   },
   "icon_picker": {
     "title": "Select icon",

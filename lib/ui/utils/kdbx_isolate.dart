@@ -1,14 +1,22 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'package:argon2_ffi_base/argon2_ffi_base.dart';
 import 'package:collection/collection.dart';
 import 'package:kdbx/kdbx.dart';
+import 'package:kdbx/src/kdbx_var_dictionary.dart' show VarDictionary;
 
 import '../error/kdbx_isolate_error.dart';
+import 'cached_argon2.dart';
 import 'kdbx_command.dart';
 import '../model/db_entry.dart';
 import '../model/db_group.dart';
 import '../model/db_root.dart';
 import '../model/kdbx_action_result.dart';
+import '../model/kdf_info.dart';
+
+const int kDefaultArgon2MemoryBytes = 64 * 1024 * 1024;
+const int kDefaultArgon2Iterations = 3;
+const int kDefaultArgon2Parallelism = 1;
 
 class KdbxIsolate {
   Isolate? _isolate;
@@ -40,10 +48,39 @@ class KdbxIsolate {
   }
 }
 
+VarDictionary argon2KdfParams(
+  VarDictionary current, {
+  required int memoryBytes,
+  required int iterations,
+  required int parallelism,
+}) {
+  final secretKey = KdfField.secretKey.read(current);
+  final assocData = KdfField.assocData.read(current);
+  return VarDictionary([
+    KdfField.uuid.item(KdfField.uuid.read(current)!),
+    KdfField.salt.item(KdfField.salt.read(current)!),
+    KdfField.version.item(KdfField.version.read(current)!),
+    KdfField.memory.item(memoryBytes),
+    KdfField.iterations.item(iterations),
+    KdfField.parallelism.item(parallelism),
+    if (secretKey != null) KdfField.secretKey.item(secretKey),
+    if (assocData != null) KdfField.assocData.item(assocData),
+  ]);
+}
+
+KdbxFormat _createKdbxFormat() {
+  try {
+    return KdbxFormat(CachedArgon2(Argon2FfiFlutter()));
+  } catch (_) {
+    return KdbxFormat();
+  }
+}
+
 void kdbxIsolateEntryPoint(SendPort mainSendPort) {
   final receivePort = ReceivePort();
   mainSendPort.send(receivePort.sendPort);
 
+  KdbxFormat? format;
   KdbxFile? kdbx;
 
   receivePort.listen((dynamic message) async {
@@ -56,7 +93,8 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         final credentials = Credentials(
           ProtectedValue.fromString(command.password),
         );
-        kdbx = await KdbxFormat().read(command.bytes, credentials);
+        format ??= _createKdbxFormat();
+        kdbx = await format!.read(command.bytes, credentials);
         replyPort.send(_serializeRoot(kdbx!));
       } else if (command is AddEntryCmd) {
         if (kdbx == null) throw Exception('No database loaded');
@@ -190,9 +228,51 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
           KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
         );
       } else if (command is CreateDatabaseCmd) {
-        kdbx = KdbxFormat().create(
+        format ??= _createKdbxFormat();
+        kdbx = format!.create(
           Credentials(ProtectedValue.fromString(command.password)),
           'KeepassUX',
+        );
+        kdbx!.header.writeKdfParameters(
+          argon2KdfParams(
+            kdbx!.header.readKdfParameters,
+            memoryBytes: kDefaultArgon2MemoryBytes,
+            iterations: kDefaultArgon2Iterations,
+            parallelism: kDefaultArgon2Parallelism,
+          ),
+        );
+        final bytes = await kdbx!.save();
+        replyPort.send(
+          KdbxActionResult(root: _serializeRoot(kdbx!), savedBytes: bytes),
+        );
+      } else if (command is GetKdfParametersCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final kdfParams = kdbx!.header.readKdfParameters;
+        final kdfTypeName =
+            KeyEncrypterKdf.kdfTypeFor(kdfParams) == KdfType.Aes
+                ? 'aes'
+                : 'argon2';
+        replyPort.send(
+          KdfInfo(
+            kdfType: kdfTypeName,
+            memoryBytes: KdfField.memory.read(kdfParams) ?? 0,
+            iterations: KdfField.iterations.read(kdfParams) ?? 0,
+            parallelism: KdfField.parallelism.read(kdfParams) ?? 0,
+          ),
+        );
+      } else if (command is ChangeKdfParametersCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        final kdfParams = kdbx!.header.readKdfParameters;
+        if (KeyEncrypterKdf.kdfTypeFor(kdfParams) != KdfType.Argon2) {
+          throw Exception('Unsupported KDF type');
+        }
+        kdbx!.header.writeKdfParameters(
+          argon2KdfParams(
+            kdfParams,
+            memoryBytes: command.memoryBytes,
+            iterations: command.iterations,
+            parallelism: command.parallelism,
+          ),
         );
         final bytes = await kdbx!.save();
         replyPort.send(
