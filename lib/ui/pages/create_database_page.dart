@@ -1,12 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
+import 'package:keepassux/ui/services/saf_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +20,7 @@ class CreateDatabasePage extends StatefulWidget {
 
 class _CreateDatabasePageState extends State<CreateDatabasePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final SafService _safService = SafService();
 
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -158,24 +158,13 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
                       if (preferences == null) {
                         return;
                       }
-                      final rawPath = await FilePicker.platform.saveFile(
-                        dialogTitle: 'Guardar como',
-                        fileName: "${nameController.text}.kdbx",
-                        type: FileType.custom,
-                        allowedExtensions: ['kdbx'],
-                        bytes: Uint8List.fromList([0]),
+                      final safUri = await _safService.createDocument(
+                        "${nameController.text}.kdbx",
                       );
-                      if (rawPath == null) {
+                      if (safUri == null) {
                         return;
                       }
-                      String documentId = rawPath.replaceFirst(
-                        '/document/',
-                        '',
-                      );
-                      String encoded = Uri.encodeComponent(documentId);
-                      String safUri =
-                          "content://com.android.externalstorage.documents/document/$encoded";
-                      await preferences!.setString('kdbx_uri', safUri);
+                      if (!mounted) return;
                       context.read<KeePassBloc>().add(
                         CreateDatabase(
                           uri: safUri,

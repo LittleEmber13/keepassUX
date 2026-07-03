@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -256,16 +255,9 @@ class _StartPageState extends State<StartPage> {
     return InkWell(
       onTap: () async {
         if (preferences == null) return;
-        final result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['kdbx'],
-          withData: false,
-        );
-        if (result != null && result.files.isNotEmpty) {
-          final safUri = result.files.single.identifier;
-          if (safUri != null) {
-            _onFilePicked(safUri);
-          }
+        final safUri = await _safService.openDocument();
+        if (safUri != null) {
+          _onFilePicked(safUri);
         }
       },
       child: Row(
