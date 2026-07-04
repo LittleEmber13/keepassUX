@@ -58,6 +58,23 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
 
   List<DbGroup> _displayedGroups = [];
   List<DbEntry> _displayedEntries = [];
+  bool _isDragging = false;
+
+  bool get _trashHasItems {
+    final trash = widget.trashGroup;
+    if (trash == null) return false;
+    return trash.entries.isNotEmpty || trash.groups.isNotEmpty;
+  }
+
+  void _handleDragStarted() {
+    setState(() => _isDragging = true);
+    widget.onDragStarted?.call();
+  }
+
+  void _handleDragEnded() {
+    setState(() => _isDragging = false);
+    widget.onDragEnded?.call();
+  }
 
   @override
   void didUpdateWidget(AnimatedEntryList oldWidget) {
@@ -422,7 +439,10 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
 
     return CustomAppScroll(
       children: [
-        if (!widget.isTrashMode && widget.trashGroup != null) _buildTrashGroupItem(),
+        if (!widget.isTrashMode &&
+            widget.trashGroup != null &&
+            (_trashHasItems || _isDragging))
+          _buildTrashGroupItem(),
         if (widget.parentGroup != null)
           FadeInItem(
             child: widget.showParentGroup
@@ -465,8 +485,8 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
                   group: currentGroup,
                   sourceGroupUuid: widget.group!.uuid,
                   onTap: () => widget.onGroupTap?.call(currentGroup),
-                  onDragStarted: widget.onDragStarted,
-                  onDragEnd: widget.onDragEnded,
+                  onDragStarted: _handleDragStarted,
+                  onDragEnd: _handleDragEnded,
                   isDescendantOf: (ancestorUuid, descendantUuid) {
                     return widget.rootGroup
                             ?.findByUuid(ancestorUuid)
@@ -532,8 +552,8 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
                 child: DraggableEntryItem(
                   entry: currentEntry,
                   sourceGroupUuid: widget.group!.uuid,
-                  onDragStarted: widget.onDragStarted,
-                  onDragEnd: widget.onDragEnded,
+                  onDragStarted: _handleDragStarted,
+                  onDragEnd: _handleDragEnded,
                 ),
               ),
             );
