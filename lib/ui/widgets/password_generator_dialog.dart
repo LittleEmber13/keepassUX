@@ -273,6 +273,11 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
                           max: 32,
                           activeColor: Colors.teal,
                           onChanged: (v) {
+                            setState(() {
+                              _length = v.toInt();
+                            });
+                          },
+                          onChangeEnd: (v) {
                             _length = v.toInt();
                             _regenerate();
                           },
