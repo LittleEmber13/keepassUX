@@ -29,15 +29,15 @@
     "create_database": "Crear base de datos"
   },
   "entries_page": {
+    "title": "Entradas",
     "search": "Buscar una entrada"
   },
   "search_page": {
+    "title": "Búsqueda",
     "hint": "Buscar grupos y entradas...",
     "no_results": "No se encontraron resultados"
   },
   "app_bar": {
-    "hello": "Hola,",
-    "welcome": "Bienvenido",
     "trash": "Papelera"
   },
   "nav_bar": {
@@ -89,6 +89,7 @@
     "keyboard_done": "Hecho"
   },
   "settings_page": {
+    "title": "Ajustes",
     "language": "Idioma",
     "biometric_login": "Login biométrico",
     "dark_theme": "Tema oscuro",

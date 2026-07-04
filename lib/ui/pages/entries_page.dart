@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:collection/collection.dart';
@@ -129,6 +130,7 @@ class _EntriesPageState extends State<EntriesPage> {
             ),
             child: RootAppBar(
               isExit: widget.uuidGroup == null,
+              title: tr("entries_page.title"),
               onTapExit: () {
                 if (widget.uuidGroup != null) {
                   Navigator.pop(context);

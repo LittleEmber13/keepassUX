@@ -101,6 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               RootAppBar(
                 isExit: true,
+                title: tr("settings_page.title"),
                 onTapExit: () {
                   // TODO unload database
                   Navigator.pushAndRemoveUntil(

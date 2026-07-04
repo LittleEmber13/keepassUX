@@ -29,6 +29,7 @@ class AboutPage extends StatelessWidget {
             children: [
               RootAppBar(
                 isExit: true,
+                title: tr("about_page.title"),
                 onTapExit: () {
                   Navigator.pushAndRemoveUntil(
                     context,

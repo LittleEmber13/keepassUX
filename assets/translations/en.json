@@ -29,15 +29,15 @@
     "create_database": "Create database"
   },
   "entries_page": {
+    "title": "Entries",
     "search": "Search an entry"
   },
   "search_page": {
+    "title": "Search",
     "hint": "Search groups and entries...",
     "no_results": "No results found"
   },
   "app_bar": {
-    "hello": "Hello,",
-    "welcome": "Welcome",
     "trash": "Trash"
   },
   "nav_bar": {
@@ -89,6 +89,7 @@
     "keyboard_done": "Done"
   },
   "settings_page": {
+    "title": "Settings",
     "language": "Language",
     "biometric_login": "Biometric login",
     "dark_theme": "Dark theme",

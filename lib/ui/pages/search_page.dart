@@ -93,11 +93,13 @@ class _SearchPageState extends State<SearchPage> {
           bottomNavigationBar: CustomBottomNavigationBar(selectedIndex: 1),
           body: SafeArea(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 28, left: 24, right: 24),
                   child: RootAppBar(
                     isExit: true,
+                    title: tr("search_page.title"),
                     onTapExit: () {
                       Navigator.pushAndRemoveUntil(
                         context,
