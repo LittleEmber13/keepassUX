@@ -97,7 +97,12 @@
     "kdf_settings": "Seguridad de la base de datos",
     "autofill_settings": "Autocompletar",
     "autofill_settings_active": "Activado",
-    "autofill_settings_inactive": "Desactivado — toca para configurar"
+    "autofill_settings_inactive": "Desactivado — toca para configurar",
+    "screenshot_protection": "Bloquear capturas de pantalla",
+    "screenshot_protection_subtitle": "Impide capturas y grabaciones de pantalla mientras usas la app",
+    "screenshot_protection_disable_warning": "Desactivar el bloqueo de capturas reduce la seguridad. Por seguridad se cerrará la sesión y tendrás que introducir tu contraseña maestra de nuevo. ¿Quieres continuar?",
+    "screenshot_protection_cancel": "Cancelar",
+    "screenshot_protection_confirm": "Desactivar"
   },
   "about_page": {
     "title": "Información",

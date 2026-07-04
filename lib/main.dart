@@ -9,6 +9,7 @@ import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/screenshot_protection_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/theme/theme_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zxcvbnm/messages.dart';
 import 'package:zxcvbnm_flutter/zxcvbnm_flutter.dart';
 
@@ -32,7 +33,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await initializeZxcvbnmMessages('es');
-  await ScreenshotProtectionService().enableProtection();
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.getBool('screenshot_protection_enabled') ?? true) {
+    await ScreenshotProtectionService().enableProtection();
+  }
   await _configureAutofillPreferences();
   await themeController.load();
   runApp(

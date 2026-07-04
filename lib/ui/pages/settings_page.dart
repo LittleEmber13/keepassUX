@@ -9,6 +9,7 @@ import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/autofill_settings_service.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/services/keyboard_fill_service.dart';
+import 'package:keepassux/ui/services/screenshot_protection_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/theme/theme_controller.dart';
 import 'package:keepassux/ui/widgets/custom_bottom_navigation_bar.dart';
@@ -27,9 +28,12 @@ class _SettingsPageState extends State<SettingsPage> {
   final BiometricService _biometricService = BiometricService();
   final AutofillSettingsService _autofillService = AutofillSettingsService();
   final KeyboardFillService _keyboardService = KeyboardFillService();
+  final ScreenshotProtectionService _screenshotProtectionService =
+      ScreenshotProtectionService();
 
   String selectedLanguage = 'Español';
   bool biometricLoginEnabled = false;
+  bool screenshotProtectionEnabled = true;
   bool _hasBiometrics = false;
   bool _autofillSupported = false;
   bool _autofillEnabled = false;
@@ -48,6 +52,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final currentLocale = context.locale;
     _hasBiometrics = await _biometricService.canAuthenticate();
     final savedEnabled = _prefs?.getBool('biometric_login_enabled') ?? false;
+    final savedScreenshotProtection =
+        _prefs?.getBool('screenshot_protection_enabled') ?? true;
     _autofillSupported = await _autofillService.isSupported;
     if (_autofillSupported) {
       _autofillEnabled = await _autofillService.isEnabled;
@@ -62,12 +68,56 @@ class _SettingsPageState extends State<SettingsPage> {
         selectedLanguage = 'Inglés';
       }
       biometricLoginEnabled = savedEnabled;
+      screenshotProtectionEnabled = savedScreenshotProtection;
     });
   }
 
   Future<void> _onBiometricToggle(bool value) async {
     await _prefs?.setBool('biometric_login_enabled', value);
     setState(() => biometricLoginEnabled = value);
+  }
+
+  Future<void> _onScreenshotProtectionToggle(bool value) async {
+    if (value) {
+      await _prefs?.setBool('screenshot_protection_enabled', true);
+      await _screenshotProtectionService.enableProtection();
+      setState(() => screenshotProtectionEnabled = true);
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(tr("settings_page.screenshot_protection")),
+            content: Text(
+              tr("settings_page.screenshot_protection_disable_warning"),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(tr("settings_page.screenshot_protection_cancel")),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(tr("settings_page.screenshot_protection_confirm")),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed != true) return;
+
+    await _prefs?.setBool('screenshot_protection_enabled', false);
+    await _screenshotProtectionService.disableProtection();
+    setState(() => screenshotProtectionEnabled = false);
+
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => StartPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   Future<void> _onAutofillSettingsTap() async {
@@ -85,7 +135,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _onDarkThemeToggle(bool value) async {
-    await themeController.setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+    await themeController.setThemeMode(
+      value ? ThemeMode.dark : ThemeMode.light,
+    );
   }
 
   @override
@@ -143,7 +195,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Text(
                         tr("settings_page.language"),
-                        style: TextStyle(color: context.appColors.secondaryText),
+                        style: TextStyle(
+                          color: context.appColors.secondaryText,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
@@ -197,6 +251,20 @@ class _SettingsPageState extends State<SettingsPage> {
                           contentPadding: EdgeInsets.zero,
                         ),
                       ],
+                      if (Platform.isAndroid) ...[
+                        const SizedBox(height: 12),
+                        SwitchListTile(
+                          title: Text(
+                            tr("settings_page.screenshot_protection"),
+                          ),
+                          subtitle: Text(
+                            tr("settings_page.screenshot_protection_subtitle"),
+                          ),
+                          value: screenshotProtectionEnabled,
+                          onChanged: _onScreenshotProtectionToggle,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ],
                       if (_autofillSupported || _keyboardSupported) ...[
                         const SizedBox(height: 12),
                         ListTile(
@@ -205,7 +273,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           subtitle: Text(
                             _autofillEnabled && _keyboardEnabled
                                 ? tr("settings_page.autofill_settings_active")
-                                : tr("settings_page.autofill_settings_inactive"),
+                                : tr(
+                                  "settings_page.autofill_settings_inactive",
+                                ),
                           ),
                           trailing: const Icon(Icons.chevron_right),
                           contentPadding: EdgeInsets.zero,

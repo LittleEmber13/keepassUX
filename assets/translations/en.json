@@ -97,7 +97,12 @@
     "kdf_settings": "Database security",
     "autofill_settings": "Autofill",
     "autofill_settings_active": "Active",
-    "autofill_settings_inactive": "Inactive — tap to configure"
+    "autofill_settings_inactive": "Inactive — tap to configure",
+    "screenshot_protection": "Block screenshots",
+    "screenshot_protection_subtitle": "Prevents screenshots and screen recording while using the app",
+    "screenshot_protection_disable_warning": "Disabling screenshot protection reduces security. For safety, your session will be closed and you'll need to enter your master password again. Do you want to continue?",
+    "screenshot_protection_cancel": "Cancel",
+    "screenshot_protection_confirm": "Disable"
   },
   "about_page": {
     "title": "About",
