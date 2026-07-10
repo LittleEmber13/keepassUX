@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
-import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:keepassux/ui/pages/main_tabs_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
@@ -52,7 +52,7 @@ class _CreateDatabasePageState extends State<CreateDatabasePage> {
         if (state is KeePassCreated) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const EntriesPage()),
+            MaterialPageRoute(builder: (context) => const MainTabsPage()),
           );
         }
         if (state is KeePassError) {

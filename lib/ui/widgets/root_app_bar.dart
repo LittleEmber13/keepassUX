@@ -26,10 +26,7 @@ class RootAppBar extends StatelessWidget {
           child: Container(
             decoration: cardDecoration(context),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               child: Icon(
                 isExit ? FeatherIcons.logOut : Icons.arrow_back,
                 color: Theme.of(context).colorScheme.onSurface,
@@ -57,12 +54,16 @@ class RootAppBar extends StatelessWidget {
           ),
           SizedBox(width: 8),
         ],
-        Text(
-          title,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: Text(
+            title,
+            key: ValueKey(title),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/create_database_page.dart';
-import 'package:keepassux/ui/pages/entries_page.dart';
+import 'package:keepassux/ui/pages/main_tabs_page.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
 import 'package:keepassux/ui/widgets/loading_overlay.dart';
@@ -162,7 +162,7 @@ class _StartPageState extends State<StartPage> {
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const EntriesPage()),
+        MaterialPageRoute(builder: (context) => const MainTabsPage()),
       );
     }
   }
