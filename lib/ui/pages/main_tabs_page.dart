@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
+import 'package:keepassux/ui/bloc/entries/keepass_events.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/pages/about_page.dart';
 import 'package:keepassux/ui/pages/entries_page.dart';
@@ -21,7 +22,8 @@ class MainTabsPage extends StatefulWidget {
   State<MainTabsPage> createState() => _MainTabsPageState();
 }
 
-class _MainTabsPageState extends State<MainTabsPage> {
+class _MainTabsPageState extends State<MainTabsPage>
+    with WidgetsBindingObserver {
   late final PageController _pageController;
   late int _currentIndex;
 
@@ -35,14 +37,23 @@ class _MainTabsPageState extends State<MainTabsPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<KeePassBloc>().add(ReloadDatabase());
+    }
   }
 
   void _onTabSelected(int index) {

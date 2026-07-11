@@ -20,6 +20,10 @@ class GetRootGroup extends KeePassEvent {
   GetRootGroup();
 }
 
+class ReloadDatabase extends KeePassEvent {
+  ReloadDatabase();
+}
+
 class AddEntry extends KeePassEvent {
   final String? uuidGroup;
   final String title;

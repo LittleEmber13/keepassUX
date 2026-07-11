@@ -6,6 +6,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/utils/kdbx_isolate.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uri_content/uri_content.dart';
 
 import '../../model/db_group.dart';
 import '../../model/db_root.dart';
@@ -16,6 +17,7 @@ import '../../utils/kdbx_command.dart';
 class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
   KeePassBloc() : super(KeePassInitial()) {
     on<LoadDatabase>(_onLoadDatabase);
+    on<ReloadDatabase>(_onReloadDatabase);
     on<AddEntry>(_onAddEntry);
     on<AddGroup>(_onAddGroup);
     on<GetRootGroup>(_onGetRootGroup);
@@ -67,6 +69,26 @@ class KeePassBloc extends Bloc<KeePassEvent, KeePassState> {
       } else {
         emit(KeePassError(tr("exception.unknown")));
       }
+    }
+  }
+
+  Future<void> _onReloadDatabase(
+    ReloadDatabase event,
+    Emitter<KeePassState> emit,
+  ) async {
+    if (_currentRoot == null) return;
+    try {
+      preferences ??= await SharedPreferences.getInstance();
+      final uri = preferences?.getString('kdbx_uri');
+      if (uri == null || uri.isEmpty) return;
+      final bytes = await UriContent().from(Uri.parse(uri));
+      final root = await _kdbxIsolate.send<DbRoot>(
+        ReloadDatabaseCmd(bytes: bytes),
+      );
+      _currentRoot = root.rootGroup;
+      emit(KeePassRootGroup(_currentRoot!));
+    } catch (e) {
+      logger.e(e);
     }
   }
 

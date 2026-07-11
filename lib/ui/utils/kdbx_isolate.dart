@@ -96,6 +96,10 @@ void kdbxIsolateEntryPoint(SendPort mainSendPort) {
         format ??= _createKdbxFormat();
         kdbx = await format!.read(command.bytes, credentials);
         replyPort.send(_serializeRoot(kdbx!));
+      } else if (command is ReloadDatabaseCmd) {
+        if (kdbx == null) throw Exception('No database loaded');
+        kdbx = await format!.read(command.bytes, kdbx!.credentials);
+        replyPort.send(_serializeRoot(kdbx!));
       } else if (command is AddEntryCmd) {
         if (kdbx == null) throw Exception('No database loaded');
         final group = _findGroup(kdbx!, command.groupUuid);

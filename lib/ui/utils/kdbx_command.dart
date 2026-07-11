@@ -8,6 +8,11 @@ class LoadDatabaseCmd extends KdbxCommand {
   LoadDatabaseCmd({required this.bytes, required this.password});
 }
 
+class ReloadDatabaseCmd extends KdbxCommand {
+  final Uint8List bytes;
+  ReloadDatabaseCmd({required this.bytes});
+}
+
 class AddEntryCmd extends KdbxCommand {
   final String groupUuid;
   final String title;
