@@ -95,7 +95,7 @@ class TrashEntryItem extends StatelessWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(24),
-                            child: EntryData(entry: entry),
+                            child: EntryData(entry: entry, showDelete: false),
                           ),
                           LoadingOverlay(isLoading: state is KeePassLoading),
                         ],

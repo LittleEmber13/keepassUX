@@ -77,16 +77,7 @@
     "notes": "Notes",
     "edit": "Edit",
     "save": "Save",
-    "cancel": "Cancel",
-    "use_with_keyboard": "Use with keyboard",
-    "keyboard_enable_title": "Enable the KeepassUX keyboard",
-    "keyboard_enable_message": "To fill in browsers and other apps, enable the KeepassUX keyboard in Android settings.",
-    "keyboard_open_settings": "Open settings",
-    "keyboard_cancel": "Cancel",
-    "keyboard_ready_title": "Credentials ready",
-    "keyboard_ready_message": "Tap the username or password field, switch to the KeepassUX keyboard and press Username or Password.",
-    "keyboard_switch": "Switch keyboard",
-    "keyboard_done": "Done"
+    "cancel": "Cancel"
   },
   "settings_page": {
     "title": "Settings",
