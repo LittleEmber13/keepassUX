@@ -61,11 +61,18 @@ class _SearchTabState extends State<SearchTab>
 
     final searchQuery = query.toLowerCase();
 
-    final allGroups = _rootGroup!.getAllGroups();
-    final allEntries = <DbEntry>[];
-    for (final group in allGroups) {
-      allEntries.addAll(group.entries);
+    final allGroups = <DbGroup>[];
+    final allEntries = <DbEntry>[..._rootGroup!.entries];
+    void collect(DbGroup parent) {
+      for (final child in parent.groups) {
+        if (child.isRecycleBin) continue;
+        allGroups.add(child);
+        allEntries.addAll(child.entries);
+        collect(child);
+      }
     }
+
+    collect(_rootGroup!);
 
     setState(() {
       _query = query;
