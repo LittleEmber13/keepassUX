@@ -7,6 +7,7 @@ import 'package:keepassux/ui/bloc/entries/keepass_states.dart';
 import 'package:keepassux/ui/model/db_entry.dart';
 import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/theme/theme.dart';
+import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/entry_data.dart';
 import 'package:keepassux/ui/widgets/kdbx_icon_widget.dart';
 import 'package:keepassux/ui/widgets/loading_overlay.dart';
@@ -64,7 +65,12 @@ class TrashEntryItem extends StatelessWidget {
           sourceGroupUuid: sourceGroupUuid,
         ),
         onDragStarted: onDragStarted,
-        onDragEnd: onDragEnd != null ? (_) => onDragEnd!() : null,
+        onDragUpdate: (details) =>
+            DragAutoScroll.of(context)?.onDragUpdate(details.globalPosition),
+        onDragEnd: (_) {
+          DragAutoScroll.of(context)?.onDragEnd();
+          onDragEnd?.call();
+        },
         feedback: _buildDragFeedback(
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,

@@ -205,7 +205,12 @@ class _AnimatedEntryListState extends State<AnimatedEntryList> {
           sourceGroupUuid: widget.group!.uuid,
         ),
         onDragStarted: widget.onDragStarted,
-        onDragEnd: widget.onDragEnded != null ? (_) => widget.onDragEnded!() : null,
+        onDragUpdate: (details) =>
+            DragAutoScroll.of(context)?.onDragUpdate(details.globalPosition),
+        onDragEnd: (_) {
+          DragAutoScroll.of(context)?.onDragEnd();
+          widget.onDragEnded?.call();
+        },
         feedback: _buildDragFeedback(
           child: Container(
             width: MediaQuery.of(context).size.width * 0.7,

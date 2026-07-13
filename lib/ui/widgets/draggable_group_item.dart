@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/model/drag_item.dart';
 import 'package:keepassux/ui/theme/theme.dart';
+import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 
 class DraggableGroupItem extends StatelessWidget {
   const DraggableGroupItem({
@@ -34,7 +35,12 @@ class DraggableGroupItem extends StatelessWidget {
           sourceGroupUuid: sourceGroupUuid,
         ),
         onDragStarted: onDragStarted,
-        onDragEnd: onDragEnd != null ? (_) => onDragEnd!() : null,
+        onDragUpdate: (details) =>
+            DragAutoScroll.of(context)?.onDragUpdate(details.globalPosition),
+        onDragEnd: (_) {
+          DragAutoScroll.of(context)?.onDragEnd();
+          onDragEnd?.call();
+        },
         feedback: _buildDragFeedback(
           child: Container(
             width: MediaQuery.of(context).size.width * 0.7,
