@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
@@ -210,9 +211,9 @@ class _StartPageState extends State<StartPage> {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Center(
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: MediaQuery.of(context).size.width / 2,
+                child: SvgPicture.asset(
+                  'assets/images/logo.svg',
+                  width: MediaQuery.of(context).size.width / 3,
                   fit: BoxFit.contain,
                 ),
               ),
