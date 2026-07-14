@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
-const Color _kButtonColor = Color(0xFF374151);
-const Color _kDisabledColor = Color(0xFF9CA3AF);
-const Color _kShimmerColor = Color(0xFF60A5FA);
+const Color _kTrackColor = Color(0xFF374151);
+const Color _kErrorColor = Color(0xFFDC2626);
+const Color _kDisabledTrackLight = Color(0xFF9CA3AF);
+const Color _kDisabledKnobLight = Colors.white;
+const Color _kDisabledTextLight = Colors.white70;
 
 enum _SlideStatus { idle, loading, success, error }
 
@@ -27,13 +29,15 @@ class SlideToOpenButton extends StatefulWidget {
 
 class _SlideToOpenButtonState extends State<SlideToOpenButton>
     with TickerProviderStateMixin {
-  static const double _trackHeight = 52;
+  static const double _trackHeight = 56;
   static const double _knobPadding = 6;
   static const double _textGap = 12;
-  static const double _trailingPadding = 16;
+  static const double _trailingPadding = 24;
+  static const double _radius = 14;
   static const TextStyle _labelStyle = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
+    color: Colors.white,
   );
 
   double _dragExtent = 0;
@@ -141,28 +145,29 @@ class _SlideToOpenButtonState extends State<SlideToOpenButton>
     }
   }
 
-  Color get _knobColor {
-    if (!widget.enabled) return _kDisabledColor;
-    if (_status == _SlideStatus.error) return context.appColors.danger;
-    return _kButtonColor;
-  }
-
-  Widget get _knobIcon {
+  Widget _knobIcon(AppColors colors, bool isDark) {
     switch (_status) {
       case _SlideStatus.loading:
         return const SizedBox(
           width: 18,
           height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: _kTrackColor,
+          ),
         );
       case _SlideStatus.success:
-        return const Icon(Icons.check, color: Colors.white);
+        return const Icon(Icons.check, color: _kTrackColor);
       case _SlideStatus.error:
-        return const Icon(Icons.close, color: Colors.white);
+        return const Icon(Icons.close, color: _kErrorColor);
       case _SlideStatus.idle:
         return Icon(
           Icons.arrow_forward,
-          color: widget.enabled ? Colors.white : Colors.white70,
+          color: widget.enabled
+              ? _kTrackColor
+              : (isDark
+                  ? colors.disabledActionText.withOpacity(0.05)
+                  : _kDisabledTrackLight),
         );
     }
   }
@@ -170,8 +175,16 @@ class _SlideToOpenButtonState extends State<SlideToOpenButton>
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final trackWidth = _trackWidth;
-    final progress = _maxDrag > 0 ? (_dragExtent / _maxDrag).clamp(0.0, 1.0) : 0.0;
+    final progress =
+        _maxDrag > 0 ? (_dragExtent / _maxDrag).clamp(0.0, 1.0) : 0.0;
+    final trackColor = widget.enabled
+        ? _kTrackColor
+        : (isDark ? colors.cardBackground : _kDisabledTrackLight);
+    final knobColor = widget.enabled
+        ? Colors.white
+        : (isDark ? colors.inputFill : _kDisabledKnobLight);
 
     return AnimatedBuilder(
       animation: _shakeController,
@@ -184,14 +197,13 @@ class _SlideToOpenButtonState extends State<SlideToOpenButton>
         return Transform.translate(offset: Offset(shake, 0), child: child);
       },
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(_radius),
         child: Container(
           width: trackWidth,
           height: _trackHeight,
           decoration: BoxDecoration(
-            color: colors.inputFill.withOpacity(widget.enabled ? 1 : 0.5),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: _kButtonColor),
+            color: trackColor,
+            borderRadius: BorderRadius.circular(_radius),
           ),
           child: Stack(
             alignment: Alignment.centerLeft,
@@ -208,13 +220,13 @@ class _SlideToOpenButtonState extends State<SlideToOpenButton>
                       top: 0,
                       bottom: 0,
                       width: bandWidth,
-                      child: DecoratedBox(
+                      child: const DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              _kShimmerColor.withOpacity(0),
-                              _kShimmerColor.withOpacity(0.35),
-                              _kShimmerColor.withOpacity(0),
+                              Color(0x00FFFFFF),
+                              Color(0x1FFFFFFF),
+                              Color(0x00FFFFFF),
                             ],
                           ),
                         ),
@@ -233,8 +245,10 @@ class _SlideToOpenButtonState extends State<SlideToOpenButton>
                       widget.label,
                       style: _labelStyle.copyWith(
                         color: widget.enabled
-                            ? colors.secondaryText
-                            : colors.secondaryText.withOpacity(0.5),
+                            ? Colors.white
+                            : (isDark
+                                ? colors.disabledActionText.withOpacity(0.05)
+                                : _kDisabledTextLight),
                       ),
                     ),
                   ),
@@ -244,16 +258,17 @@ class _SlideToOpenButtonState extends State<SlideToOpenButton>
                 left: _knobPadding + _dragExtent,
                 top: _knobPadding,
                 child: GestureDetector(
-                  onHorizontalDragUpdate: (details) => _onDragUpdate(details.delta.dx),
+                  onHorizontalDragUpdate: (details) =>
+                      _onDragUpdate(details.delta.dx),
                   onHorizontalDragEnd: (_) => _onDragEnd(),
                   child: Container(
                     width: _knobSize,
                     height: _knobSize,
                     decoration: BoxDecoration(
-                      color: _knobColor,
-                      borderRadius: BorderRadius.circular(8),
+                      color: knobColor,
+                      borderRadius: BorderRadius.circular(_radius - 4),
                     ),
-                    child: Center(child: _knobIcon),
+                    child: Center(child: _knobIcon(colors, isDark)),
                   ),
                 ),
               ),

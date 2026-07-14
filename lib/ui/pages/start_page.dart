@@ -38,6 +38,7 @@ class _StartPageState extends State<StartPage> {
   bool _hasBiometrics = false;
   bool _hasSavedPassword = false;
   bool _biometricLoginEnabled = false;
+  bool _passwordMode = true;
 
   SharedPreferences? preferences;
 
@@ -45,6 +46,9 @@ class _StartPageState extends State<StartPage> {
 
   bool get _canOpenDatabase =>
       folderController.text.isNotEmpty && passwordController.text.isNotEmpty;
+
+  bool get _showBiometricOption =>
+      _hasBiometrics && _hasSavedPassword && _biometricLoginEnabled;
 
   Future<void> _initStateAsync() async {
     preferences = await SharedPreferences.getInstance();
@@ -56,6 +60,7 @@ class _StartPageState extends State<StartPage> {
     _hasBiometrics = await _biometricService.canAuthenticate();
     _hasSavedPassword = await _biometricService.hasSavedPassword(savedUri);
     _biometricLoginEnabled = preferences!.getBool('biometric_login_enabled') ?? false;
+    _passwordMode = !_showBiometricOption;
     setState(() {});
   }
 
@@ -85,6 +90,7 @@ class _StartPageState extends State<StartPage> {
     await preferences!.setString('kdbx_uri', safUri);
     _safService.takePersistablePermission(safUri);
     _hasSavedPassword = await _biometricService.hasSavedPassword(safUri);
+    _passwordMode = !_showBiometricOption;
     setState(() {});
   }
 
@@ -202,47 +208,93 @@ class _StartPageState extends State<StartPage> {
 
   Widget _page() {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/images/logo.svg',
-                  width: MediaQuery.of(context).size.width / 3,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            _buildFormCard(),
-            _buildActionButtons(),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTopGroup(),
+              _buildBottomGroup(),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  Widget _buildTopGroup() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 42),
+        Center(
+          child: Container(
+            decoration: BoxDecoration(
+              color:  Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              borderRadius:
+                BorderRadius.all(Radius.circular(32)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 42),
+              child: SvgPicture.asset(
+                'assets/images/logo.svg',
+                width: MediaQuery.of(context).size.width / 4,
+                fit: BoxFit.contain,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+        _buildFormCard(),
+        const SizedBox(height: 20),
+        _buildCreateDatabaseLink(),
+      ],
+    );
+  }
+
+  Widget _buildBottomGroup() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(child: _buildBottomAction()),
+        if (_showBiometricOption) ...[
+          const SizedBox(height: 24),
+          _buildToggleLink(),
+        ],
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
   Widget _buildFormCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        decoration: cardDecoration(context),
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildFilePickerRow(),
-                SizedBox(height: 16),
+    return Container(
+      decoration: cardDecoration(context),
+      child: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildFilePickerRow(),
+              if (_passwordMode) ...[
+                const SizedBox(height: 16),
                 _buildPasswordField(),
               ],
-            ),
+            ],
           ),
         ),
       ),
@@ -260,8 +312,6 @@ class _StartPageState extends State<StartPage> {
       },
       child: Row(
         children: [
-          Icon(Icons.folder_open),
-          SizedBox(width: 16),
           Expanded(
             child: TextFormField(
               controller: folderController,
@@ -279,6 +329,33 @@ class _StartPageState extends State<StartPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildToggleLink() {
+    return GestureDetector(
+      onTap: () => setState(() => _passwordMode = !_passwordMode),
+      child: Text(
+        _passwordMode
+            ? tr("start_page.open_with_biometric")
+            : tr("start_page.open_with_password"),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: context.appColors.secondaryText,
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomAction() {
+    if (!_passwordMode && _showBiometricOption) {
+      return _buildBiometricButton();
+    }
+    return SlideToOpenButton(
+      label: tr("start_page.open_database"),
+      enabled: _canOpenDatabase,
+      onConfirmed: _openDatabase,
     );
   }
 
@@ -310,60 +387,34 @@ class _StartPageState extends State<StartPage> {
     );
   }
 
-  Widget _buildActionButtons() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SlideToOpenButton(
-            label: tr("start_page.open_database"),
-            enabled: _canOpenDatabase,
-            onConfirmed: _openDatabase,
-          ),
-          SizedBox(height: 16),
-          if (_hasBiometrics && _hasSavedPassword && _biometricLoginEnabled) _buildBiometricButton(),
-          if (_hasBiometrics && _hasSavedPassword && _biometricLoginEnabled) SizedBox(height: 16),
-          _buildCreateDatabaseLink(),
-        ],
-      ),
-    );
-  }
-
   Widget _buildBiometricButton() {
-    return InkWell(
+    return GestureDetector(
       onTap: _authenticateWithBiometric,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Color(0xFF374151),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(FontAwesomeIcons.fingerprint, color: Colors.white, size: 24),
-              SizedBox(width: 12),
-              Text(
-                tr("start_page.open_with_biometric"),
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ],
-          ),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Icon(
+          FontAwesomeIcons.fingerprint,
+          color: context.appColors.secondaryText,
+          size: 56,
         ),
       ),
     );
   }
 
   Widget _buildCreateDatabaseLink() {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const CreateDatabasePage()),
         );
       },
-      child: Text(tr("start_page.create_database")),
+      child: Text(
+        tr("start_page.create_database"),
+        textAlign: TextAlign.center,
+        style: TextStyle(color: context.appColors.secondaryText),
+      ),
     );
   }
 }

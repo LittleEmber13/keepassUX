@@ -9,6 +9,7 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color inputFill;
   final Color danger;
   final Color infoCardBackground;
+  final Color disabledActionText;
 
   const AppColors({
     required this.cardBackground,
@@ -18,6 +19,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.inputFill,
     required this.danger,
     required this.infoCardBackground,
+    required this.disabledActionText,
   });
 
   static const light = AppColors(
@@ -28,6 +30,7 @@ class AppColors extends ThemeExtension<AppColors> {
     inputFill: Color(0xFFF3F5F9),
     danger: Colors.red,
     infoCardBackground: Color(0xFFEEFDFF),
+    disabledActionText: Colors.white,
   );
 
   static const dark = AppColors(
@@ -38,6 +41,7 @@ class AppColors extends ThemeExtension<AppColors> {
     inputFill: Color(0xFF2A2A2A),
     danger: Color(0xFFCF6679),
     infoCardBackground: Color(0xFF173036),
+    disabledActionText: Colors.white38,
   );
 
   @override
@@ -49,6 +53,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? inputFill,
     Color? danger,
     Color? infoCardBackground,
+    Color? disabledActionText,
   }) {
     return AppColors(
       cardBackground: cardBackground ?? this.cardBackground,
@@ -58,6 +63,7 @@ class AppColors extends ThemeExtension<AppColors> {
       inputFill: inputFill ?? this.inputFill,
       danger: danger ?? this.danger,
       infoCardBackground: infoCardBackground ?? this.infoCardBackground,
+      disabledActionText: disabledActionText ?? this.disabledActionText,
     );
   }
 
@@ -72,6 +78,7 @@ class AppColors extends ThemeExtension<AppColors> {
       inputFill: Color.lerp(inputFill, other.inputFill, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
       infoCardBackground: Color.lerp(infoCardBackground, other.infoCardBackground, t)!,
+      disabledActionText: Color.lerp(disabledActionText, other.disabledActionText, t)!,
     );
   }
 }

@@ -14,6 +14,7 @@
     "open_database_error": "No se pudo abrir el archivo de base de datos. Por favor, selecciónalo de nuevo.",
     "create_database": "Crear base de datos",
     "open_with_biometric": "Abrir con huella",
+    "open_with_password": "Abrir con contraseña",
     "biometric_reason": "Autentícate para abrir tu base de datos",
     "biometric_error": "Error en la autenticación biométrica",
     "biometric_locked": "Autenticación biométrica bloqueada temporalmente",

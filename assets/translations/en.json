@@ -14,6 +14,7 @@
     "open_database_error": "Could not open the database file. Please select it again.",
     "create_database": "Create database",
     "open_with_biometric": "Open with fingerprint",
+    "open_with_password": "Open with password",
     "biometric_reason": "Authenticate to open your database",
     "biometric_error": "Biometric authentication failed",
     "biometric_locked": "Biometric authentication temporarily locked",
