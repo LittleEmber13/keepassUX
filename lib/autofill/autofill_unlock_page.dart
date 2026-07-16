@@ -6,8 +6,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../ui/model/db_root.dart';
 import '../ui/services/biometric_service.dart';
+import '../ui/theme/theme.dart';
 import '../ui/utils/kdbx_command.dart';
 import '../ui/utils/kdbx_isolate.dart';
+import '../ui/widgets/app_logo.dart';
+import '../ui/widgets/loading_overlay.dart';
+import '../ui/widgets/slide_to_open_button.dart';
 
 class AutofillUnlockPage extends StatefulWidget {
   const AutofillUnlockPage({
@@ -40,21 +44,28 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
 
   bool _obscure = true;
   bool _busy = false;
+  bool _passwordMode = true;
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_onPasswordChanged);
+  }
+
+  void _onPasswordChanged() {
+    setState(() {});
+  }
+
+  @override
   void dispose() {
+    _passwordController.removeListener(_onPasswordChanged);
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _unlockWithPassword() async {
-    final password = _passwordController.text;
-    if (password.isEmpty) {
-      setState(() => _error = tr('autofill.unlock_empty_password_error'));
-      return;
-    }
-    await _tryUnlock(password);
+  Future<bool> _unlockWithPassword() async {
+    return _tryUnlock(_passwordController.text);
   }
 
   Future<void> _unlockWithBiometric() async {
@@ -63,106 +74,184 @@ class _AutofillUnlockPageState extends State<AutofillUnlockPage> {
     );
     if (password == null || password.isEmpty) {
       if (mounted) {
-        setState(() => _error = tr('autofill.unlock_biometric_error'));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(tr('autofill.unlock_biometric_error')),
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
       return;
     }
+    setState(() => _busy = true);
     await _tryUnlock(password);
+    if (mounted) {
+      setState(() => _busy = false);
+    }
   }
 
-  Future<void> _tryUnlock(String password) async {
-    if (_busy) return;
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
+  Future<bool> _tryUnlock(String password) async {
+    setState(() => _error = null);
     try {
       final root = await widget.isolate.send<DbRoot>(
         LoadDatabaseCmd(bytes: widget.bytes, password: password),
       );
       widget.onUnlocked(root);
+      return true;
     } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _busy = false;
-        _error = tr('autofill.unlock_wrong_password_error');
-      });
+      if (mounted) {
+        setState(() => _error = tr('autofill.unlock_wrong_password_error'));
+      }
+      return false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        _page(),
+        LoadingOverlay(isLoading: _busy),
+      ],
+    );
+  }
+
+  Widget _page() {
     return Scaffold(
-      appBar: AppBar(title: const Text('KeepassUX')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(
-                Icons.lock_outline,
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                widget.subtitle ?? tr('autofill.unlock_default_subtitle'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: _passwordController,
-                obscureText: _obscure,
-                autofocus: true,
-                enabled: !_busy,
-                onSubmitted: (_) => _unlockWithPassword(),
-                decoration: InputDecoration(
-                  labelText: tr('autofill.master_password_hint'),
-                  errorText: _error,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscure
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                    ),
-                    onPressed: () => setState(() => _obscure = !_obscure),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: _busy ? null : _unlockWithPassword,
-                  icon: const Icon(Icons.lock_open),
-                  label: Text(tr('autofill.unlock_button')),
-                ),
-              ),
-              if (widget.biometricEligible) ...[
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    onPressed: _busy ? null : _unlockWithBiometric,
-                    icon: const Icon(FontAwesomeIcons.fingerprint),
-                    label: Text(tr('autofill.use_fingerprint_button')),
-                  ),
-                ),
-              ],
-              if (_busy) ...[
-                const SizedBox(height: 24),
-                const CircularProgressIndicator(),
-              ],
+              _buildTopGroup(),
+              _buildBottomGroup(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopGroup() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 42),
+        const Center(child: AppLogo()),
+        const SizedBox(height: 40),
+        _buildFormCard(),
+        const SizedBox(height: 20),
+        Text(
+          widget.subtitle ?? tr('autofill.unlock_default_subtitle'),
+          textAlign: TextAlign.center,
+          style: TextStyle(color: context.appColors.secondaryText),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomGroup() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(child: _buildBottomAction()),
+        if (widget.biometricEligible) ...[
+          const SizedBox(height: 24),
+          _buildToggleLink(),
+        ],
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildFormCard() {
+    return Container(
+      decoration: cardDecoration(context),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_passwordMode) _buildPasswordField(),
+            if (!_passwordMode)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  tr('start_page.open_with_biometric'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: context.appColors.secondaryText),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: _obscure,
+      autofocus: true,
+      enabled: !_busy,
+      decoration: InputDecoration(
+        labelText: tr('autofill.master_password_hint'),
+        errorText: _error,
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscure
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+          onPressed: () => setState(() => _obscure = !_obscure),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggleLink() {
+    return GestureDetector(
+      onTap: () => setState(() => _passwordMode = !_passwordMode),
+      child: Text(
+        _passwordMode
+            ? tr("start_page.open_with_biometric")
+            : tr("start_page.open_with_password"),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: context.appColors.secondaryText,
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomAction() {
+    if (!_passwordMode && widget.biometricEligible) {
+      return _buildBiometricButton();
+    }
+    return SlideToOpenButton(
+      label: tr("start_page.open_database"),
+      enabled: _passwordController.text.isNotEmpty && !_busy,
+      onConfirmed: _unlockWithPassword,
+    );
+  }
+
+  Widget _buildBiometricButton() {
+    return GestureDetector(
+      onTap: _busy ? null : _unlockWithBiometric,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Icon(
+          FontAwesomeIcons.fingerprint,
+          color: context.appColors.secondaryText,
+          size: 56,
         ),
       ),
     );

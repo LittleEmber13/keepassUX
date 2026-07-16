@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keepassux/ui/bloc/entries/keepass_bloc.dart';
@@ -11,6 +10,7 @@ import 'package:keepassux/ui/pages/create_database_page.dart';
 import 'package:keepassux/ui/pages/main_tabs_page.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
 import 'package:keepassux/ui/services/saf_service.dart';
+import 'package:keepassux/ui/widgets/app_logo.dart';
 import 'package:keepassux/ui/widgets/loading_overlay.dart';
 import 'package:keepassux/ui/widgets/slide_to_open_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -231,31 +231,7 @@ class _StartPageState extends State<StartPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 42),
-        Center(
-          child: Container(
-            decoration: BoxDecoration(
-              color:  Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
-              borderRadius:
-                BorderRadius.all(Radius.circular(32)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 42),
-              child: SvgPicture.asset(
-                'assets/images/logo.svg',
-                width: MediaQuery.of(context).size.width / 4,
-                fit: BoxFit.contain,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ),
+        const Center(child: AppLogo()),
         const SizedBox(height: 40),
         _buildFormCard(),
         const SizedBox(height: 20),
