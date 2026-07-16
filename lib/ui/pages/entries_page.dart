@@ -93,7 +93,7 @@ class _EntriesTabState extends State<EntriesTab>
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
               child: FadeInItem(
                 child:
                     _alerts.isEmpty
