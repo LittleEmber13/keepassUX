@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:keepassux/ui/services/autofill_settings_service.dart';
-import 'package:keepassux/ui/services/keyboard_fill_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/widgets/custom_app_scroll.dart';
 import 'package:keepassux/ui/widgets/group_app_bar.dart';
@@ -17,12 +14,9 @@ class AutofillSettingsPage extends StatefulWidget {
 
 class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
   final AutofillSettingsService _autofillService = AutofillSettingsService();
-  final KeyboardFillService _keyboardService = KeyboardFillService();
 
   bool _autofillSupported = false;
   bool _autofillEnabled = false;
-  final bool _keyboardSupported = Platform.isAndroid;
-  bool _keyboardEnabled = false;
 
   @override
   void initState() {
@@ -33,12 +27,10 @@ class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
   Future<void> _loadState() async {
     final autofillSupported = await _autofillService.isSupported;
     final autofillEnabled = autofillSupported ? await _autofillService.isEnabled : false;
-    final keyboardEnabled = _keyboardSupported ? await _keyboardService.isEnabled() : false;
     if (!mounted) return;
     setState(() {
       _autofillSupported = autofillSupported;
       _autofillEnabled = autofillEnabled;
-      _keyboardEnabled = keyboardEnabled;
     });
   }
 
@@ -50,12 +42,6 @@ class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
     }
     final enabled = await _autofillService.isEnabled;
     if (mounted) setState(() => _autofillEnabled = enabled);
-  }
-
-  Future<void> _onKeyboardTap() async {
-    await _keyboardService.openSettings();
-    final enabled = await _keyboardService.isEnabled();
-    if (mounted) setState(() => _keyboardEnabled = enabled);
   }
 
   @override
@@ -79,7 +65,7 @@ class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
                   style: TextStyle(color: context.appColors.secondaryText),
                 ),
                 const SizedBox(height: 16),
-                if (_autofillSupported) ...[
+                if (_autofillSupported)
                   _buildCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,35 +79,6 @@ class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
                         const SizedBox(height: 4),
                         Text(
                           tr("autofill_settings_page.autofill_toggle_description"),
-                          style: TextStyle(color: context.appColors.secondaryText),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                if (_keyboardSupported)
-                  _buildCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          title: Text(tr("autofill_settings_page.keyboard_toggle_title")),
-                          subtitle: Text(
-                            _keyboardEnabled
-                                ? tr("autofill_settings_page.keyboard_status_enabled")
-                                : tr("autofill_settings_page.keyboard_status_disabled"),
-                          ),
-                          trailing: Icon(
-                            _keyboardEnabled ? Icons.check_circle : Icons.chevron_right,
-                            color: _keyboardEnabled ? Colors.green : null,
-                          ),
-                          onTap: _onKeyboardTap,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          tr("autofill_settings_page.keyboard_toggle_description"),
                           style: TextStyle(color: context.appColors.secondaryText),
                         ),
                       ],

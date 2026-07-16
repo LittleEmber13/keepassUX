@@ -7,7 +7,6 @@ import 'package:flutter_autofill_service/flutter_autofill_service.dart';
 import '../ui/model/db_entry.dart';
 import '../ui/model/db_root.dart';
 import '../ui/model/kdbx_action_result.dart';
-import '../ui/services/keyboard_fill_service.dart';
 import '../ui/theme/theme.dart';
 import '../ui/utils/kdbx_command.dart';
 import '../ui/utils/kdbx_isolate.dart';
@@ -140,70 +139,36 @@ class _AutofillFillPageState extends State<AutofillFillPage> {
   }
 
   Future<void> _fill(DbEntry entry) async {
-    String status = 'keyboard';
+    String status = 'unsupported';
     try {
       status = await _channel.invokeMethod<String>('fillDataset', {
             'label': entry.label,
             'username': entry.userName,
             'password': entry.password,
           }) ??
-          'keyboard';
+          'unsupported';
     } catch (e) {
       debugPrint('Native fillDataset failed: $e');
     }
 
     if (status == 'dataset') return; // filled; activity already finished natively.
-    if (mounted) await _offerKeyboardFallback(entry);
+    if (mounted) await _showCannotAutofill();
   }
 
-  Future<void> _offerKeyboardFallback(DbEntry entry) async {
-    final keyboard = KeyboardFillService();
-    await keyboard.setEntry(
-      label: entry.label,
-      username: entry.userName,
-      password: entry.password,
-    );
-    final enabled = await keyboard.isEnabled();
-    if (!mounted) return;
-
-    final label = entry.label.isNotEmpty ? entry.label : tr('autofill.untitled_entry');
+  Future<void> _showCannotAutofill() async {
     final where = _sourceLabel.isNotEmpty ? _sourceLabel : tr('autofill.this_app_fallback');
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(tr('autofill.cannot_autofill_title')),
         content: Text(
-          enabled
-              ? tr(
-                  'autofill.cannot_autofill_message_keyboard_enabled',
-                  namedArgs: {'where': where, 'label': label},
-                )
-              : tr(
-                  'autofill.cannot_autofill_message_keyboard_disabled',
-                  namedArgs: {'where': where},
-                ),
+          tr('autofill.cannot_autofill_message', namedArgs: {'where': where}),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(tr('autofill.close')),
           ),
-          if (!enabled)
-            TextButton(
-              onPressed: () async {
-                await keyboard.openSettings();
-                if (ctx.mounted) Navigator.pop(ctx);
-              },
-              child: Text(tr('autofill.enable_keyboard')),
-            ),
-          if (enabled)
-            TextButton(
-              onPressed: () async {
-                await keyboard.showPicker();
-                if (ctx.mounted) Navigator.pop(ctx);
-              },
-              child: Text(tr('autofill.switch_keyboard')),
-            ),
         ],
       ),
     );

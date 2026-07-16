@@ -8,7 +8,6 @@ import 'package:keepassux/ui/pages/kdf_settings_page.dart';
 import 'package:keepassux/ui/pages/start_page.dart';
 import 'package:keepassux/ui/services/autofill_settings_service.dart';
 import 'package:keepassux/ui/services/biometric_service.dart';
-import 'package:keepassux/ui/services/keyboard_fill_service.dart';
 import 'package:keepassux/ui/services/screenshot_protection_service.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 import 'package:keepassux/ui/theme/theme_controller.dart';
@@ -28,7 +27,6 @@ class _SettingsTabState extends State<SettingsTab>
 
   final BiometricService _biometricService = BiometricService();
   final AutofillSettingsService _autofillService = AutofillSettingsService();
-  final KeyboardFillService _keyboardService = KeyboardFillService();
   final ScreenshotProtectionService _screenshotProtectionService =
       ScreenshotProtectionService();
 
@@ -38,8 +36,6 @@ class _SettingsTabState extends State<SettingsTab>
   bool _hasBiometrics = false;
   bool _autofillSupported = false;
   bool _autofillEnabled = false;
-  final bool _keyboardSupported = Platform.isAndroid;
-  bool _keyboardEnabled = false;
   SharedPreferences? _prefs;
 
   @override
@@ -58,9 +54,6 @@ class _SettingsTabState extends State<SettingsTab>
     _autofillSupported = await _autofillService.isSupported;
     if (_autofillSupported) {
       _autofillEnabled = await _autofillService.isEnabled;
-    }
-    if (_keyboardSupported) {
-      _keyboardEnabled = await _keyboardService.isEnabled();
     }
     setState(() {
       if (currentLocale.languageCode == 'es') {
@@ -128,9 +121,6 @@ class _SettingsTabState extends State<SettingsTab>
     );
     if (_autofillSupported) {
       _autofillEnabled = await _autofillService.isEnabled;
-    }
-    if (_keyboardSupported) {
-      _keyboardEnabled = await _keyboardService.isEnabled();
     }
     if (mounted) setState(() {});
   }
@@ -243,13 +233,13 @@ class _SettingsTabState extends State<SettingsTab>
                       contentPadding: EdgeInsets.zero,
                     ),
                   ],
-                  if (_autofillSupported || _keyboardSupported) ...[
+                  if (_autofillSupported) ...[
                     const SizedBox(height: 12),
                     ListTile(
                       leading: const Icon(Icons.auto_fix_high_outlined),
                       title: Text(tr("settings_page.autofill_settings")),
                       subtitle: Text(
-                        _autofillEnabled && _keyboardEnabled
+                        _autofillEnabled
                             ? tr("settings_page.autofill_settings_active")
                             : tr("settings_page.autofill_settings_inactive"),
                       ),

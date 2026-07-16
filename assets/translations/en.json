@@ -105,13 +105,9 @@
   },
   "autofill_settings_page": {
     "title": "Autofill",
-    "intro": "Autofill lets KeepassUX suggest and fill your saved usernames and passwords in other apps and in your browser. For autocomplete to work correctly you must activate the following options.",
+    "intro": "Autofill lets KeepassUX suggest and fill your saved usernames and passwords in other apps and in your browser. For autocomplete to work correctly you must activate the following option.",
     "autofill_toggle_title": "Android autofill service",
-    "autofill_toggle_description": "Makes KeepassUX the autofill service Android uses, so it can suggest and fill your saved credentials directly in login fields across apps and browsers.",
-    "keyboard_toggle_title": "KeepassUX keyboard",
-    "keyboard_toggle_description": "A companion keyboard that types your credentials into the focused field. Some browsers only let a third-party service read login fields once their own autofill is turned off, so the keyboard covers those cases.",
-    "keyboard_status_enabled": "Enabled",
-    "keyboard_status_disabled": "Disabled — tap to enable"
+    "autofill_toggle_description": "Makes KeepassUX the autofill service Android uses, so it can suggest and fill your saved credentials directly in login fields across apps and browsers."
   },
   "change_password_page": {
     "title": "Change master password",
@@ -190,11 +186,8 @@
     "fill_only": "Fill only",
     "associate_and_fill": "Associate and fill",
     "cannot_autofill_title": "Can't autofill here",
-    "cannot_autofill_message_keyboard_enabled": "The {where} form doesn't support direct autofill (common in apps built with Jetpack Compose).\n\nSwitch to the KeepassUX keyboard and tap Username or Password to type in the data for \"{label}\".",
-    "cannot_autofill_message_keyboard_disabled": "The {where} form doesn't support direct autofill (common in apps built with Jetpack Compose).\n\nTo fill it you need to enable the KeepassUX keyboard once. After that you can switch to it and tap Username or Password.",
+    "cannot_autofill_message": "The {where} form doesn't support autofill (common in apps built with Jetpack Compose).\n\nOpen KeepassUX and copy the entry's username and password to paste them manually.",
     "close": "Close",
-    "enable_keyboard": "Enable keyboard",
-    "switch_keyboard": "Switch keyboard",
     "matches_header": "Matches",
     "no_matches_header": "No matches for this app",
     "results_header": "Results",

@@ -18,19 +18,19 @@ object AutofillFiller {
     private const val TAG = "KpuxAutofillFiller"
 
     const val RESULT_DATASET = "dataset"
-    const val RESULT_KEYBOARD = "keyboard"
+    const val RESULT_UNSUPPORTED = "unsupported"
 
     fun fill(activity: Activity, label: String, username: String, password: String): String {
         val structure = structureFrom(activity.intent)
         if (structure == null) {
-            Log.w(TAG, "No assist structure available; falling back to keyboard")
-            return RESULT_KEYBOARD
+            Log.w(TAG, "No assist structure available; cannot fill")
+            return RESULT_UNSUPPORTED
         }
 
         val form = LoginFormInspector(structure).inspect()
         if (form == null || !form.hasPasswordField) {
-            Log.w(TAG, "No fillable login form; falling back to keyboard")
-            return RESULT_KEYBOARD
+            Log.w(TAG, "No fillable login form; cannot fill")
+            return RESULT_UNSUPPORTED
         }
 
         val presentation = presentationFor(activity, label, username)

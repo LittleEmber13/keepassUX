@@ -1,12 +1,8 @@
 package com.example.keepassux;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.Settings;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodInfo;
-import android.view.inputmethod.InputMethodManager;
 
 import io.flutter.embedding.android.FlutterFragmentActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -14,7 +10,6 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class MainActivity extends FlutterFragmentActivity {
     private static final String CHANNEL = "com.example.keepassux/saf";
-    private static final String KEYBOARD_CHANNEL = "com.example.keepassux/keyboard";
     private static final int REQUEST_OPEN_DOCUMENT = 4311;
     private static final int REQUEST_CREATE_DOCUMENT = 4312;
 
@@ -69,42 +64,6 @@ public class MainActivity extends FlutterFragmentActivity {
                     result.notImplemented();
                 }
             });
-
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), KEYBOARD_CHANNEL)
-            .setMethodCallHandler((call, result) -> {
-                switch (call.method) {
-                    case "setKeyboardEntry":
-                        KeyboardCredentialHolder.set(
-                                call.argument("label"),
-                                call.argument("username"),
-                                call.argument("password"));
-                        result.success(true);
-                        break;
-                    case "clearKeyboardEntry":
-                        KeyboardCredentialHolder.clear();
-                        result.success(true);
-                        break;
-                    case "isKeyboardEnabled":
-                        result.success(isKeyboardEnabled());
-                        break;
-                    case "openKeyboardSettings":
-                        Intent settings = new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS);
-                        settings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(settings);
-                        result.success(true);
-                        break;
-                    case "showKeyboardPicker":
-                        InputMethodManager picker =
-                                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (picker != null) {
-                            picker.showInputMethodPicker();
-                        }
-                        result.success(true);
-                        break;
-                    default:
-                        result.notImplemented();
-                }
-            });
     }
 
     @Override
@@ -127,18 +86,5 @@ public class MainActivity extends FlutterFragmentActivity {
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /** Whether this app's IME is enabled in Android's input-method settings. */
-    private boolean isKeyboardEnabled() {
-        InputMethodManager imm =
-                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm == null) return false;
-        for (InputMethodInfo info : imm.getEnabledInputMethodList()) {
-            if (info.getPackageName().equals(getPackageName())) {
-                return true;
-            }
-        }
-        return false;
     }
 }

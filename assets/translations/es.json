@@ -105,13 +105,9 @@
   },
   "autofill_settings_page": {
     "title": "Autocompletar",
-    "intro": "El autocompletado permite que KeepassUX sugiera y rellene tus usuarios y contraseñas guardados en otras apps y en el navegador. Para que el autocompletar funcione correctamente debes activar las siguientes opciones.",
+    "intro": "El autocompletado permite que KeepassUX sugiera y rellene tus usuarios y contraseñas guardados en otras apps y en el navegador. Para que el autocompletar funcione correctamente debes activar la siguiente opción.",
     "autofill_toggle_title": "Servicio de autocompletado de Android",
-    "autofill_toggle_description": "Convierte a KeepassUX en el servicio de autocompletado de Android, para que pueda sugerir y rellenar tus credenciales guardadas directamente en los campos de inicio de sesión de apps y navegadores.",
-    "keyboard_toggle_title": "Teclado de KeepassUX",
-    "keyboard_toggle_description": "Un teclado adicional que escribe tus credenciales en el campo que tengas seleccionado. Algunos navegadores solo dejan que un servicio externo lea los campos de inicio de sesión si desactivas su propio autocompletado; el teclado cubre esos casos.",
-    "keyboard_status_enabled": "Activado",
-    "keyboard_status_disabled": "Desactivado — toca para activarlo"
+    "autofill_toggle_description": "Convierte a KeepassUX en el servicio de autocompletado de Android, para que pueda sugerir y rellenar tus credenciales guardadas directamente en los campos de inicio de sesión de apps y navegadores."
   },
   "change_password_page": {
     "title": "Cambiar contraseña maestra",
@@ -190,11 +186,8 @@
     "fill_only": "Solo rellenar",
     "associate_and_fill": "Asociar y rellenar",
     "cannot_autofill_title": "No se puede autorrellenar aquí",
-    "cannot_autofill_message_keyboard_enabled": "El formulario de {where} no admite el autocompletado directo (es habitual en apps hechas con Jetpack Compose).\n\nCambia al teclado de KeepassUX y pulsa Usuario o Contraseña para escribir los datos de \"{label}\".",
-    "cannot_autofill_message_keyboard_disabled": "El formulario de {where} no admite el autocompletado directo (es habitual en apps hechas con Jetpack Compose).\n\nPara rellenarlo necesitas activar una vez el teclado de KeepassUX. Después podrás cambiar a él y pulsar Usuario o Contraseña.",
+    "cannot_autofill_message": "El formulario de {where} no admite el autocompletado (es habitual en apps hechas con Jetpack Compose).\n\nAbre KeepassUX y copia el usuario y la contraseña de la entrada para pegarlos manualmente.",
     "close": "Cerrar",
-    "enable_keyboard": "Activar teclado",
-    "switch_keyboard": "Cambiar teclado",
     "matches_header": "Coincidencias",
     "no_matches_header": "Sin coincidencias para esta app",
     "results_header": "Resultados",
