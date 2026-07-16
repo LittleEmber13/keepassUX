@@ -7,6 +7,37 @@ import 'package:keepassux/ui/pages/add_group.dart';
 import 'package:keepassux/ui/pages/main_tabs_page.dart';
 import 'package:keepassux/ui/theme/theme.dart';
 
+class _TappableIcon extends StatelessWidget {
+  const _TappableIcon({required this.onTap, required this.child});
+
+  final VoidCallback onTap;
+  final Widget child;
+
+  static const double _hitSlop = 16;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        child,
+        Positioned(
+          left: -_hitSlop,
+          right: -_hitSlop,
+          top: -_hitSlop,
+          bottom: -_hitSlop,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: Container(color: Colors.transparent),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({
     this.selectedIndex,
@@ -50,7 +81,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                InkWell(
+                _TappableIcon(
                   onTap: () => _goToTab(context, 0),
                   child: Icon(
                     FontAwesomeIcons.folder,
@@ -60,7 +91,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                             : context.appColors.secondaryText,
                   ),
                 ),
-                InkWell(
+                _TappableIcon(
                   onTap: () => _goToTab(context, 1),
                   child: Icon(
                     FontAwesomeIcons.magnifyingGlass,
@@ -166,7 +197,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                InkWell(
+                _TappableIcon(
                   onTap: () => _goToTab(context, 2),
                   child: Icon(
                     Icons.info_outline,
@@ -177,7 +208,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                             : context.appColors.secondaryText,
                   ),
                 ),
-                InkWell(
+                _TappableIcon(
                   onTap: () => _goToTab(context, 3),
                   child: Icon(
                     FeatherIcons.settings,
