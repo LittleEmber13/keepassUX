@@ -107,7 +107,9 @@
     "title": "Autocompletar",
     "intro": "El autocompletado permite que KeepassUX sugiera y rellene tus usuarios y contraseñas guardados en otras apps y en el navegador. Para que el autocompletar funcione correctamente debes activar la siguiente opción.",
     "autofill_toggle_title": "Servicio de autocompletado de Android",
-    "autofill_toggle_description": "Convierte a KeepassUX en el servicio de autocompletado de Android, para que pueda sugerir y rellenar tus credenciales guardadas directamente en los campos de inicio de sesión de apps y navegadores."
+    "autofill_toggle_description": "Convierte a KeepassUX en el servicio de autocompletado de Android, para que pueda sugerir y rellenar tus credenciales guardadas directamente en los campos de inicio de sesión de apps y navegadores.",
+    "browser_note_title": "Autocompletado en el navegador",
+    "browser_note_description": "Algunos navegadores tienen su propio autocompletado activado por defecto. Actívalo desde sus ajustes de contraseñas eligiendo la opción de autocompletar con otro servicio."
   },
   "change_password_page": {
     "title": "Cambiar contraseña maestra",

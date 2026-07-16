@@ -107,7 +107,9 @@
     "title": "Autofill",
     "intro": "Autofill lets KeepassUX suggest and fill your saved usernames and passwords in other apps and in your browser. For autocomplete to work correctly you must activate the following option.",
     "autofill_toggle_title": "Android autofill service",
-    "autofill_toggle_description": "Makes KeepassUX the autofill service Android uses, so it can suggest and fill your saved credentials directly in login fields across apps and browsers."
+    "autofill_toggle_description": "Makes KeepassUX the autofill service Android uses, so it can suggest and fill your saved credentials directly in login fields across apps and browsers.",
+    "browser_note_title": "Browser autofill",
+    "browser_note_description": "Some browsers have their own autofill turned on by default. Enable KeepassUX from their password settings by choosing to autofill using another service."
   },
   "change_password_page": {
     "title": "Change master password",

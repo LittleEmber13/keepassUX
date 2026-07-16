@@ -84,6 +84,10 @@ class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
                       ],
                     ),
                   ),
+                if (_autofillSupported) ...[
+                  const SizedBox(height: 12),
+                  _buildBrowserNote(context),
+                ],
                 const SizedBox(height: 16),
               ],
             ),
@@ -98,6 +102,48 @@ class _AutofillSettingsPageState extends State<AutofillSettingsPage> {
       decoration: cardDecoration(context),
       padding: const EdgeInsets.all(16),
       child: child,
+    );
+  }
+
+  Widget _buildBrowserNote(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: context.appColors.infoCardBackground,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: context.appColors.cardShadow,
+            blurRadius: 5,
+            spreadRadius: 1,
+            offset: const Offset(1, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 18, color: context.appColors.secondaryText),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tr("autofill_settings_page.browser_note_title"),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  tr("autofill_settings_page.browser_note_description"),
+                  style: TextStyle(fontSize: 13, color: context.appColors.secondaryText),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
